@@ -22,7 +22,7 @@ const Page = () => {
   }
   return (
     <form onSubmit={handleSubmit}>
-      <label className='text-red-700'>NAME</label>
+      <label>NAME</label>
       <input  type='text'name='name' value={form.name} placeholder='Enter Your Name' onChange={handelValues} />
        <label>Email</label>
       <input type='email' name='email' value={form.email} placeholder='Enter Your Email' onChange={handelValues} />
