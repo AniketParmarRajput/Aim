@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from 'react'
+import Button from './src/Components/Button.jsx'
 
 const Page = () => {
   const [form, setForm]=useState({
@@ -32,7 +33,7 @@ const Page = () => {
       <input  type='password'name='passWord' value={form.passWord} placeholder='Enter Your Password'onChange={handelValues} />
       <label>Upload Image</label>
       <input type='file' name='image'  placeholder='Enter Your Password'onChange={handelValues} />
-      <button type='submit'>Submit</button>
+      <Button/>
       </form>
   )
 }
