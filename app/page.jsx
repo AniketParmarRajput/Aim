@@ -1,74 +1,6 @@
-// "use client"
-// import React, { useState } from 'react'
-
-// const Page = () => {
-//   const [form, setForm]=useState({
-//     name:"",
-//     email:"",
-//     role:"",
-//     passWord:"",
-//     image:null
-
-//   });
-//   const [SubmittedData, setSubmittedData]=useState(null);
-
-//   const handelValues=(e)=>{
-//     const {name,type,value,files} =e.target
-//     setForm({...form, [name]: type === 'file'?files:value})
-
-//   }
-//   const handleSubmit=( e)=>{
-//     e.preventDefault();
-//     console.log(form)
-//     setSubmittedData(form);
-//     setForm({
-//       name:"",
-//       email:"",
-//       role:"",
-//       passWord:"",
-//       image:null
-//     })
-//   }
-//   const handleEdit=()=>{
-//     setForm(SubmittedData);
-//     setSubmittedData(null);
-//   }
-//   return (
-//     <>
-//     <form onSubmit={handleSubmit}>
-//       <label className='text-red-500'>NAME</label>
-//       <input  type='text'name='name' value={form.name} placeholder='Enter Your Name' onChange={handelValues} />
-//        <label>Email</label>
-//       <input type='email' name='email' value={form.email} placeholder='Enter Your Email' onChange={handelValues} />
-//        <label>Role</label>
-//       <input type='text' name='role' value={form.role} placeholder='Enter Your Role'onChange={handelValues} />
-//        <label>Password</label>
-//       <input  type='password'name='passWord' value={form.passWord} placeholder='Enter Your Password'onChange={handelValues} />
-//       <label>Upload Image</label>
-//       <input type='file' name='image'  placeholder='Enter Your Password'onChange={handelValues} />
-//       <button type='submit'>Submit</button>
-//       </form>
-
-// {SubmittedData && (
-//     <div>
-//       <h2>Submitted Data:</h2>
-//       <p><strong>Name:</strong> {SubmittedData.name}</p>
-//        <p><strong>email:</strong> {SubmittedData.email}</p>
-//         <p><strong>role:</strong> {SubmittedData.role}</p>
-//          <p><strong>passWord:</strong> {SubmittedData.passWord}</p>
-//           <p><strong>Image:</strong> {SubmittedData.image ? SubmittedData.image[0].name : 'No image uploaded'}</p>
-//           <button onClick={()=>setSubmittedData(null)}>Clear Data</button>
-//          <button onClick={handleEdit}>Edit</button>
-//       </div>
-// )}
-// </>
-//   )
-// }
-
-// export default Page
-
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 
 const Page = () => {
   const [form, setForm] = useState({
@@ -208,7 +140,7 @@ const Page = () => {
                   {submittedData.image ? (
                     <div>
                       <p>{submittedData.image.name}</p>
-                      <img
+                      <Image
                         src={URL.createObjectURL(submittedData.image)}
                         alt="Uploaded Preview"
                         className="w-32 h-32 object-cover rounded mt-1 border"
