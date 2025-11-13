@@ -1,8 +1,7 @@
 {
-  "name": "my-next-app",
+  "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,17 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "16.0.1",
-    "postcss": "^8.5.6",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "next": "16.0.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.21",
+    "babel-plugin-react-compiler": "1.0.0",
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4",
     "eslint": "^9",
-    "eslint-config-next": "16.0.1",
-    "tailwindcss": "^4.1.17"
+    "eslint-config-next": "16.0.2"
   }
 }
