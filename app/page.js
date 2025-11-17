@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 
 const Page = () => {
@@ -7,12 +7,13 @@ const Page = () => {
     name: "",
     email: "",
     role: "",
-    passWord: "",
-    image: null,
+    position: "",
+    password: "", // only for frontend display if needed
   });
 
+  const imageRef = useRef();
   const [submittedData, setSubmittedData] = useState([]);
-  const [edit,setEdit]=useState(null)
+  const [edit, setEdit] = useState(null);
 
   const handleValues = (e) => {
     const { name, type, value, files } = e.target;
@@ -21,126 +22,187 @@ const Page = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(edit !== null ){
+
+    // Update local list (UI)
+    if (edit !== null) {
       const updatedData = [...submittedData];
       updatedData[edit] = form;
-      setSubmittedData(updatedData)
-      setEdit({
-      name: "",
-      email: "",
-      role: "",
-      passWord: "",
-      image: null,
-    });
+      setSubmittedData(updatedData);
+      setEdit(null);
+    } else {
+      setSubmittedData((prev) => [...prev, form]);
     }
-    else{ setSubmittedData((prev) => [...prev, form]);
-    console.log(form);
+
+    // Send JSON request to backend
+    fetch("http://localhost:5000/api/employees", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        role: form.role,
+        position: form.position,
+        password:form.password // Backend requires this
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log("Server response:", data))
+      .catch((err) => console.error("Error submitting form:", err));
+
+    // Reset form
     setForm({
       name: "",
       email: "",
       role: "",
+      position: "",
       passWord: "",
-      image: null,
     });
-  }
+
+    if (imageRef?.current) {
+      imageRef.current.value = null;
+    }
   };
+
   const handleEdit = (index) => {
     setForm(submittedData[index]);
-    setEdit(index)
-  }
+    setEdit(index);
+  };
+
   const handleDelete = (index) => {
     const updatedData = submittedData.filter((_, i) => i !== index);
     setSubmittedData(updatedData);
-  }
+  };
 
   return (
-    <div className="p-6">
-      <form onSubmit={handleSubmit}>
-        <label className="block font-semibold text-gray-700">Name</label>
-        <input
-          required
-          type="text"
-          name="name"
-          value={form.name}
-          placeholder="Enter Your Name"
-          onChange={handleValues}
-          className="border rounded p-2 w-full mb-2"
-        />
+    <div className="max-w-3xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        Employee Details Form
+      </h1>
 
-        <label className="block font-semibold text-gray-700">Email</label>
-        <input
-          required
-          type="email"
-          name="email"
-          value={form.email}
-          placeholder="Enter Your Email"
-          onChange={handleValues}
-          className="border rounded p-2 w-full mb-2"
-        />
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <label className="block font-semibold text-gray-700">Role</label>
-        <input
-          required
-          type="text"
-          name="role"
-          value={form.role}
-          placeholder="Enter Your Role"
-          onChange={handleValues}
-          className="border rounded p-2 w-full mb-2"
-        />
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">Name</label>
+            <input
+              required
+              type="text"
+              name="name"
+              value={form.name}
+              placeholder="Enter Your Name"
+              onChange={handleValues}
+              className="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
 
-        <label className="block font-semibold text-gray-700">Password</label>
-        <input
-          required
-          type="password"
-          name="passWord"
-          value={form.passWord}
-          placeholder="Enter Your Password"
-          onChange={handleValues}
-          className="border rounded p-2 w-full mb-2"
-        />
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">Email</label>
+            <input
+              required
+              type="email"
+              name="email"
+              value={form.email}
+              placeholder="Enter Your Email"
+              onChange={handleValues}
+              className="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
 
-        <label className="block font-semibold text-gray-700">
-          Upload Image
-        </label>
-        <input
-          required
-          type="file"
-          name="image"
-          onChange={handleValues}
-          className="mb-4"
-        />
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">Role</label>
+            <input
+              required
+              type="text"
+              name="role"
+              value={form.role}
+              placeholder="Enter Your Role"
+              onChange={handleValues}
+              className="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">Position</label>
+            <input
+              required
+              type="text"
+              name="position"
+              value={form.position}
+              placeholder="Job Position"
+              onChange={handleValues}
+              className="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">Password</label>
+            <input
+              required
+              type="password"
+              name="password"
+              value={form.password}
+              placeholder="Enter Password"
+              onChange={handleValues}
+              className="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+        </div>
 
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="mt-4 bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"
         >
-          Submit
+          {edit !== null ? "Update" : "Submit"}
         </button>
       </form>
-      {submittedData.map((data, index) => (
-        <div key={index}>
-          {Object.entries(data).map(([key, value], i) => (
-            <p key={i}>
-              <strong>{key}:</strong>{" "}
-              {key === "image" && value ? (
-                <Image
-                  src={URL.createObjectURL(value)}
-                  alt="Uploaded"
-                  width={80}
-                  height={80}
-                />
-              ) : (
-                String(value)
-              )}
-            </p>
-          ))}
-          <button onClick={() =>handleEdit(index)}>Edit</button>
-           <button onClick={() =>handleDelete(index)}>Delete</button>
+
+      {/* Submitted Data */}
+      {submittedData.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Employee List</h2>
+          <div className="space-y-4">
+            {submittedData.map((data, index) => (
+              <div
+                key={index}
+                className="border rounded p-4 flex flex-col md:flex-row items-center md:justify-between gap-4"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="space-y-1">
+                    <p><strong>Name:</strong> {data.name}</p>
+                    <p><strong>Email:</strong> {data.email}</p>
+                    <p><strong>Role:</strong> {data.role}</p>
+                    <p><strong>Position:</strong> {data.position}</p>
+                    <p><strong>Password:</strong> {data.password}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(index)}
+                    className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };
 
 export default Page;
+
