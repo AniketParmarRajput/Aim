@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 
 const Page = () => {
   const [form, setForm] = useState({
@@ -14,6 +16,7 @@ const Page = () => {
   const imageRef = useRef();
   const [submittedData, setSubmittedData] = useState([]);
   const [edit, setEdit] = useState(null);
+  const router = useRouter();
 
   const handleValues = (e) => {
     const { name, type, value, files } = e.target;
@@ -64,6 +67,9 @@ const Page = () => {
       imageRef.current.value = null;
     }
   };
+  const handleGo = () => {
+    router.push("/logic");
+  }
 
   const handleEdit = (index) => {
     setForm(submittedData[index]);
@@ -157,6 +163,13 @@ const Page = () => {
           className="mt-4 bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"
         >
           {edit !== null ? "Update" : "Submit"}
+        </button>
+        <button
+          type="button"
+          onClick={handleGo}
+          className="mt-4 ml-4 bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition duration-200"
+        >
+          Go to Home
         </button>
       </form>
 
