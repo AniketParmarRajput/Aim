@@ -1,11 +1,13 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 export default function Page() {
-  const [form, setForm] = React.useState({
+  const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  const [submittedData, setSubmittedData] = useState(null);
 
   const handleValues = (e) => {
     const { name, value } = e.target;
@@ -14,7 +16,29 @@ export default function Page() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", form);
+
+    console.log("Submitted Data:", form);
+
+    // save data
+    setSubmittedData(form);
+
+    // API CALL
+    fetch("http://localhost:5000/api/login/check", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: form.email,
+        password: form.password,  // FIXED
+      }),
+    })
+      // .then((res) => res.json())
+      .then((data) => console.log("Server response:", data))
+      .catch((err) => console.error("Error submitting form:", err));
+
+    // clear input fields
+    setForm({ email: "", password: "" });
   };
 
   return (
@@ -35,6 +59,7 @@ export default function Page() {
             type="email"
             id="email"
             name="email"
+            value={form.email}
             required
             onChange={handleValues}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
@@ -49,6 +74,7 @@ export default function Page() {
             type="password"
             id="password"
             name="password"
+            value={form.password}
             required
             onChange={handleValues}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
@@ -62,7 +88,13 @@ export default function Page() {
           Login
         </button>
       </form>
+
+      {submittedData && (
+        <div className="absolute bottom-10 bg-white p-4 rounded-xl shadow-md">
+          <p><strong>Email:</strong> {submittedData.email}</p>
+          <p><strong>Password:</strong> {submittedData.password}</p>
+        </div>
+      )}
     </div>
   );
 }
-
