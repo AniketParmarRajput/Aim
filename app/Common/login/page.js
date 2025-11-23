@@ -2,44 +2,52 @@
 import React, { useState } from "react";
 
 export default function Page() {
+ 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
   const [submittedData, setSubmittedData] = useState(null);
-
   const handleValues = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    console.log("Submitted Data:", form);
+  console.log("Submitted Data:", form);
 
-    // save data
-    setSubmittedData(form);
+  // save data to state
+  setSubmittedData(form);
 
-    // API CALL
-    fetch("http://localhost:5000/api/login/check", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: form.email,
-        password: form.password,  // FIXED
-      }),
+  fetch("http://localhost:5000/api/login/check", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: form.email,
+      password: form.password,
+    }),
+  })
+    .then((response) => response.json()) // parse response JSON
+    .then((data) => {
+      console.log("Success:", data);
+      // Optional: handle API response here
+      // e.g., navigate, show message, store token, etc.
     })
-      // .then((res) => res.json())
-      .then((data) => console.log("Server response:", data))
-      .catch((err) => console.error("Error submitting form:", err));
+    .catch((err) => {
+      console.error("Error submitting form:", err);
+    });
 
-    // clear input fields
-    setForm({ email: "", password: "" });
-  };
+  // clear input fields AFTER request
+  setForm({ email: "", password: "" });
+};
+
+
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
