@@ -169,7 +169,7 @@ const Page = () => {
           onClick={handleGo}
           className="mt-4 ml-4 bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition duration-200"
         >
-          Go to Home
+          Go to Login
         </button>
       </form>
 

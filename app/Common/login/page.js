@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";   // ✔️
+
 
 export default function Page() {
  
@@ -13,6 +15,7 @@ export default function Page() {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
+  const router =useRouter();
 
   const handleSubmit = (e) => {
   e.preventDefault();
@@ -44,7 +47,10 @@ export default function Page() {
 
   // clear input fields AFTER request
   setForm({ email: "", password: "" });
+
+router.push("/Common/home");
 };
+
 
 
 
