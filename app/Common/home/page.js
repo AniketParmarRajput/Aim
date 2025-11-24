@@ -1,10 +1,13 @@
 import React from 'react'
+import Button from '@/app/Components/Resuable/button'
 
 
 const Home = () => {
   return (
     <div>
-      welcome home
+    <Button>
+      Click me
+    </Button>
     </div>
   )
 }
