@@ -1,17 +1,19 @@
+"use Client"
 import React from "react";
 
-const Card = () => {
+const Card = ({handleCards}) => {
   const cards = [
     { title: "hello", des: "I am hello1" },
     { title: "hello2", des: "I am hello2" },
-    { title: "Dynamic!", des: "Cards can be added anytime" },
+    { title: "Dynamic!", des: "Cards " },
+      { title: "Dynamic!", des: "Cards " }
   ];
 
   return (
-    <div className="w-full border-2 border-red-500 p-4">
-      <div className="flex justify-between w-1/2 gap-4 flex-wrap">
+    <div className="w-full  p-4 border-3 border-red-300">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {cards.map((item, index) => (
-          <div key={index} className="p-3 border rounded shadow">
+          <div key={index} className=" w-96 p-3 border rounded shadow" onClick={() =>handleCards(item)} >
             <h2 className="text-xl font-bold">{item.title}</h2>
             <p className="text-gray-600">{item.des}</p>
           </div>
