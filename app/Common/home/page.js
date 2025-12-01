@@ -28,7 +28,7 @@ const Home = () => {
         router.push("/Pricing");
         break;
       case "About":
-        router.push("/About");
+        router.push("/Common/About");
         break;
       case "Contact":
         router.push("/Contact");
