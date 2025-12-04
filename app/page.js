@@ -76,7 +76,7 @@ const Page = () => {
   };
 
   const handleGo = () => {
-    router.push("/Common/login");
+    router.push("/Common/pages/login");
   };
 
   const handleEdit = (index) => {

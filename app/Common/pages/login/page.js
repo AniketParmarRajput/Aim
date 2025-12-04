@@ -46,7 +46,7 @@ export default function Page() {
       setForm({ email: "", password: "" });
       
       // Navigate to home page
-      router.push("/Common/home");
+      router.push("/Common/pages/home");
     } catch (err) {
       console.error("Error submitting form:", err);
     } finally {

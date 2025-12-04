@@ -22,16 +22,16 @@ const Home = () => {
         router.push("/");
         break;
       case "Our Products":
-        router.push("/Common/Products");
+        router.push("/Common/pages/Products");
         break;
       case "Pricing":
-        router.push("/Pricing");
+        router.push("/Common/pages/Pricing");
         break;
       case "About":
-        router.push("/Common/About");
+        router.push("/Common/pages/About");
         break;
       case "Contact":
-        router.push("/Contact");
+        router.push("/Common/pages/Contact");
         break;
       default:
         break;
