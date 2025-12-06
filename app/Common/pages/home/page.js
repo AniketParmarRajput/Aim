@@ -30,6 +30,9 @@ const Home = () => {
       case "About":
         router.push("/Common/pages/About");
         break;
+      case "Emp": // Capitalized, optional
+        router.push("/Common/pages/Employes"); // Corrected spelling
+        break;
       case "Contact":
         router.push("/Common/pages/Contact");
         break;
@@ -37,6 +40,7 @@ const Home = () => {
         break;
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -64,7 +68,7 @@ const Home = () => {
 
             {/* FIXED NAVIGATION */}
             <div className="hidden md:flex space-x-8">
-              {["Home", "Our Products", "Pricing", "About", "Contact"].map(
+              {["Home", "Our Products", "Pricing", "About", "Emp", "Contact"].map(
                 (item) => (
                   <button
                     key={item}
