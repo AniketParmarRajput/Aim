@@ -1,5 +1,4 @@
 "use client"
-import DynamicTable from '@/app/Components/Resuable/Table';
 import React, { useEffect, useState } from 'react'
 
 const Page = () => {
@@ -23,8 +22,8 @@ const Page = () => {
     return (
         <div className='text-red-500'>
             <h1>Employees</h1>
-            {/* <pre>{JSON.stringify(employees, null, 2)}</pre> */}
-            <DynamicTable/>
+            <pre>{JSON.stringify(employees, null, 2)}</pre>
+           
         </div>
     )
 }
