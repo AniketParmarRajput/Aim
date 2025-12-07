@@ -23,6 +23,7 @@ const Page = () => {
         <div className='text-red-500'>
             <h1>Employees</h1>
             <pre>{JSON.stringify(employees, null, 2)}</pre>
+              <h1>Employees</h1>
            
         </div>
     )
