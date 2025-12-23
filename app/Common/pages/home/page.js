@@ -36,6 +36,9 @@ const Home = () => {
       case "Contact":
         router.push("/Common/pages/Contact");
         break;
+         case "demo":
+        router.push("/Common/pages/demo");
+        break;
       default:
         break;
     }
@@ -68,7 +71,7 @@ const Home = () => {
 
             {/* FIXED NAVIGATION */}
             <div className="hidden md:flex space-x-8">
-              {["Home", "Our Products", "Pricing", "About", "Emp", "Contact"].map(
+              {["Home", "Our Products", "Pricing", "About", "Emp", "Contact","demo"].map(
                 (item) => (
                   <button
                     key={item}
