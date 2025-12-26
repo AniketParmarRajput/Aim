@@ -115,7 +115,7 @@ export default function Page() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-500 text-white py-3 rounded-xl"
+         className="w-full bg-sky-700 text-white py-3 rounded-xl"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
