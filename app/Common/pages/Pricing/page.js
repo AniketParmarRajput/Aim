@@ -20,7 +20,17 @@ export default function Page() {
       method:"POST",
       body:formData,
      });
-    
+     
+     setData({
+       itemName: "",
+    amount: "",
+    description: "",
+    image: null,
+     })
+     const files= document.querySelector('input[type="file"]')
+    if (files) {
+          files.value = "";
+        }
   }
 
 
