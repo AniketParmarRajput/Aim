@@ -18,9 +18,25 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+
+    const res = await fetch("http://localhost:5000/api/contact/create", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: formData.name,
+    email: formData.email,
+    subject:formData.subject,
+    message: formData.message,
+  }),
+});
+
+// const data = await response.json()
+//     console.log("resp", data)
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
