@@ -7,7 +7,12 @@ const Page = () => {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/employees/get");
+                const response = await fetch("http://localhost:5000/api/employees/get",
+                     {
+                    method: "GET",
+                    credentials: "include", // ⭐ THIS sends cookies
+                }
+                );
                 const data = await response.json();
                 console.log("data:", data);
                 setEmployees(data); // or data.data if backend sends { data: [...] }
