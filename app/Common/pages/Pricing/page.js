@@ -8,6 +8,21 @@ export default function Page() {
     description: "",
     image: null,
   });
+  const[AddItem, setAddItem]=useState(false);
+
+  const handleshow=()=>{
+    setAddItem(true);
+    setData({...data,amount: "" })
+  }
+  const handleselected=(e) =>{
+     const value = e.target.value;
+    if(value === "add"){
+      handleshow();
+    }else {
+      setAddItem(false);
+      setData({ ...data, amount: value });
+    }
+  }
   const handleSubmit = async(e)=>{
     e.preventDefault();
      const formData = new FormData();
@@ -60,7 +75,15 @@ export default function Page() {
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Amount
             </label>
-            <input
+            <select onChange={handleselected} value={AddItem?"add":data.amount}>
+              <option>select</option>
+              <option value="500">500</option>
+               <option value="5900">5900</option>
+              <option value="add">Add</option>
+            </select>
+            
+           {AddItem &&(
+             <input
               type="number"
               name="amount"
               value={data.amount}
@@ -68,13 +91,14 @@ export default function Page() {
               className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               onChange={(e)=>setData({...data, amount:e.target.value})}
             />
+           )}
           </div>
              <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               description
             </label>
             <input
-              type="string"
+              type="text"
               name="description"
               value={data.description}
               placeholder="Enter description"
