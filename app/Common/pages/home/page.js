@@ -1,82 +1,51 @@
 "use client";
+
 import React, { useState } from "react";
 import Card from "@/app/Components/Resuable/Card";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Home = () => {
   const router = useRouter();
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleCardClick = (item) => {
-    setSelectedItem(item);
-  };
+  const handleCardClick = (item) => setSelectedItem(item);
+  const handleCloseModal = () => setSelectedItem(null);
 
-  const handleCloseModal = () => {
-    setSelectedItem(null);
-  };
-
-  // FIXED: This function must be inside component and without extra closing brace
   const handle = (item) => {
-    switch (item) {
-      case "Home":
-        router.push("/");
-        break;
-      case "Our Products":
-        router.push("/Common/pages/Products");
-        break;
-      case "Pricing":
-        router.push("/Common/pages/Pricing");
-        break;
-      case "About":
-        router.push("/Common/pages/About");
-        break;
-      case "Emp": // Capitalized, optional
-        router.push("/Common/pages/Employes"); // Corrected spelling
-        break;
-      case "Contact":
-        router.push("/Common/pages/Contact");
-        break;
-         case "Mail":
-        router.push("/Common/pages/Mail");
-        break;
-      default:
-        break;
-    }
+    const routes = {
+      Home: "/",
+      "Our Products": "/Common/pages/Products",
+      Pricing: "/Common/pages/Pricing",
+      About: "/Common/pages/About",
+      Emp: "/Common/pages/Employes",
+      Contact: "/Common/pages/Contact",
+      Mail: "/Common/pages/Mail",
+    };
+    router.push(routes[item]);
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Enhanced Header */}
-      <header className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white shadow-2xl">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          ></div>
-        </div>
-
-        <div className="relative z-10 container mx-auto px-6 py-16">
-          {/* Navigation Bar */}
-          <nav className="flex justify-between items-center mb-16">
+      {/* ================= HEADER ================= */}
+      <header className="relative text-white overflow-hidden">
+        <div className="container mx-auto px-6 py-12 relative z-10">
+          {/* NAVBAR */}
+          <nav className="flex justify-between items-center mb-12">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">⚡</span>
+                <span className="text-blue-600 font-bold">⚡</span>
               </div>
               <span className="text-xl font-bold">YourBrand</span>
             </div>
 
-            {/* FIXED NAVIGATION */}
-            <div className="hidden md:flex space-x-8">
-              {["Home", "Our Products", "Pricing", "About", "Emp", "Contact","Mail"].map(
+            <div className="hidden md:flex space-x-6">
+              {["Home", "Our Products", "Pricing", "About", "Emp", "Contact", "Mail"].map(
                 (item) => (
                   <button
                     key={item}
                     onClick={() => handle(item)}
-                    className="hover:text-blue-200 transition-colors duration-300 font-medium"
+                    className="hover:text-blue-200 transition"
                   >
                     {item}
                   </button>
@@ -84,124 +53,74 @@ const Home = () => {
               )}
             </div>
 
-            <div className="flex space-x-4">
-              <button className="px-4 py-2 text-sm font-medium text-white hover:text-blue-200 transition-colors duration-300">
-                Login
-              </button>
-              <button className="px-6 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors duration-300 shadow-lg">
+            <div className="space-x-3">
+              <button className="text-sm hover:text-blue-200">Login</button>
+              <button className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium">
                 Sign Up
               </button>
             </div>
           </nav>
 
-          {/* Hero Section */}
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-              New features available now
-            </div>
-
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Transform Your
-              <span className="block bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
-                Digital Experience
-              </span>
-            </h1>
-
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed max-w-2xl mx-auto">
-              Discover powerful tools and features designed to elevate your
-              productivity. Join thousands of satisfied users worldwide.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-2xl">
-                Get Started Free
-              </button>
-              <button className="px-8 py-4 border-2 border-white/30 text-white rounded-xl font-bold hover:bg-white/10 transform hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-                Watch Demo
-              </button>
-            </div>
+          {/* HERO IMAGE */}
+          <div className="relative w-full h-[320px] md:h-[420px] rounded-2xl overflow-hidden shadow-2xl">
+            <Image
+              src="/web.jpg"
+              alt="Web Banner"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
 
-        {/* Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            className="w-full h-12 text-slate-50"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28..."
-              opacity=".25"
-              fill="currentColor"
-            ></path>
-            <path
-              d="M0,0V15.81C13,36.92,27.64,56.86..."
-              opacity=".5"
-              fill="currentColor"
-            ></path>
-            <path
-              d="M0,0V5.63C149.93,59,314.09,71.32..."
-              fill="currentColor"
-            ></path>
-          </svg>
-        </div>
+        {/* WAVE DIVIDER */}
+        <svg
+          className="absolute bottom-0 left-0 w-full"
+          viewBox="0 0 1440 90"
+          preserveAspectRatio="none"
+        >
+          <path
+            fill="#f8fafc"
+            d="M0,40 C120,70 360,0 720,30 1080,60 1320,20 1440,10 L1440,90 L0,90 Z"
+          />
+        </svg>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-16 -mt-8 relative z-20">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+      {/* ================= MAIN ================= */}
+      <main className="container mx-auto px-6 py-20 -mt-10 relative z-10">
+        <div className="text-center mb-14">
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">
             Our Amazing Features
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Explore our carefully crafted features designed to help you achieve
-            more.
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Explore powerful features crafted to boost your productivity.
           </p>
         </div>
 
         <Card handleCards={handleCardClick} />
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-b from-gray-900 to-black text-white pt-16 pb-8">
-        {/* ... footer unchanged ... */}
-      </footer>
-
-      {/* Modal */}
+      {/* ================= MODAL ================= */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-800">
-                {selectedItem.title}
-              </h3>
-              <button
-                onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700 p-1"
-              >
-                ✕
-              </button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between mb-4">
+              <h3 className="font-bold text-lg">{selectedItem.title}</h3>
+              <button onClick={handleCloseModal}>✕</button>
             </div>
-
             <p className="text-gray-600 mb-6">
-              You selected:{" "}
-              <span className="font-semibold text-blue-600">
-                {selectedItem.title}
-              </span>
+              You selected <b>{selectedItem.title}</b>
             </p>
-
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={handleCloseModal}
-                className="px-6 py-2 border border-gray-300 rounded-lg"
+                className="px-4 py-2 border rounded"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCloseModal}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                className="px-4 py-2 bg-blue-600 text-white rounded"
               >
                 Continue
               </button>
