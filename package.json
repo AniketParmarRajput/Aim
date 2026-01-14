@@ -11,10 +11,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/material": "^7.3.6",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
     "@reduxjs/toolkit": "^2.11.2",
     "@tanstack/react-virtual": "^3.13.16",
     "js-cookie": "^3.0.5",
+    "material-react-table": "^3.2.1",
     "next": "^16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
