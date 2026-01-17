@@ -7,10 +7,10 @@ import Image from "next/image";
 
 const Home = () => {
   const router = useRouter();
-  const [selectedItem, setSelectedItem] = useState(null);
+  // const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleCardClick = (item) => setSelectedItem(item);
-  const handleCloseModal = () => setSelectedItem(null);
+  // const handleCardClick = (item) => setSelectedItem(item);
+  // const handleCloseModal = () => setSelectedItem(null);
 
   const handle = (item) => {
     const routes = {
