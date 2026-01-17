@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+ import Card from "@/app/Components/Resuable/Card";
 
 const Home = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const Home = () => {
   };
 
   return (
+    <>
     <div
       className="
         relative w-full
@@ -58,7 +60,7 @@ const Home = () => {
         </div>
 
         {/* Menu */}
-        <div className="hidden md:flex gap-6 text-sm">
+        <div className="hidden md:flex gap-6  font-bold  position-fixed">
           {["Home", "Our Products", "Pricing", "About", "Emp", "Contact", "Mail"].map(
             (item) => (
               <button
@@ -81,6 +83,8 @@ const Home = () => {
         </div>
       </nav>
     </div>
+    <Card/>
+    </>
   );
 };
 
