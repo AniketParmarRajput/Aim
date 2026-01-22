@@ -21,6 +21,10 @@ const Home = () => {
 
     router.push(routes[item]);
   };
+  const handleClick = (cardType) =>{
+     router.push(`/Common/pages/Employes?cardType=${cardType}`)
+     
+  }
 
   return (
     <>
@@ -83,7 +87,20 @@ const Home = () => {
         </div>
       </nav>
     </div>
-    <Card/>
+     <div className="flex w-full gap-4 p-4 border-2 border-red-500">
+      <Card
+      title="All"
+      onClick={() => handleClick("All")}
+      />
+       <Card
+      title="deleted"
+      onClick={() => handleClick("deleted")}
+      />
+       <Card
+      title="Restored"
+      onClick={() => handleClick("Restored")}
+      />
+     </div>
     </>
   );
 };
