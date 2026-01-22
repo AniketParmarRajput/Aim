@@ -25,6 +25,11 @@ const Home = () => {
      router.push(`/Common/pages/Employes?cardType=${cardType}`)
      
   }
+  const handleClick1 = (cardType) =>{
+     router.push(`/Common/Test/interviwe?cardType=${cardType}`)
+     
+  }
+
 
   return (
     <>
@@ -98,7 +103,7 @@ const Home = () => {
       />
        <Card
       title="Restored"
-      onClick={() => handleClick("Restored")}
+      onClick={() => handleClick1("Restored")}
       />
      </div>
     </>

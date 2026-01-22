@@ -1,44 +1,19 @@
 "use client"
-import React, { useState } from 'react'
-// import { FixedSizeList as List } from "react-window";
+import React, { useState } from 'react';
 
 const Page = () => {
-    // const users=["aniket", "tushar", "vinay", "vinit"]
-    const users =[{id:1, name: "aniket"},
-      {id:2, name: "tushar"},
-
-    ]
-    // const users= Array.from(
-    //   {length:100000000},(_,i) =>`items ${i+1}`
-    // );
-    const handleNext=() =>{
-      
-    }
+  const[data,setdate]=useState("hello")
+  const handleit=()=>{
+    setdate(prev =>(prev?"":"hello"))
+  }
   return (
-
-    // <List
-    // height={400}
-    // width={200}
-    // itemCount={users.length}
-    // itemSize={20}
-    // itemData={users}
-    // >
-    //   {({index,data}) =>(
-    //     <div>
-    //       {data[index]}
-    //       </div>
-    //   )
-
-    //   }
-
-    // </List>
     <div>
-      {users.map((item, index)=>(
-        <div key={index}>{item.id}</div>
-      ))}
-      <button onClick={handleNext}>next</button>
+     <button 
+     onClick={handleit}>{data?"hide":"show"}</button>
+     <br/>
+     {data}
     </div>
-  )
+  );
 }
 
-export default Page
+export default Page;
