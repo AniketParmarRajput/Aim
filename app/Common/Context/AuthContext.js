@@ -8,33 +8,41 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
+  // Initialize user from localStorage safely
   const [user, setUser] = useState(() => {
     if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
+      try {
+        const storedUser = localStorage.getItem("user");
+        return storedUser ? JSON.parse(storedUser) : null;
+      } catch (err) {
+        console.error("Failed to parse user from localStorage:", err);
+        return null;
+      }
     }
     return null;
   });
 
-  // ✅ Auto logout redirect
+  // Auto logout redirect if user is not logged in
   useEffect(() => {
-    if (!user) {
+    if (typeof window !== "undefined" && !user) {
       router.push("/Common/pages/login");
     }
-  }, [user]);
+  }, [user, router]);
 
-  const login = (data) => {
-    const { username, password } = data;
-
+  // Login function
+  const login = ({ username, password }) => {
+    // Hardcoded credentials for demo
     if (username === "rajputaniket@1122" && password === "123456") {
-      setUser(data);
-      localStorage.setItem("user", JSON.stringify(data));
+      const userData = { username }; // Only store necessary info
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
       router.push("/Common/pages/home");
     } else {
       alert("Invalid username or password");
     }
   };
 
+  // Logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -48,5 +56,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// Custom hook to use AuthContext
 export const useAuth = () => useContext(AuthContext);
+
 

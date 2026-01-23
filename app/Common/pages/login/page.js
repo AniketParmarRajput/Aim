@@ -209,7 +209,7 @@ export default function Page() {
             disabled={isLoading}
             className="w-full bg-sky-700 text-white py-3 rounded-xl"
           >
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? "logged in..." : "log In"}
           </button>
 
         </form>
