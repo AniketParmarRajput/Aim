@@ -4,8 +4,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
  import Card from "@/app/Components/Resuable/Card";
+ import { useAuth } from "../../Context/AuthContext";
+ 
 
 const Home = () => {
+  const { logout } = useAuth();
   const router = useRouter();
 
   const handle = (item) => {
@@ -85,7 +88,7 @@ const Home = () => {
 
         {/* Auth */}
         <div className="flex items-center gap-3">
-          <button className="text-sm hover:text-blue-300">Login</button>
+          <button className="text-sm hover:text-blue-300" onClick={logout}>Loge out</button>
           <button className="px-4 py-2 bg-white text-blue-600 rounded-lg text-sm font-medium">
             Sign Up
           </button>
