@@ -6,9 +6,12 @@ const Card = ({
   value,
   icon,
   onClick,
+   item,
+  handleAction,
   showImageOnNoValue = false,
   noValueImage,
 }) => {
+  console.log(handleAction)
   return (
     <div
       onClick={onClick}
@@ -34,10 +37,10 @@ const Card = ({
 
       {/* Actions */}
       <div className="mt-4 flex gap-3">
-        <button className="flex-1 rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
+        <button  className="flex-1 rounded-lg bg-blue-600 py-2 text-sm font-medium text-white transition hover:bg-blue-700"  onClick={() => handleAction("addToCart", "add")}>
           Add to Cart
         </button>
-        <button className="flex-1 rounded-lg bg-slate-900 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
+        <button className="flex-1 rounded-lg bg-slate-900 py-2 text-sm font-medium text-white transition hover:bg-slate-800"  onClick={() => handleAction("buyNow", "buy")}>
           Buy Now
         </button>
       </div>
