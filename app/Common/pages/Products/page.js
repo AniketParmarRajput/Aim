@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 const Product = () => {
   const tittle = ["menu1", "menu2", "menu3", "menu4"];
-  const handlecard = (item) => {
+  const handleCard = (item) => {
     alert(item);
   };
   const handleProductAction = (actionType, type) => {
@@ -32,7 +32,7 @@ const Product = () => {
           <Products
             key={index}
             title={item}
-            onClick={() => handlecard(item)}
+            onClick={() => handleCard(item)}
             handleAction={handleProductAction}
             onClick1={() =>handleRoutes(item)}
           />
