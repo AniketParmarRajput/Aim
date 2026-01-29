@@ -10,6 +10,7 @@ const Card = ({
   handleAction,
   showImageOnNoValue = false,
   noValueImage,
+  onClick1
 }) => {
   console.log(handleAction)
   return (
@@ -29,7 +30,7 @@ const Card = ({
           <p className="text-sm text-slate-500">{value}</p>
         )}
         <div>
-          <p className="flex-1    py-2 text-sm font-medium text-blue-600 underline ">
+          <p className="flex-1    py-2 text-sm font-medium text-blue-600 underline " onClick={onClick1}>
          view details
         </p>
         </div>
