@@ -1,7 +1,8 @@
 "use client";
 import Products from "@/app/Components/Resuable/ProductCards";
 import React from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+
 
 const Product = () => {
   const tittle = ["menu1", "menu2", "menu3", "menu4"];
@@ -17,9 +18,11 @@ const Product = () => {
       // your buy-now logic
     }
   };
-   const handlRoutes=(item) =>{
-    console.log("by route",item)
-   }
+  const router = useRouter();
+    const handleRoutes = (item) => {
+    console.log("by route", item);
+    router.push(`/Common/pages/Products${item}`);
+  };
 
   return (
     <div className="m-5">
@@ -31,7 +34,7 @@ const Product = () => {
             title={item}
             onClick={() => handlecard(item)}
             handleAction={handleProductAction}
-            onClick1={() =>handlRoutes(item)}
+            onClick1={() =>handleRoutes(item)}
           />
         ))}
       </div>
