@@ -1,11 +1,14 @@
-import React from 'react';
+'use client';
 
-const page = () => {
+import { useParams } from 'next/navigation';
+const Page = () => {
+    const { id } = useParams();
   return (
     <div>
-      comming soon
+    <pre>{id}</pre>
     </div>
   );
-}
+};
 
-export default page;
+export default Page;
+
