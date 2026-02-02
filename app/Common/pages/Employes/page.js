@@ -27,7 +27,7 @@ const Page = () => {
 
                 return (
                     <button
-                        onClick={() => handledelete(deleteId)}
+                        onClick={() => handledelete(id)}
                         style={{
                             background: "red",
                             color: "white",
@@ -120,7 +120,7 @@ const handledelete = async (id) => {
 
     if (response.ok) {
       alert(result.message);
-      setEmployees((prev) => prev.filter((emp) => emp.id !== deletedid));
+      setEmployees((prev) => prev.filter((emp) => emp.id !== id));
     } else {
       alert(result.message || "Delete failed ❌");
     }
