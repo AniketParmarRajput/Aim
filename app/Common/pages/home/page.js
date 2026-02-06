@@ -24,14 +24,21 @@ const Home = () => {
 
     router.push(routes[item]);
   };
+
   const handleClick = (cardType) =>{
-     router.push(`/Common/pages/Employes?cardType=${cardType}`)
-     
+    switch(cardType){
+    case "All":
+      router.push(`/Common/pages/Employes?cardType=${cardType}`);
+      break;
+ case "deleted":
+  router.push(`/Common/pages/About?cardType=${cardType}`);
+  break;
+  default:
+  router.push(`/Common/Test/interviwe?cardType=${cardType}`);
+  break;
+    }
   }
-  const handleClick1 = (cardType) =>{
-     router.push(`/Common/Test/interviwe?cardType=${cardType}`)
-     
-  }
+
 
 
   return (
@@ -95,7 +102,7 @@ const Home = () => {
         </div>
       </nav>
     </div>
-     <div className="flex w-full gap-4 p-4 border-2 border-red-500">
+     <div className="flex w-full gap-4 p-4">
       <Card
       title="All"
       onClick={() => handleClick("All")}
@@ -106,7 +113,7 @@ const Home = () => {
       />
        <Card
       title="Restored"
-      onClick={() => handleClick1("Restored")}
+      onClick={() => handleClick("Restored")}
       />
      </div>
     </>
