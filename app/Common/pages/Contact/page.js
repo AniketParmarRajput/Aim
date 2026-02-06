@@ -34,9 +34,6 @@ const Contact = () => {
     message: formData.message,
   }),
 });
-
-// const data = await response.json()
-//     console.log("resp", data)
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
 

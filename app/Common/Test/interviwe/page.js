@@ -1,19 +1,19 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const Page = () => {
-  const[data,setdate]=useState("hello")
-  const handleit=()=>{
-    setdate(prev =>(prev?"":"hello"))
-  }
+  const inputref = useRef(null);
+ useEffect(() =>{
+  inputref.current.focus();
+ },[])
   return (
     <div>
-     <button 
-     onClick={handleit}>{data?"hide":"show"}</button>
-     <br/>
-     {data}
+      
+      <input ref={inputref} placeholder='enter name'/>
     </div>
   );
 }
 
 export default Page;
+
+
