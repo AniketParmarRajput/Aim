@@ -16,6 +16,12 @@ export default function AboutPage() {
         user-friendly experience.
       </p>
 
+      <p className="text-lg leading-relaxed mb-6">
+        State management is handled using both the <strong>React Context API</strong> and
+        <strong> Redux Toolkit</strong>, enabling efficient global state handling for features such as
+        authentication, login state, user sessions, and real-time data updates across the application.
+        This ensures consistent data flow and better scalability as the application grows.
+      </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-3">Backend: Node.js & Express</h2>
       <p className="text-lg leading-relaxed mb-6">
@@ -31,16 +37,16 @@ export default function AboutPage() {
         with the Node.js backend.
       </p>
 
-
       <h2 className="text-2xl font-semibold mt-8 mb-3">Our Mission</h2>
       <p className="text-lg leading-relaxed">
-        This project demonstrates how Next.js, Node.js, and MySQL combine to create a
-        fast, secure, and scalable full-stack application. The mission is to provide
-        an excellent user experience while maintaining clean and maintainable code.
+        This project demonstrates how Next.js, Node.js, MySQL, Context API, and Redux Toolkit
+        combine to create a fast, secure, and scalable full-stack application. The mission is to provide
+        an excellent user experience while maintaining clean, maintainable, and production-ready code.
       </p>
     </div>
   );
 }
+
 
 
 
