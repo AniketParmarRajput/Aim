@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ServerTable from "@/app/Components/Resuable/ServerTable";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [employees, setEmployees] = useState([]);
@@ -13,6 +14,37 @@ const Page = () => {
     pageSize: 10,
   });
   const [sorting, setSorting] = useState([]);
+  const router= useRouter();
+
+   const handledelete = async (id) => {
+    console.log("Deleting employee with ID:", id);
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/employees/delete/${id}`,
+        { method: "DELETE" },
+      );
+
+      const result = await response.json(); // ✅ only this
+
+      console.log("Delete response:", result);
+
+      if (response.ok) {
+        alert(result.message);
+        setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+      } else {
+        alert(result.message || "Delete failed ❌");
+      }
+    } catch (err) {
+      console.error("Error deleting employee:", err);
+    }
+  };
+  const handleEdit = async (id) => {
+    alert("edit" + id);
+   router.push("/");
+
+  };
+
 
   const columns = [
     { accessorKey: "id", header: "ID" },
@@ -91,33 +123,6 @@ const Page = () => {
 
     fetchEmployees();
   }, []);
-
-  const handledelete = async (id) => {
-    console.log("Deleting employee with ID:", id);
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/employees/delete/${id}`,
-        { method: "DELETE" },
-      );
-
-      const result = await response.json(); // ✅ only this
-
-      console.log("Delete response:", result);
-
-      if (response.ok) {
-        alert(result.message);
-        setEmployees((prev) => prev.filter((emp) => emp.id !== id));
-      } else {
-        alert(result.message || "Delete failed ❌");
-      }
-    } catch (err) {
-      console.error("Error deleting employee:", err);
-    }
-  };
-  const handleEdit = async (id) => {
-    alert("edit" + id);
-  };
 
   return (
     <div>
