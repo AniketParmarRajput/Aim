@@ -39,11 +39,9 @@ const Page = () => {
       console.error("Error deleting employee:", err);
     }
   };
-  const handleEdit = async (id) => {
-    alert("edit" + id);
-   router.push("/");
-
-  };
+ const handleEdit = (id) => {
+  router.push(`/?id=${id}`);
+};
 
 
   const columns = [
