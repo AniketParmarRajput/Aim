@@ -8,7 +8,7 @@ export default function Page() {
   const { login } = useAuth();
 
   const [form, setForm] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -27,7 +27,7 @@ export default function Page() {
 
     try {
       login(form); // 🔥 AuthContext login
-      setForm({ username: "", password: "" });
+      setForm({ email: "", password: "" });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,9 +50,9 @@ export default function Page() {
               Email Address
             </label>
             <input
-              type="text"
-              name="username"
-              value={form.username}
+              type="email"
+              name="email"
+              value={form.email}
               onChange={handleValues}
               required
               className="w-full px-4 py-3 border rounded-xl text-black"
