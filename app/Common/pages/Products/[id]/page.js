@@ -1,219 +1,144 @@
-'use client';
+"use client";
 
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-// Mock product fetch
-const getProductById = async (id) => {
-  return {
-    id,
-    name: `Product ${id}`,
-    price: 1999,
-    rating: 4.3,
-    reviews: 56,
-    description:
-      'This is a modern, clean product detail page design with better layout, spacing, and UX without external UI libraries.',
-    features: [
-      'Premium build quality',
-      'Long-lasting performance',
-      'Affordable pricing',
-      'Easy to use interface',
-    ],
-    image: 'https://via.placeholder.com/500x600',
-  };
-};
+const Page = () => {
+  const params = useParams();
+  const id = params.id;
 
-export default function Page() {
-  const { id } = useParams();
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    if (id) getProductById(id).then(setProduct);
+    const fetchProductDetails = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/prizing/getPrizing/${id}`
+        );
+
+        const result = await response.json();
+
+        console.log("Product details:", result);
+
+        setProduct(result);
+      } catch (err) {
+        console.error("Error fetching product details:", err);
+      }
+    };
+
+    if (id) {
+      fetchProductDetails();
+    }
   }, [id]);
 
   if (!product) {
-    return <div style={styles.loader}>Loading product...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <h1 className="text-2xl font-semibold animate-pulse">
+          Loading Product...
+        </h1>
+      </div>
+    );
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        {/* Image Section */}
-        <div style={styles.imageSection}>
-          {/* <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            style={{ objectFit: 'contain' }}
-            priority
-          /> */}
-        </div>
-
-        {/* Details Section */}
-        <div style={styles.detailsSection}>
-          <h1 style={styles.title}>{product.name}</h1>
-
-          <div style={styles.metaRow}>
-            <span style={styles.price}>₹ {product.price}</span>
-            <span style={styles.rating}>⭐ {product.rating} ({product.reviews})</span>
+    <div className="min-h-screen bg-[#f1f3f6] p-5">
+      
+      {/* Main Container */}
+      <div className="max-w-6xl mx-auto bg-white shadow-sm rounded-sm grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+        
+        {/* Left Side Image */}
+        <div className="flex flex-col items-center">
+          
+          <div className="border p-5 rounded bg-white">
+            <img
+              src="https://rukminim2.flixcart.com/image/832/832/xif0q/mobile/g/l/c/-original-imah4jyfyrpxfhtk.jpeg?q=70&crop=false"
+              alt="product"
+              className="w-[300px] h-[350px] object-contain"
+            />
           </div>
 
-          <p style={styles.description}>{product.description}</p>
+          {/* Buttons */}
+          <div className="flex gap-4 mt-6 w-full">
+            <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 w-1/2 rounded">
+              ADD TO CART
+            </button>
 
-          <div style={styles.featuresBox}>
-            <h3>Key Features</h3>
-            <ul style={styles.featureList}>
-              {product.features.map((f, i) => (
-                <li key={i} style={styles.featureItem}>✔ {f}</li>
-              ))}
+            <button className="bg-[#fb641b] hover:bg-[#e85a16] text-white font-semibold py-3 w-1/2 rounded">
+              BUY NOW
+            </button>
+          </div>
+        </div>
+
+        {/* Right Side Details */}
+        <div>
+          
+          <h1 className="text-2xl font-semibold text-gray-800">
+            {product.data?.description}
+          </h1>
+
+          {/* Rating */}
+          <div className="flex items-center gap-2 mt-3">
+            <span className="bg-green-600 text-white text-sm px-2 py-1 rounded">
+              4.3 ★
+            </span>
+
+            <span className="text-gray-500 text-sm">
+              2,514 Ratings & 210 Reviews
+            </span>
+          </div>
+
+          {/* Price */}
+          <div className="mt-5">
+            <h2 className="text-4xl font-bold text-gray-900">
+              ₹ {product.data?.amount}
+            </h2>
+
+            <p className="text-green-600 font-semibold mt-1">
+              25% off
+            </p>
+          </div>
+
+          {/* Product ID */}
+          <div className="mt-6 border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Product ID
+            </h3>
+
+            <p className="text-gray-600 mt-1">
+              {product.data?.id}
+            </p>
+          </div>
+
+          {/* Description */}
+          <div className="mt-6 border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Description
+            </h3>
+
+            <p className="text-gray-600 leading-7 mt-2">
+              {product.data?.description}
+            </p>
+          </div>
+
+          {/* Offers */}
+          <div className="mt-6 border-t pt-4">
+            <h3 className="text-lg font-semibold text-gray-700 mb-3">
+              Available Offers
+            </h3>
+
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li>✔ Bank Offer 10% off on HDFC Cards</li>
+              <li>✔ Special Price Get extra 25% off</li>
+              <li>✔ No Cost EMI Available</li>
+              <li>✔ Free Delivery Available</li>
             </ul>
           </div>
 
-          <div style={styles.actions}>
-            <button style={styles.cartBtn}>Add to Cart</button>
-            <button style={styles.buyBtn}>Buy Now</button>
-          </div>
-
-          <div style={styles.footerRow}>
-            <span style={styles.productId}>Product ID: {id}</span>
-          </div>
         </div>
       </div>
     </div>
   );
-}
-
-const styles = {
-  page: {
-    minHeight: '100vh',
-    background: 'linear-gradient(120deg, #f8f9fb, #eef1f5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '40px 20px',
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-
-  card: {
-    maxWidth: '1100px',
-    width: '100%',
-    background: '#fff',
-    borderRadius: '20px',
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
-    overflow: 'hidden',
-  },
-
-  imageSection: {
-    position: 'relative',
-    background: '#f5f6f8',
-    padding: '40px',
-  },
-
-  detailsSection: {
-    padding: '50px 45px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-
-  title: {
-    fontSize: '32px',
-    fontWeight: '700',
-    marginBottom: '10px',
-  },
-
-  metaRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    margin: '10px 0 20px',
-  },
-
-  price: {
-    fontSize: '26px',
-    fontWeight: '700',
-    color: '#0a7',
-  },
-
-  rating: {
-    background: '#f1f3f5',
-    padding: '6px 12px',
-    borderRadius: '20px',
-    fontSize: '14px',
-  },
-
-  description: {
-    lineHeight: 1.7,
-    color: '#444',
-    marginBottom: '25px',
-  },
-
-  featuresBox: {
-    background: '#fafbfc',
-    padding: '20px',
-    borderRadius: '12px',
-    marginBottom: '30px',
-  },
-
-  featureList: {
-    listStyle: 'none',
-    padding: 0,
-    marginTop: '10px',
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '10px',
-  },
-
-  featureItem: {
-    fontSize: '14px',
-    color: '#333',
-  },
-
-  actions: {
-    display: 'flex',
-    gap: '15px',
-  },
-
-  cartBtn: {
-    flex: 1,
-    padding: '14px',
-    borderRadius: '10px',
-    border: '1px solid #000',
-    background: '#fff',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: '0.2s',
-  },
-
-  buyBtn: {
-    flex: 1,
-    padding: '14px',
-    borderRadius: '10px',
-    border: 'none',
-    background: '#000',
-    color: '#fff',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: '0.2s',
-  },
-
-  footerRow: {
-    marginTop: '25px',
-  },
-
-  productId: {
-    fontSize: '12px',
-    color: '#888',
-  },
-
-  loader: {
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '18px',
-  },
 };
+
+export default Page;
