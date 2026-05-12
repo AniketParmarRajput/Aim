@@ -16,10 +16,10 @@ const Card = ({
   return (
     <div
       onClick={onClick}
-      className="flex h-[320px] w-[270px] cursor-pointer flex-col justify-between rounded-2xl bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="flex h-80 w-67.5 cursor-pointer flex-col justify-between rounded-2xl bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       {/* Image / Icon Section */}
-      <div className="flex h-[180px] items-center justify-center rounded-xl bg-slate-100">
+      <div className="flex h-45 items-center justify-center rounded-xl bg-slate-100">
         {icon}
       </div>
 
