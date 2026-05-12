@@ -49,14 +49,6 @@ const Page = () => {
         
         {/* Left Side Image */}
         <div className="flex flex-col items-center">
-          
-          <div className="border p-5 rounded bg-white">
-            <img
-              src="https://rukminim2.flixcart.com/image/832/832/xif0q/mobile/g/l/c/-original-imah4jyfyrpxfhtk.jpeg?q=70&crop=false"
-              alt="product"
-              className="w-[300px] h-[350px] object-contain"
-            />
-          </div>
 
           {/* Buttons */}
           <div className="flex gap-4 mt-6 w-full">
