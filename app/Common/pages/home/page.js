@@ -20,6 +20,7 @@ const Home = () => {
       Emp: "/Common/pages/Employes",
       Contact: "/Common/pages/Contact",
       Mail: "/Common/pages/Mail",
+      Test: "/Common/Test/interviwe",
     };
 
     router.push(routes[item]);
@@ -80,7 +81,7 @@ const Home = () => {
 
         {/* Menu */}
         <div className="hidden md:flex gap-6  font-bold  position-fixed">
-          {["Home", "Our Products", "Pricing", "About", "Emp", "Contact", "Mail"].map(
+          {["Home", "Our Products", "Pricing", "About", "Emp", "Contact", "Mail", "Test"].map(
             (item) => (
               <button
                 key={item}

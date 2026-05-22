@@ -1,4 +1,3 @@
-
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
@@ -13,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   // Initialize user from cookies
   const [user, setUser] = useState(() => {
     try {
-      const storedUser = Cookies.get("token");
+      const storedUser = Cookies.get("user");
       return storedUser ? JSON.parse(storedUser) : null;
     } catch (err) {
       console.error("Failed to parse user from cookies:", err);
@@ -27,6 +26,7 @@ export const AuthProvider = ({ children }) => {
       router.push("/Common/pages/login");
     }
   }, [user, router]);
+  console.log("Current user:", user);
 
   // Login
 const login = async ({ email, password }) => {
@@ -46,10 +46,10 @@ const login = async ({ email, password }) => {
     }
 
     // ✅ Save user (or token)
-    // setUser(data.user);
+    setUser(data.user);
 
     // // Optional (only if NOT using HTTP-only cookie from backend)
-    // Cookies.set("user", JSON.stringify(data.user));
+    Cookies.set("user", JSON.stringify(data.user));
 
     router.push("/Common/pages/home");
   } catch (err) {
@@ -61,7 +61,7 @@ const login = async ({ email, password }) => {
     setUser(null);
 
     // Remove cookie
-    Cookies.remove("token");
+    Cookies.remove("user");
 
     router.push("/Common/pages/login");
   };
@@ -74,3 +74,4 @@ const login = async ({ email, password }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
