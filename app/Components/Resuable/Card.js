@@ -14,7 +14,7 @@ const Card = ({
       onClick={onClick}
       className={`
         relative flex flex-col justify-between w-full cursor-pointer
-        rounded-2xl bg-white p-[18px] transition-all duration-200
+        rounded-2xl bg-white p-4.5 transition-all duration-200
         border-[1.5px] hover:-translate-y-0.5
         hover:shadow-[0_6px_24px_rgba(99,102,241,0.12)]
         ${active

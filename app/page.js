@@ -1,21 +1,17 @@
 "use client";
 import React, { useState, useRef } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    role: "",
-    position: "",
-    password: "",
+    name: "", email: "", role: "", position: "", password: "",
   });
 
   const imageRef = useRef();
   const [submittedData, setSubmittedData] = useState([]);
   const [edit, setEdit] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const handleValues = (e) => {
@@ -26,9 +22,8 @@ const Page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+    setSuccess(false);
     try {
-      // Update local list (UI)
       if (edit !== null) {
         const updatedData = [...submittedData];
         updatedData[edit] = form;
@@ -38,36 +33,19 @@ const Page = () => {
         setSubmittedData((prev) => [...prev, form]);
       }
 
-      // Send JSON request to backend
-      const response = await fetch("http://localhost:5000/api/employees", {
+      await fetch("http://localhost:5000/api/employees", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          role: form.role,
-          position: form.position,
-          password: form.password
+          name: form.name, email: form.email,
+          role: form.role, position: form.position, password: form.password,
         }),
       });
 
-      const data = await response.json();
-      console.log("Server response:", data);
-
-      // Reset form
-      setForm({
-        name: "",
-        email: "",
-        role: "",
-        position: "",
-        password: "",
-      });
-
-      if (imageRef?.current) {
-        imageRef.current.value = null;
-      }
+      setForm({ name: "", email: "", role: "", position: "", password: "" });
+      if (imageRef?.current) imageRef.current.value = null;
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error("Error submitting form:", err);
     } finally {
@@ -75,166 +53,150 @@ const Page = () => {
     }
   };
 
-  const handleGo = () => {
-    router.push("/Common/pages/login");
-  };
-
-  const handleEdit = (index) => {
-    setForm(submittedData[index]);
-    setEdit(index);
-  };
-
-  const handleDelete = (index) => {
-    const updatedData = submittedData.filter((_, i) => i !== index);
-    setSubmittedData(updatedData);
-  };
+  const inputClass =
+    "w-full pl-9 pr-4 py-2.5 border-[1.5px] border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Employee Management System
-          </h1>
-          <p className="text-lg text-gray-600">
-            Add new employees to your organization
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#f0f4ff] px-4 py-10 relative overflow-hidden">
 
-        {/* Form Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-              </svg>
+      {/* Blobs */}
+      <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-indigo-400/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-16 -left-12 w-60 h-60 rounded-full bg-blue-400/8 blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 max-w-xl mx-auto">
+        <div className="bg-white border border-indigo-100 rounded-2xl shadow-[0_8px_40px_rgba(99,102,241,0.08)] px-8 py-8">
+
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-md shadow-indigo-200 shrink-0">
+              👥
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {edit !== null ? "Edit Employee" : "Add New Employee"}
-            </h2>
+            <div>
+              <h1 className="text-[19px] font-bold text-gray-900 tracking-tight">
+                {edit !== null ? "Edit Employee" : "Add New Employee"}
+              </h1>
+              <p className="text-[12px] text-gray-400 mt-0.5">
+                Fill in the details to add to your organization
+              </p>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="h-px bg-gray-100 my-5" />
+
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Full Name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">
                   Full Name
                 </label>
-                <input
-                  required
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  placeholder="John Doe"
-                  onChange={handleValues}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">👤</span>
+                  <input
+                    required type="text" name="name"
+                    value={form.name} onChange={handleValues}
+                    placeholder="John Doe" className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">
                   Email Address
                 </label>
-                <input
-                  required
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  placeholder="john.doe@company.com"
-                  onChange={handleValues}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">✉️</span>
+                  <input
+                    required type="email" name="email"
+                    value={form.email} onChange={handleValues}
+                    placeholder="john@company.com" className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Role */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">
                   Role
                 </label>
-                <input
-                  required
-                  type="text"
-                  name="role"
-                  value={form.role}
-                  placeholder="Software Engineer"
-                  onChange={handleValues}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">💼</span>
+                  <input
+                    required type="text" name="role"
+                    value={form.role} onChange={handleValues}
+                    placeholder="Software Engineer" className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Position */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">
                   Position
                 </label>
-                <input
-                  required
-                  type="text"
-                  name="position"
-                  value={form.position}
-                  placeholder="Senior Developer"
-                  onChange={handleValues}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">🏅</span>
+                  <input
+                    required type="text" name="position"
+                    value={form.position} onChange={handleValues}
+                    placeholder="Senior Developer" className={inputClass}
+                  />
+                </div>
               </div>
 
+              {/* Password — full width */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">
                   Password
                 </label>
-                <input
-                  required
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  placeholder="••••••••"
-                  onChange={handleValues}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">🔒</span>
+                  <input
+                    required type="password" name="password"
+                    value={form.password} onChange={handleValues}
+                    placeholder="••••••••" className={inputClass}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            {/* Buttons */}
+            <div className="flex gap-3 mt-6">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                className="flex-1 py-2.5 bg-linear-to-br from-indigo-500 to-indigo-600 text-white rounded-xl text-[14px] font-bold tracking-wide shadow-md shadow-indigo-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2"
               >
                 {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Processing...
-                  </span>
+                  </>
                 ) : (
-                  edit !== null ? "Update Employee" : "Add Employee"
+                  <>{edit !== null ? "✏️ Update Employee" : "+ Add Employee"}</>
                 )}
               </button>
-              
+
               <button
                 type="button"
-                onClick={handleGo}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition duration-200"
+                onClick={() => router.push("/Common/pages/login")}
+                className="px-5 py-2.5 bg-white border-[1.5px] border-gray-200 rounded-xl text-[13.5px] font-semibold text-gray-600 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-500 transition-all duration-150"
               >
                 Go to Login
               </button>
             </div>
 
+            {/* Cancel edit */}
             {edit !== null && (
               <button
                 type="button"
                 onClick={() => {
                   setEdit(null);
-                  setForm({
-                    name: "",
-                    email: "",
-                    role: "",
-                    position: "",
-                    password: "",
-                  });
+                  setForm({ name: "", email: "", role: "", position: "", password: "" });
                 }}
-                className="w-full text-gray-500 hover:text-gray-700 transition duration-200 text-sm font-medium"
+                className="w-full mt-3 text-[12.5px] font-semibold text-gray-400 hover:text-indigo-500 transition-colors"
               >
                 ← Cancel Edit
               </button>
@@ -242,17 +204,13 @@ const Page = () => {
           </form>
         </div>
 
-        {/* Success Message (Optional) */}
-        {submittedData.length > 0 && (
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-green-800 font-medium">
-                Employee {edit !== null ? 'updated' : 'added'} successfully!
-              </span>
-            </div>
+        {/* Success toast */}
+        {success && (
+          <div className="flex items-center gap-3 bg-green-50 border border-green-100 rounded-2xl px-5 py-3.5 mt-4 shadow-sm">
+            <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+            <span className="text-[13px] font-semibold text-green-700">
+              Employee {edit !== null ? "updated" : "added"} successfully!
+            </span>
           </div>
         )}
       </div>
