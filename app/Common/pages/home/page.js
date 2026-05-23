@@ -19,7 +19,7 @@ const Home = () => {
       Emp: "/Common/pages/Employes",
       Contact: "/Common/pages/Contact",
       Mail: "/Common/pages/Mail",
-      Test: "/Common/Test/interviwe",
+      Test: "/Common/Test/interview",
     };
     router.push(routes[item]);
   };

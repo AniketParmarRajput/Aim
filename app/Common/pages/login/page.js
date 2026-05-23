@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { login } = useAuth();
@@ -29,6 +30,10 @@ export default function Page() {
       setIsLoading(false);
     }
   };
+  const router = useRouter();
+  const handleGotoForgetPassword = (e) => {
+    router.push("/Common/pages/ForgetPasswords"); 
+  }
 
   return (
     <div className="min-h-screen bg-[#f0f4ff] flex items-center justify-center px-4 py-10 relative overflow-hidden">
@@ -77,8 +82,8 @@ export default function Page() {
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-[12.5px] font-semibold text-gray-700">Password</label>
               <button
-                type="button"
                 className="text-[12px] text-indigo-500 font-medium hover:underline"
+                onClick={handleGotoForgetPassword}
               >
                 Forgot password?
               </button>
