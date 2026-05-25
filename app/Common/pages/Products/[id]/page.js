@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 const Page = () => {
   const params = useParams();
@@ -18,228 +18,295 @@ const Page = () => {
         const response = await fetch(
           `http://localhost:5000/api/prizing/getPrizing/${id}`
         );
-
         const result = await response.json();
         setProduct(result);
       } catch (err) {
-        console.error("Error fetching product details:", err);
+        console.error("Error fetching product:", err);
       }
     };
-
     if (id) fetchProductDetails();
   }, [id]);
 
-  // Loading state
   if (!product) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-[#f0f4ff] gap-4">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-500 rounded-full animate-spin" />
-
-        <p className="text-[14px] font-semibold text-gray-400 animate-pulse">
-          Loading product...
-        </p>
+      <div className="flex justify-center items-center h-screen bg-[#f5f7ff]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-gray-400 font-medium">Loading product...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f4ff] px-4 py-8 relative overflow-hidden">
-      
-      {/* Background blobs */}
-      <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-indigo-400/10 blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#f5f7ff] px-4 py-8">
+      <div className="max-w-4xl mx-auto">
 
-      <div className="absolute -bottom-16 -left-12 w-60 h-60 rounded-full bg-blue-400/8 blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 max-w-5xl mx-auto">
-
-        {/* Back button */}
+        {/* Back Button */}
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-indigo-500 bg-indigo-50 px-3.5 py-2 rounded-lg mb-5 hover:bg-indigo-100 transition-colors"
+          className="mb-6 inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
-          ← Back to Products
+          ← Back
         </button>
 
-        {/* Main card */}
-        <div className="bg-white border border-indigo-100 rounded-2xl shadow-[0_8px_40px_rgba(99,102,241,0.07)] overflow-hidden">
+        {/* Main Card */}
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-[260px_1fr]">
 
-          <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-
-            {/* Left Side */}
-            <div className="bg-linear-to-br from-indigo-50/80 to-purple-50/60 border-b md:border-b-0 md:border-r border-indigo-100 flex flex-col items-center justify-center gap-5 p-8">
+            {/* ── LEFT PANEL ── */}
+            <div className="flex flex-col items-center gap-5 p-6 border-b md:border-b-0 md:border-r border-gray-100">
 
               {/* Stock badge */}
-              <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-600 text-[11px] font-bold px-3 py-1 rounded-full border border-green-100">
-                ● In Stock
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-green-50 text-green-700 border border-green-100 px-3 py-1 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                In Stock
+              </span>
+
+              {/* Product image placeholder */}
+              <div className="w-44 h-44 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-5xl">
+                🛍️
               </div>
 
-              {/* Product Image */}
-              {/* <div className="w-44 h-44 rounded-2xl bg-white border border-indigo-100 shadow-md shadow-indigo-100/50 flex items-center justify-center overflow-hidden">
+              {/* Add to Cart */}
+              <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors">
+                🛒 Add to cart
+              </button>
 
-                {product.data?.image ? (
-                  <Image
-                    src={`http://localhost:5000/uploads/${product.data.image.replace(
-                      /^.*[\\/]uploads[\\/]/,
-                      ""
-                    )}`}
-                    alt={product.data?.itemName || "Product"}
-                    width={176}
-                    height={176}
-                    className="object-contain w-full h-full"
-                  />
-                ) : (
-                  <span className="text-5xl">🛍️</span>
-                )}
+              {/* PayPal */}
+              <div className="w-full border border-gray-100 rounded-xl p-3">
+                <p className="text-xs text-center text-gray-400 mb-2">Pay securely with</p>
+                <PayPalScriptProvider
+                  options={{
+                    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+                    currency: "USD",
+                  }}
+                >
+                  {/* <PayPalButtons
+                    style={{ layout: "vertical", color: "gold", shape: "rect", label: "paypal" }}
+                    createOrder={(data, actions) =>
+                      actions.order.create({
+                        purchase_units: [
+                          {
+                            description: product.data?.itemName,
+                            amount: { value: String(product.data?.amount) },
+                          },
+                        ],
+                      })
+                    }
+                    onApprove={async (data, actions) => {
+                      if (!actions.order) return;
+                      const details = await actions.order.capture();
+                      alert(`Payment successful — ${details?.payer?.name?.given_name}`);
+                    }}
+                    onError={(err) => {
+                      console.error(err);
+                      alert("Payment failed. Please try again.");
+                    }}
+                  /> */}
+                  <PayPalButtons
+  style={{
+    layout: "vertical",
+    color: "gold",
+    shape: "rect",
+    label: "paypal",
+  }}
 
-              </div> */}
+  // CREATE ORDER
+  createOrder={async () => {
 
-              {/* Thumbnail strip */}
-              <div className="flex gap-2">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className={`w-10 h-10 rounded-lg bg-white border flex items-center justify-center text-lg cursor-pointer transition-all ${
-                      i === 0
-                        ? "border-indigo-400 shadow-sm"
-                        : "border-gray-200"
-                    }`}
-                  >
-                    🛍️
-                  </div>
-                ))}
+    try {
+
+      const response = await fetch(
+
+        "http://localhost:5000/api/paypal/create-order",
+
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type": "application/json",
+
+          },
+
+          body: JSON.stringify({
+
+            amount: product.data?.amount,
+
+            itemName: product.data?.itemName,
+
+          }),
+
+        }
+      );
+
+
+
+      const data = await response.json();
+
+      console.log("ORDER RESPONSE:", data);
+
+      return data.id;
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  }}
+
+
+
+  // PAYMENT SUCCESS
+  onApprove={async (data) => {
+
+    try {
+
+      const response = await fetch(
+
+        "http://localhost:5000/api/paypal/capture-order",
+
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type": "application/json",
+
+          },
+
+          body: JSON.stringify({
+
+            orderID: data.orderID,
+
+          }),
+
+        }
+      );
+
+
+
+      const details = await response.json();
+
+      console.log("CAPTURE RESPONSE:", details);
+
+
+
+      alert("Payment Successful");
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert("Payment Failed");
+
+    }
+
+  }}
+
+
+
+  // ERROR
+  onError={(err) => {
+
+    console.log(err);
+
+    alert("Payment failed");
+
+  }}
+/>
+                </PayPalScriptProvider>
               </div>
 
-              {/* Buttons */}
-              <div className="flex flex-col gap-2.5 w-full">
-
-                <button className="w-full py-2.5 bg-orange-50 text-orange-600 border-[1.5px] border-orange-200 rounded-xl text-[13px] font-bold hover:bg-orange-100 transition-all">
-                  🛒 ADD TO CART
-                </button>
-
-                <button className="w-full py-2.5 bg-linear-to-br from-orange-500 to-orange-600 text-white rounded-xl text-[13px] font-bold shadow-md shadow-orange-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
-                  ⚡ BUY NOW
-                </button>
-
+              {/* Trust signals */}
+              <div className="w-full pt-3 border-t border-gray-100 flex flex-col gap-2 text-xs text-gray-400">
+                <span>🔒 Secure checkout</span>
+                <span>🚚 Fast shipping</span>
+                <span>🔄 Easy returns</span>
               </div>
             </div>
 
-            {/* Right Side */}
-            <div className="p-7">
+            {/* ── RIGHT PANEL ── */}
+            <div className="p-6 md:p-8">
 
-              {/* Product Name */}
-              <h1 className="text-[18px] font-bold text-gray-900 tracking-tight leading-snug mb-3">
+              {/* Product name */}
+              <h1 className="text-xl font-semibold text-gray-900 leading-snug mb-4">
                 {product.data?.itemName || product.data?.description}
               </h1>
 
               {/* Rating */}
               <div className="flex items-center gap-2 mb-5">
-
-                <span className="flex items-center gap-1 bg-green-600 text-white text-[11.5px] font-bold px-2.5 py-1 rounded-lg">
+                <span className="inline-flex items-center gap-1 bg-green-600 text-white text-xs font-semibold px-2 py-0.5 rounded-md">
                   ★ 4.3
                 </span>
-
-                <span className="text-[12px] text-gray-400">
-                  2,514 Ratings & 210 Reviews
-                </span>
-
+                <span className="text-sm text-gray-400">2,514 ratings · 210 reviews</span>
               </div>
 
               {/* Price */}
-              <div className="mb-1">
-
-                <span className="text-[30px] font-bold text-gray-900 tracking-tight">
-                  <sup className="text-base align-super">₹</sup>
-
-                  {Number(product.data?.amount).toLocaleString("en-IN")}
+              <div className="flex items-baseline gap-3 mb-1">
+                <span className="text-3xl font-bold text-gray-900">
+                  ₹{Number(product.data?.amount).toLocaleString("en-IN")}
                 </span>
-
+                <span className="text-sm text-gray-400 line-through">
+                  ₹{(Number(product.data?.amount) * 1.3).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                </span>
+                <span className="text-sm font-medium text-green-600">23% off</span>
               </div>
+              <p className="text-xs text-gray-400 mb-6">Inclusive of all taxes</p>
 
-              <div className="flex items-center gap-2 mb-5">
-
-                <span className="text-[13px] text-gray-400 line-through">
-                  ₹
-                  {Math.round(
-                    Number(product.data?.amount) * 1.33
-                  ).toLocaleString("en-IN")}
-                </span>
-
-                <span className="bg-green-50 text-green-600 text-[11.5px] font-bold px-2.5 py-1 rounded-full border border-green-100">
-                  25% off
-                </span>
-
-              </div>
-
-              <div className="h-px bg-gray-100 mb-4" />
+              <hr className="border-gray-100 mb-5" />
 
               {/* Product ID */}
-              <p className="text-[12px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                Product ID
-              </p>
-
-              <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-500 text-[12px] font-semibold px-3 py-1.5 rounded-lg border border-indigo-100 mb-4">
-                🔑 {product.data?.id}
+              <div className="mb-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Product ID
+                </p>
+                <div className="inline-flex items-center gap-2 text-xs font-medium text-indigo-500 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-lg">
+                  🔑 {product.data?.id}
+                </div>
               </div>
 
-              <div className="h-px bg-gray-100 mb-4" />
-
               {/* Description */}
-              <p className="text-[12px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                Description
-              </p>
-
-              <p className="text-[13px] text-gray-500 leading-relaxed mb-4">
-                {product.data?.description}
-              </p>
+              <div className="mb-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Description
+                </p>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {product.data?.description}
+                </p>
+              </div>
 
               {/* Offers */}
-              <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
-
+              <div className="bg-gray-50 rounded-xl border border-gray-100 p-4">
                 <div className="flex items-center justify-between">
-
-                  <p className="text-[12px] font-bold text-gray-400 uppercase tracking-wider">
-                    Available Offers
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                    Available offers
                   </p>
-
                   <button
-                    className="text-[12px] font-bold text-orange-500 hover:text-orange-600"
                     onClick={() => setOffers(!offers)}
+                    className="text-xs font-medium text-indigo-500 hover:text-indigo-600 transition-colors"
                   >
-                    {offers ? "Hide Offers" : "View All Offers"}
+                    {offers ? "Hide offers" : "View offers"}
                   </button>
-
                 </div>
 
                 {offers && (
-                  <div className="mt-3 space-y-2">
-
-                    <div className="flex items-start gap-2 bg-green-50 border border-green-100 rounded-lg p-2">
-
-                      <span className="text-green-600 text-[11.5px] font-bold">
-                        🔥 10% Instant Discount on HDFC Bank Cards
-                      </span>
-
+                  <div className="mt-3 flex flex-col gap-2">
+                    <div className="flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 text-xs font-medium rounded-lg px-3 py-2">
+                      ⚡ 10% instant discount on HDFC cards
                     </div>
-
-                    <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-lg p-2">
-
-                      <span className="text-blue-600 text-[11.5px] font-bold">
-                        💳 Extra ₹500 Cashback on UPI Payments
-                      </span>
-
+                    <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium rounded-lg px-3 py-2">
+                      💳 ₹500 cashback on UPI payments
                     </div>
-
-                    <div className="flex items-start gap-2 bg-purple-50 border border-purple-100 rounded-lg p-2">
-
-                      <span className="text-purple-600 text-[11.5px] font-bold">
-                        🚚 Free Delivery on Orders Above ₹999
-                      </span>
-
+                    <div className="flex items-center gap-2 bg-purple-50 border border-purple-100 text-purple-700 text-xs font-medium rounded-lg px-3 py-2">
+                      🚚 Free delivery above ₹999
                     </div>
-
                   </div>
                 )}
-
               </div>
 
             </div>

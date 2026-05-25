@@ -8,17 +8,47 @@ const Page = () => {
 
   const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSuccess(false);
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  setSuccess(false);
+
+  // Validate Email
+  if (!validateEmail(email)) {
+    setError("Please enter a valid email address.");
+    return;
+  }
+
+  setError("");
+
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/employees/update-password",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Something went wrong");
     }
-    setError("");
+
     setSuccess(true);
-    console.log("Email submitted:", email);
-  };
+
+    console.log("Response:", data);
+  } catch (error) {
+    console.error("Error:", error.message);
+    setError(error.message);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
