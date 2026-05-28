@@ -61,7 +61,7 @@ export default function Page() {
           {/* Email */}
           <div>
             <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">
-              Email addressdddddddd
+              Email address
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">✉</span>
