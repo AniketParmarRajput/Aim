@@ -16,6 +16,9 @@ const Page = () => {
   const [offers, setOffers] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
 
+  // ✅ Quantity State
+  const [quantity, setQuantity] = useState(1);
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -33,8 +36,17 @@ const Page = () => {
     if (id) fetchProductDetails();
   }, [id]);
 
+  // ✅ Total Price
+  const totalPrice = Number(product?.data?.amount || 0) * quantity;
+
+  // ✅ Add To Cart
   const handleAddtoCart = (id) => {
-    console.log("Add to cart:", id);
+    console.log("Add to cart:", {
+      id,
+      quantity,
+      totalPrice,
+    });
+
     // Add your cart logic here
   };
 
@@ -118,6 +130,7 @@ const Page = () => {
                 <span className="inline-flex items-center gap-1 bg-green-600 text-white text-xs font-semibold px-2 py-0.5 rounded-md">
                   ★ 4.3
                 </span>
+
                 <span className="text-sm text-gray-400">
                   2,514 ratings · 210 reviews
                 </span>
@@ -126,14 +139,12 @@ const Page = () => {
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-1">
                 <span className="text-3xl font-bold text-gray-900">
-                  ₹{Number(product.data?.amount).toLocaleString("en-IN")}
+                  ₹{totalPrice.toLocaleString("en-IN")}
                 </span>
 
                 <span className="text-sm text-gray-400 line-through">
                   ₹
-                  {(
-                    Number(product.data?.amount) * 1.3
-                  ).toLocaleString("en-IN", {
+                  {(totalPrice * 1.3).toLocaleString("en-IN", {
                     maximumFractionDigits: 0,
                   })}
                 </span>
@@ -146,6 +157,39 @@ const Page = () => {
               <p className="text-xs text-gray-400 mb-6">
                 Inclusive of all taxes
               </p>
+
+              {/* ✅ Quantity Section */}
+              <div className="mb-6">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Quantity
+                </p>
+
+                <div className="flex items-center gap-3">
+
+                  {/* Minus */}
+                  <button
+                    onClick={() =>
+                      setQuantity((prev) => Math.max(1, prev - 1))
+                    }
+                    className="w-10 h-10 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-lg font-semibold"
+                  >
+                    -
+                  </button>
+
+                  {/* Quantity */}
+                  <span className="text-lg font-semibold w-10 text-center">
+                    {quantity}
+                  </span>
+
+                  {/* Plus */}
+                  <button
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    className="w-10 h-10 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-lg font-semibold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
 
               <hr className="border-gray-100 mb-5" />
 
@@ -188,6 +232,7 @@ const Page = () => {
 
                 {offers && (
                   <div className="mt-3 flex flex-col gap-2">
+
                     <div className="flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 text-xs font-medium rounded-lg px-3 py-2">
                       ⚡ 10% instant discount on HDFC cards
                     </div>
@@ -210,6 +255,7 @@ const Page = () => {
       {/* PAYMENT POPUP */}
       {showPayment && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+
           <div className="bg-white rounded-2xl p-5 w-[380px] relative shadow-xl">
 
             {/* Close */}
@@ -224,10 +270,33 @@ const Page = () => {
               Complete Payment
             </h2>
 
+            {/* Order Summary */}
+            <div className="mb-4 bg-gray-50 border border-gray-100 rounded-xl p-4">
+
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-gray-500">Product</span>
+                <span className="font-medium">
+                  {product.data?.itemName}
+                </span>
+              </div>
+
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-gray-500">Quantity</span>
+                <span className="font-medium">{quantity}</span>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Total</span>
+                <span className="font-semibold text-indigo-600">
+                  ₹{totalPrice.toLocaleString("en-IN")}
+                </span>
+              </div>
+            </div>
+
             <PayPalScriptProvider
               options={{
                 clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
-                currency: "USD",
+                currency: "INR",
               }}
             >
               <PayPalButtons
@@ -238,6 +307,7 @@ const Page = () => {
                   label: "paypal",
                 }}
 
+                // ✅ Create Order
                 createOrder={async () => {
                   try {
                     const response = await fetch(
@@ -247,20 +317,24 @@ const Page = () => {
                         headers: {
                           "Content-Type": "application/json",
                         },
+
                         body: JSON.stringify({
-                          amount: product.data?.amount,
+                          amount: totalPrice,
                           itemName: product.data?.itemName,
+                          quantity,
                         }),
                       }
                     );
 
                     const data = await response.json();
+
                     return data.id;
                   } catch (err) {
                     console.log(err);
                   }
                 }}
 
+                // ✅ Payment Success
                 onApprove={async (data) => {
                   try {
                     const response = await fetch(
@@ -270,8 +344,10 @@ const Page = () => {
                         headers: {
                           "Content-Type": "application/json",
                         },
+
                         body: JSON.stringify({
                           orderID: data.orderID,
+                          quantity,
                         }),
                       }
                     );
@@ -279,15 +355,19 @@ const Page = () => {
                     await response.json();
 
                     alert("Payment Successful");
+
                     setShowPayment(false);
                   } catch (err) {
                     console.log(err);
+
                     alert("Payment Failed");
                   }
                 }}
 
+                // ✅ Payment Error
                 onError={(err) => {
                   console.log(err);
+
                   alert("Payment Failed");
                 }}
               />
@@ -300,4 +380,3 @@ const Page = () => {
 };
 
 export default Page;
-
