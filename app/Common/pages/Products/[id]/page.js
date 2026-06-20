@@ -296,7 +296,7 @@ const Page = () => {
             <PayPalScriptProvider
               options={{
                 clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
-                currency: "INR",
+                currency: "USD",
               }}
             >
               <PayPalButtons

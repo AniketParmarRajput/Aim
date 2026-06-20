@@ -18,7 +18,7 @@ const Home = () => {
       About: "/Common/pages/About",
       Emp: "/Common/pages/Employes",
       Contact: "/Common/pages/Contact",
-      Mail: "/Common/pages/Mail",
+      Management: "/Common/pages/Management",
       Test: "/Common/Test/interview",
     };
     router.push(routes[item]);
@@ -74,7 +74,7 @@ const Home = () => {
 
           {/* Nav links — plain text, no borders */}
           <div className="hidden md:flex items-center">
-            {["Home", "Our Products", "Pricing", "About", "Emp", "Contact", "Mail", "Test"].map(
+            {["Home", "Our Products", "Pricing", "About", "Emp", "Contact", "Management", "Test"].map(
               (item) => (
                 <button
                   key={item}
