@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/app/Common/Context/CartContext";
 
 // ─── Product Data ─────────────────────────────────────────────────────────────
 const PRODUCTS = [
@@ -91,24 +92,13 @@ const PRODUCTS = [
   },
 ];
 
-const NAV_ITEMS = [
-  { label: "Home",         route: "/" },
-  { label: "Our Products", route: "/Common/pages/Products" },
-  { label: "Pricing",      route: "/Common/pages/Pricing" },
-  { label: "About",        route: "/Common/pages/About" },
-  { label: "Emp",          route: "/Common/pages/Employes" },
-  { label: "Contact",      route: "/Common/pages/Contact" },
-  { label: "Management",   route: "/Common/pages/Management" },
-  { label: "Test",         route: "/Common/Test/interview" },
-];
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt  = (n) => n.toLocaleString("en-IN");
 const disc = (p, o) => Math.round((1 - p / o) * 100);
 const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
-const ProductCard = ({ product, onAdd }) => (
+const ProductCard = ({ product, onAdd, onBuy }) => (
   <div className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-gray-300 transition-colors cursor-pointer">
     {/* Image area */}
     <div className={`relative aspect-square flex items-center justify-center text-5xl ${product.bg}`}>
@@ -142,13 +132,21 @@ const ProductCard = ({ product, onAdd }) => (
         <span className="text-[11px] text-red-600">-{disc(product.price, product.original)}%</span>
       </div>
 
-      {/* Add to cart */}
-      <button
-        onClick={(e) => { e.stopPropagation(); onAdd(); }}
-        className="w-full bg-orange-500 hover:bg-orange-600 text-white text-[12px] font-medium py-1.5 rounded-full transition-colors"
-      >
-        Add to cart
-      </button>
+      {/* Buttons */}
+      <div className="flex gap-2">
+        <button
+          onClick={(e) => { e.stopPropagation(); onAdd(product); }}
+          className="flex-1 bg-brand-orange hover:bg-brand-orange-hover text-white text-[11px] font-medium py-1.5 rounded-full transition-colors"
+        >
+          Add to cart
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onBuy(product); }}
+          className="flex-1 bg-brand-dark hover:bg-[#0a1230] text-white text-[11px] font-medium py-1.5 rounded-full transition-colors"
+        >
+          Buy now
+        </button>
+      </div>
     </div>
   </div>
 );
@@ -156,72 +154,19 @@ const ProductCard = ({ product, onAdd }) => (
 // ─── Main Page ────────────────────────────────────────────────────────────────
 const Home = () => {
   const router = useRouter();
-  const [cart, setCart] = useState(0);
-
-  // replace with real logout from useAuth
-  const logout = () => router.push("/login");
+  const { addToCart } = useCart();
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-
-      {/* ── Navbar ── */}
-      <nav className="bg-[#0b1437] px-5 py-2.5 flex items-center gap-3 flex-wrap sticky top-0 z-50">
-
-        {/* Logo */}
-        <div
-          className="flex items-center gap-2 cursor-pointer shrink-0"
-          onClick={() => router.push("/")}
-        >
-          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-sm">
-            ⚡
-          </div>
-          <span className="text-white text-[14px] font-medium">YourBrand</span>
-        </div>
-
-        {/* Nav links */}
-        <div className="hidden md:flex items-center gap-0.5 flex-wrap">
-          {NAV_ITEMS.map(({ label, route }) => (
-            <button
-              key={label}
-              onClick={() => router.push(route)}
-              className="text-white/60 hover:text-white hover:bg-white/10 text-[12px] px-2.5 py-1.5 rounded-md transition-colors"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Right side */}
-        <div className="ml-auto flex items-center gap-2">
-          {/* Cart */}
-          <div className="relative cursor-pointer mr-1">
-            <span className="text-white text-xl">🛒</span>
-            {cart > 0 && (
-              <span className="absolute -top-1 -right-2 bg-orange-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {cart}
-              </span>
-            )}
-          </div>
-          <button
-            onClick={logout}
-            className="text-[12px] text-white/70 border border-white/20 px-3 py-1.5 rounded-lg hover:bg-white/10 hover:text-white transition-colors"
-          >
-            Log out
-          </button>
-          <button className="text-[12px] font-medium text-blue-700 bg-white px-3.5 py-1.5 rounded-lg hover:bg-blue-50 transition-colors">
-            Sign up
-          </button>
-        </div>
-      </nav>
+    <div className="bg-gray-50 font-sans">
 
       {/* ── Hero ── */}
-      <div className="bg-[#0b1437] px-6 pt-10 pb-12 relative overflow-hidden">
+      <div className="bg-brand-dark px-6 pt-10 pb-12 relative overflow-hidden">
         <span className="inline-flex items-center gap-1.5 bg-blue-500/15 border border-blue-400/25 text-blue-300 text-[11px] font-medium px-3 py-1 rounded-full mb-4">
           Dashboard
         </span>
         <h1 className="text-white text-2xl md:text-3xl font-medium leading-snug mb-2">
           Welcome back to<br />
-          <span className="text-blue-400">YourBrand</span>
+          <span className="text-blue-400">Easy Shop</span>
         </h1>
         <p className="text-white/50 text-[13px] mb-5">
           Manage your store, employees and orders from one place.
@@ -229,7 +174,7 @@ const Home = () => {
         <div className="flex gap-2">
           <button
             onClick={() => router.push("/Common/pages/Products")}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-[12px] font-medium px-4 py-2 rounded-lg transition-colors"
+            className="bg-brand-orange hover:bg-brand-orange-hover text-white text-[12px] font-medium px-4 py-2 rounded-lg transition-colors"
           >
             View products
           </button>
@@ -248,14 +193,14 @@ const Home = () => {
       <div className="max-w-6xl mx-auto px-4 py-5">
 
         {/* Promo banner */}
-        <div className="bg-[#0b1437] rounded-xl px-5 py-4 flex items-center justify-between gap-3 mb-6">
+        <div className="bg-brand-dark rounded-xl px-5 py-4 flex items-center justify-between gap-3 mb-6">
           <div>
             <p className="text-white/50 text-[11px] mb-0.5">Limited time offer</p>
             <p className="text-white text-[14px] font-medium">Up to 60% off on Electronics</p>
           </div>
           <button
             onClick={() => router.push("/Common/pages/Products")}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-[12px] font-medium px-4 py-2 rounded-lg transition-colors shrink-0"
+            className="bg-brand-orange hover:bg-brand-orange-hover text-white text-[12px] font-medium px-4 py-2 rounded-lg transition-colors shrink-0"
           >
             Shop now
           </button>
@@ -278,7 +223,8 @@ const Home = () => {
             <ProductCard
               key={product.id}
               product={product}
-              onAdd={() => setCart((c) => c + 1)}
+              onAdd={(product) => addToCart({ id: product.id, itemName: product.name, amount: product.price, image: null })}
+              onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
             />
           ))}
         </div>

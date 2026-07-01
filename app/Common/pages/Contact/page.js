@@ -22,20 +22,20 @@ const Contact = () => {
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
-  const inputClass = "w-full pl-9 pr-4 py-2.5 border-[1.5px] border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all";
+  const inputClass = "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all";
 
   return (
-    <div className="min-h-screen bg-[#f0f4ff] py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 relative overflow-hidden">
 
       {/* Blobs */}
-      <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-indigo-400/10 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-16 -left-12 w-60 h-60 rounded-full bg-blue-400/8 blur-3xl pointer-events-none" />
+      <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-16 -left-12 w-60 h-60 rounded-full bg-brand-dark/5 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-2xl mx-auto">
 
         {/* Page Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-500 text-[11.5px] font-semibold px-3 py-1.5 rounded-full mb-3">
+          <div className="inline-flex items-center gap-1.5 bg-orange-50 text-brand-orange text-[11.5px] font-semibold px-3 py-1.5 rounded-full mb-3">
             ✉️ Get in Touch
           </div>
           <h1 className="text-[26px] font-bold text-gray-900 tracking-tight">Contact Us</h1>
@@ -45,7 +45,7 @@ const Contact = () => {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white border border-indigo-100 rounded-2xl shadow-[0_8px_40px_rgba(99,102,241,0.07)] px-8 py-8 mb-4">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg px-8 py-8 mb-4">
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* Name + Email row */}
@@ -104,7 +104,7 @@ const Contact = () => {
                   name="message" value={formData.message}
                   onChange={handleChange} required rows={5}
                   placeholder="Write your message here..."
-                  className="w-full pl-9 pr-4 py-2.5 border-[1.5px] border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none leading-relaxed"
+                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all resize-none leading-relaxed"
                 />
               </div>
             </div>
@@ -112,7 +112,7 @@ const Contact = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full py-2.5 bg-linear-to-br from-indigo-500 to-indigo-600 text-white rounded-xl text-[14px] font-bold tracking-wide shadow-md shadow-indigo-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 mt-1"
+              className="w-full py-2.5 bg-brand-dark text-white rounded-xl text-[14px] font-bold tracking-wide hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-1"
             >
               ➤ Send Message
             </button>
@@ -122,15 +122,15 @@ const Contact = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[
-            { icon: "📍", label: "Address", value: "123 Main Street, City, Country", bg: "bg-indigo-50", text: "text-indigo-500" },
-            { icon: "📞", label: "Phone",   value: "+1 (555) 123-4567",             bg: "bg-green-50",  text: "text-green-600" },
-            { icon: "📧", label: "Email",   value: "contact@example.com",           bg: "bg-orange-50", text: "text-orange-500" },
-          ].map(({ icon, label, value, bg, text }) => (
-            <div key={label} className="bg-white border border-indigo-100 rounded-2xl px-5 py-5 text-center shadow-sm">
-              <div className={`w-9 h-9 ${bg} rounded-xl flex items-center justify-center mx-auto mb-3 text-lg`}>
+            { icon: "📍", label: "Address", value: "123 Main Street, City, Country" },
+            { icon: "📞", label: "Phone",   value: "+1 (555) 123-4567" },
+            { icon: "📧", label: "Email",   value: "contact@example.com" },
+          ].map(({ icon, label, value }) => (
+            <div key={label} className="bg-white border border-gray-200 rounded-2xl px-5 py-5 text-center shadow-sm">
+              <div className="w-9 h-9 bg-brand-dark/10 rounded-xl flex items-center justify-center mx-auto mb-3 text-lg">
                 {icon}
               </div>
-              <p className={`text-[12px] font-700 font-bold ${text} mb-1`}>{label}</p>
+              <p className="text-[12px] font-bold text-brand-dark mb-1">{label}</p>
               <p className="text-[12px] text-gray-400 leading-relaxed">{value}</p>
             </div>
           ))}
