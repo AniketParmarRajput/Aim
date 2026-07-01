@@ -96,4 +96,9 @@
   
   /* ========== WHITE ========== */
   --color-white: #ffffff;
+
+  /* ========== BRAND ========== */
+  --color-brand-dark: #0b1437;
+  --color-brand-orange: #f97316;
+  --color-brand-orange-hover: #ea580c;
 }
