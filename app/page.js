@@ -196,7 +196,7 @@ const Page = () => {
           <div className="flex items-center gap-3 bg-green-50 border border-green-100 rounded-2xl px-5 py-3.5 mt-4 shadow-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
             <span className="text-[13px] font-semibold text-green-700">
-              Employesssse {edit !== null ? "updated" : "added"} successfully!
+              Employese {edit !== null ? "updated" : "added"} successfully!
             </span>
           </div>
         )}
