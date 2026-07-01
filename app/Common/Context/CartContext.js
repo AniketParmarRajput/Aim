@@ -9,16 +9,17 @@ export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
 
   const addToCart = (product) => {
+    const qty = Number(product.quantity) || 1;
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + qty }
             : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: qty }];
     });
   };
 
@@ -38,8 +39,14 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const getDiscountedPrice = (item) => {
+    const amount = Number(item.amount);
+    const discount = Number(item.discount) || 0;
+    return discount > 0 ? Math.round(amount - (amount * discount) / 100) : amount;
+  };
+
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = items.reduce((sum, item) => sum + Number(item.amount) * item.quantity, 0);
+  const cartTotal = items.reduce((sum, item) => sum + getDiscountedPrice(item) * item.quantity, 0);
 
   return (
     <CartContext.Provider value={{ items, cartCount, cartTotal, addToCart, removeFromCart, updateQuantity }}>
