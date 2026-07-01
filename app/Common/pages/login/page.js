@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const { login } = useAuth();
 
-  const [form, setForm] = useState({ name: "", email: "", mobile: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +23,7 @@ export default function Page() {
     setIsLoading(true);
     try {
       login(form);
-      setForm({ name: "", email: "", mobile: "", password: "" });
+      setForm({ email: "", password: "" });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,31 +47,15 @@ export default function Page() {
           <span className="text-[16px] font-bold text-gray-900 tracking-tight">Easy Shop</span>
         </div>
 
-        <h1 className="text-[22px] font-bold text-gray-900 tracking-tight mb-1">Create Account</h1>
-        <p className="text-[13px] text-gray-400 mb-7">Fill in your details to get started</p>
+        <h1 className="text-[22px] font-bold text-gray-900 tracking-tight mb-1">Log In</h1>
+        <p className="text-[13px] text-gray-400 mb-7">Welcome back! Enter your credentials</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Full Name</label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">👤</span>
-              <input type="text" name="name" value={form.name} onChange={handleValues} placeholder="John Doe" required className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
-            </div>
-          </div>
-
           <div>
             <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Email address</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">✉</span>
               <input type="email" name="email" value={form.email} onChange={handleValues} placeholder="you@example.com" required className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Mobile Number</label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">📱</span>
-              <input type="tel" name="mobile" value={form.mobile} onChange={handleValues} placeholder="+1 234 567 890" required className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
             </div>
           </div>
 
@@ -95,27 +79,13 @@ export default function Page() {
           )}
 
           <button type="submit" disabled={isLoading} className="w-full py-2.5 mt-1 bg-brand-dark text-white rounded-xl text-[14px] font-bold tracking-wide hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-            {isLoading ? "Creating account..." : "Create Account"}
+            {isLoading ? "Logging in..." : "Log In"}
           </button>
         </form>
 
-        <div className="flex items-center gap-3 my-5">
-          <div className="flex-1 h-px bg-gray-100" />
-          <span className="text-[11.5px] text-gray-300 font-medium">or continue with</span>
-          <div className="flex-1 h-px bg-gray-100" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {[{ label: "Google", icon: "G" }, { label: "GitHub", icon: "⎔" }].map(({ label, icon }) => (
-            <button key={label} type="button" className="flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl text-[12.5px] font-semibold text-gray-700 hover:border-brand-orange hover:bg-orange-50/50 transition-all">
-              <span>{icon}</span> {label}
-            </button>
-          ))}
-        </div>
-
         <p className="text-center text-[12.5px] text-gray-400 mt-6">
-          Already have an account?{" "}
-          <span className="text-brand-orange font-semibold cursor-pointer hover:underline">Log in</span>
+          Don&apos;t have an account?{" "}
+          <span className="text-brand-orange font-semibold cursor-pointer hover:underline">Sign up</span>
         </p>
       </div>
     </div>
