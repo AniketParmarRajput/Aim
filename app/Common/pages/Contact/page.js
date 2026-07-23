@@ -22,10 +22,10 @@ const Contact = () => {
     setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
-  const inputClass = "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all";
+  const inputClass = "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all";
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-brand-cream py-10 px-4 relative overflow-hidden">
 
       {/* Blobs */}
       <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
@@ -45,7 +45,7 @@ const Contact = () => {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg px-8 py-8 mb-4">
+        <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-8 py-8 mb-4">
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* Name + Email row */}
@@ -104,7 +104,7 @@ const Contact = () => {
                   name="message" value={formData.message}
                   onChange={handleChange} required rows={5}
                   placeholder="Write your message here..."
-                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all resize-none leading-relaxed"
+                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all resize-none leading-relaxed"
                 />
               </div>
             </div>
@@ -126,7 +126,7 @@ const Contact = () => {
             { icon: "📞", label: "Phone",   value: "+1 (555) 123-4567" },
             { icon: "📧", label: "Email",   value: "contact@example.com" },
           ].map(({ icon, label, value }) => (
-            <div key={label} className="bg-white border border-gray-200 rounded-2xl px-5 py-5 text-center shadow-sm">
+            <div key={label} className="bg-brand-light border border-gray-200 rounded-2xl px-5 py-5 text-center shadow-sm">
               <div className="w-9 h-9 bg-brand-dark/10 rounded-xl flex items-center justify-center mx-auto mb-3 text-lg">
                 {icon}
               </div>

@@ -68,7 +68,7 @@ export default function EditProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10">
+    <div className="min-h-screen bg-brand-cream px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl bg-brand-orange flex items-center justify-center shadow-md">
@@ -80,29 +80,29 @@ export default function EditProduct() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg px-8 py-8">
+        <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-8 py-8">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Item Name</label>
-              <input type="text" value={form.itemName} required onChange={(e) => setForm({ ...form, itemName: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
+              <input type="text" value={form.itemName} required onChange={(e) => setForm({ ...form, itemName: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Price (₹)</label>
-              <input type="number" value={form.amount} required onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
+              <input type="number" value={form.amount} required onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
             </div>
             <div className="md:col-span-2">
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Description</label>
-              <textarea value={form.description} rows={2} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all resize-none" />
+              <textarea value={form.description} rows={2} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all resize-none" />
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Category</label>
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all">
+              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all">
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Discount %</label>
-              <input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} className="w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all" />
+              <input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} className="w-full px-3 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all" />
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Badge</label>
@@ -111,7 +111,7 @@ export default function EditProduct() {
                 if (val === "out of stock") setForm({ ...form, badge: val, stock: "0" });
                 else if (val === "limited stock") setForm({ ...form, badge: val, stock: form.stock || "1" });
                 else setForm({ ...form, badge: val });
-              }} className="w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all">
+              }} className="w-full px-3 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all">
                 <option value="none">None</option>
                 <option value="new">New</option>
                 <option value="sale">Sale</option>
@@ -121,15 +121,15 @@ export default function EditProduct() {
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">SKU Code</label>
-              <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5">
+              <div className="flex items-center gap-2 bg-brand-cream border border-gray-200 rounded-xl px-3 py-2.5">
                 <span className="text-[13.5px] font-mono font-bold text-brand-dark">{form.sku || <span className="text-gray-300 font-normal">-</span>}</span>
               </div>
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Colour</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={form.colour || "#000000"} onChange={(e) => setForm({ ...form, colour: e.target.value })} className="w-10 h-10 rounded-xl border border-gray-200 bg-gray-50 cursor-pointer p-0.5" />
-                <input type="text" value={form.colour} placeholder="#000000" onChange={(e) => setForm({ ...form, colour: e.target.value })} className="flex-1 px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all font-mono" />
+                <input type="color" value={form.colour || "#000000"} onChange={(e) => setForm({ ...form, colour: e.target.value })} className="w-10 h-10 rounded-xl border border-gray-200 bg-brand-cream cursor-pointer p-0.5" />
+                <input type="text" value={form.colour} placeholder="#000000" onChange={(e) => setForm({ ...form, colour: e.target.value })} className="flex-1 px-3 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all font-mono" />
               </div>
             </div>
             <div>
@@ -137,7 +137,7 @@ export default function EditProduct() {
               <input type="number" value={form.stock} onChange={(e) => {
                 const s = Number(e.target.value);
                 setForm({ ...form, stock: e.target.value, badge: s === 0 && form.badge !== "out of stock" ? "out of stock" : s > 0 && s <= 5 && form.badge !== "limited stock" ? "limited stock" : s > 5 && (form.badge === "limited stock" || form.badge === "out of stock") ? "none" : form.badge });
-              }} required={form.badge === "limited stock" || form.badge === "out of stock"} className="w-full px-3 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all" />
+              }} required={form.badge === "limited stock" || form.badge === "out of stock"} className="w-full px-3 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange transition-all" />
             </div>
             <div>
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Status</label>
@@ -147,7 +147,7 @@ export default function EditProduct() {
             </div>
             <div className="md:col-span-2">
               <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Image (leave empty to keep current)</label>
-              <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl px-4 py-4 bg-gray-50 hover:border-brand-orange hover:bg-orange-50/30 transition-all cursor-pointer text-center group">
+              <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl px-4 py-4 bg-brand-cream hover:border-brand-orange hover:bg-orange-50/30 transition-all cursor-pointer text-center group">
                 <span className="text-2xl mb-1">🖼️</span>
                 <span className="text-[12.5px] text-gray-500 font-medium"><span className="text-brand-orange font-semibold group-hover:underline">Click to upload</span> new image</span>
                 <input type="file" className="hidden" onChange={(e) => setForm({ ...form, image: e.target.files[0] })} />
@@ -158,7 +158,7 @@ export default function EditProduct() {
               <button type="submit" className="flex-1 py-2.5 bg-brand-dark text-white rounded-xl text-[14px] font-bold hover:opacity-90 active:scale-[0.98] transition-all">
                 Update Product
               </button>
-              <button type="button" onClick={() => router.back()} className="py-2.5 px-6 border border-gray-200 text-gray-600 rounded-xl text-[14px] font-medium hover:bg-gray-50 transition-all">
+              <button type="button" onClick={() => router.back()} className="py-2.5 px-6 border border-gray-200 text-gray-600 rounded-xl text-[14px] font-medium hover:bg-brand-cream transition-all">
                 Cancel
               </button>
             </div>

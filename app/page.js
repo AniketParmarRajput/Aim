@@ -54,17 +54,17 @@ const Page = () => {
   };
 
   const inputClass =
-    "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-white transition-all";
+    "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all";
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10 relative overflow-hidden">
+    <div className="min-h-screen bg-brand-cream px-4 py-10 relative overflow-hidden">
 
       {/* Blobs */}
       <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-16 -left-12 w-60 h-60 rounded-full bg-brand-dark/5 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-xl mx-auto">
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg px-8 py-8">
+        <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-8 py-8">
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
@@ -169,7 +169,7 @@ const Page = () => {
               <button
                 type="button"
                 onClick={() => router.push("/Common/pages/login")}
-                className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-[13.5px] font-semibold text-gray-600 hover:border-brand-orange hover:bg-orange-50 hover:text-brand-orange transition-all duration-150"
+                className="px-5 py-2.5 bg-brand-light border border-gray-200 rounded-xl text-[13.5px] font-semibold text-gray-600 hover:border-brand-orange hover:bg-orange-50 hover:text-brand-orange transition-all duration-150"
               >
                 Go to Login
               </button>

@@ -136,7 +136,11 @@
   --color-white: #ffffff;
 
   /* ========== BRAND ========== */
-  --color-brand-dark: #0b1437;
-  --color-brand-orange: #f97316;
-  --color-brand-orange-hover: #ea580c;
+  --color-brand-dark: #2D1810;
+  --color-brand-orange: #8B7355;
+  --color-brand-orange-hover: #6B5335;
+  --color-brand-cream: #FAF0E6;
+  --color-brand-light: #FFF8F0;
+  --color-brand-muted: #E8D5C4;
+  --color-brand-tan: #D4A87A;
 }
