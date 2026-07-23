@@ -1,11 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../Context/AuthContext";
 
 const CATEGORIES = ["Men", "Women", "Childs", "Other"];
 
 export default function Page() {
   const router = useRouter();
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({
@@ -36,6 +38,21 @@ export default function Page() {
 
   useEffect(() => { fetchProducts(); }, []);
 
+  if (user && user.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
+        <div className="text-center animate-fade-in max-w-md">
+          <span className="text-6xl">🚫</span>
+          <h1 className="text-xl font-bold text-gray-900 mt-4">Access Denied</h1>
+          <p className="text-sm text-gray-400 mt-2">Only admin users can manage products.</p>
+          <button onClick={() => router.push("/Common/pages/home")} className="mt-6 bg-brand-orange text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl hover:bg-brand-orange-hover transition-all">
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const openAdd = () => setShowAdd(true);
   const closeAdd = () => {
     setShowAdd(false);
@@ -62,7 +79,7 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10">
+    <div className="min-h-screen bg-brand-cream px-4 py-10">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -79,11 +96,11 @@ export default function Page() {
           </button>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-[12px] font-semibold text-gray-500 uppercase tracking-wider">
+                <tr className="bg-brand-cream border-b border-gray-200 text-[12px] font-semibold text-gray-500 uppercase tracking-wider">
                   <th className="px-4 py-3">Image</th>
                   <th className="px-4 py-3">SKU</th>
                   <th className="px-4 py-3">Name</th>
@@ -106,9 +123,9 @@ export default function Page() {
                   const stockLow = Number(p.stock) > 0 && Number(p.stock) <= 5;
                   const outOfStock = Number(p.stock) === 0;
                   return (
-                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-[13px] animate-fade-in" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                    <tr key={p.id} className="border-b border-gray-100 hover:bg-brand-cream transition-colors text-[13px] animate-fade-in" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
                       <td className="px-4 py-3">
-                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                        <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
                           {p.image ? (
                             <img src={`http://localhost:5000/uploads/${p.image}`} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -137,7 +154,7 @@ export default function Page() {
                           <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
                             p.badge === "new" ? "bg-pink-50 text-pink-700" :
                             p.badge === "sale" ? "bg-orange-50 text-orange-700" :
-                            p.badge === "out of stock" ? "bg-gray-200 text-gray-500" :
+                            p.badge === "out of stock" ? "bg-brand-muted text-gray-500" :
                             p.badge === "limited stock" ? "bg-yellow-50 text-yellow-700" :
                             "bg-sky-50 text-sky-700"
                           }`}>{p.badge === "out of stock" ? "Out of Stock" : p.badge === "limited stock" ? `Limited Stock - ${p.stock ?? 0}` : p.badge}</span>
@@ -177,7 +194,7 @@ export default function Page() {
 
       {showAdd && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in" onClick={closeAdd}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-scale-in" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-brand-light rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 pb-2">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-brand-dark flex items-center justify-center">
@@ -188,31 +205,31 @@ export default function Page() {
                   <p className="text-[11px] text-gray-400">Fill in the details to add a new item</p>
                 </div>
               </div>
-              <button onClick={closeAdd} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-lg transition-colors">✕</button>
+              <button onClick={closeAdd} className="w-8 h-8 rounded-full bg-brand-muted hover:bg-brand-muted flex items-center justify-center text-gray-500 text-lg transition-colors">✕</button>
             </div>
             <div className="p-6 pt-4">
               <form onSubmit={handleAddSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Item Name</label>
-                  <input type="text" value={form.itemName} placeholder="Enter item name" required onChange={(e) => setForm({ ...form, itemName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
+                  <input type="text" value={form.itemName} placeholder="Enter item name" required onChange={(e) => setForm({ ...form, itemName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
                 </div>
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Price (₹)</label>
-                  <input type="number" value={form.amount} placeholder="Enter price" required onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all" />
+                  <input type="number" value={form.amount} placeholder="Enter price" required onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Description</label>
-                  <textarea value={form.description} placeholder="Enter a short description..." rows={2} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all resize-none" />
+                  <textarea value={form.description} placeholder="Enter a short description..." rows={2} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all resize-none" />
                 </div>
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Category</label>
-                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all">
+                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all">
                     {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Discount %</label>
-                  <input type="number" value={form.discount} placeholder="%" onChange={(e) => setForm({ ...form, discount: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
+                  <input type="number" value={form.discount} placeholder="%" onChange={(e) => setForm({ ...form, discount: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
                 </div>
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Badge</label>
@@ -221,7 +238,7 @@ export default function Page() {
                     if (val === "out of stock") setForm({ ...form, badge: val, stock: "0" });
                     else if (val === "limited stock") setForm({ ...form, badge: val, stock: form.stock || "1" });
                     else setForm({ ...form, badge: val });
-                  }} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all">
+                  }} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all">
                     <option value="none">None</option>
                     <option value="new">New</option>
                     <option value="sale">Sale</option>
@@ -231,15 +248,15 @@ export default function Page() {
                 </div>
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">SKU Code</label>
-                  <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                  <div className="flex items-center gap-2 bg-brand-cream border border-gray-200 rounded-xl px-3 py-2">
                     <span className="text-[13px] font-mono font-bold text-brand-dark">{skuPreview || <span className="text-gray-300 font-normal">Auto-generated</span>}</span>
                   </div>
                 </div>
                 <div>
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Colour</label>
                   <div className="flex items-center gap-2">
-                    <input type="color" value={form.colour || "#000000"} onChange={(e) => setForm({ ...form, colour: e.target.value })} className="w-10 h-10 rounded-xl border border-gray-200 bg-gray-50 cursor-pointer p-0.5" />
-                    <input type="text" value={form.colour} placeholder="#000000" onChange={(e) => setForm({ ...form, colour: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-white transition-all font-mono" />
+                    <input type="color" value={form.colour || "#000000"} onChange={(e) => setForm({ ...form, colour: e.target.value })} className="w-10 h-10 rounded-xl border border-gray-200 bg-brand-cream cursor-pointer p-0.5" />
+                    <input type="text" value={form.colour} placeholder="#000000" onChange={(e) => setForm({ ...form, colour: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all font-mono" />
                   </div>
                 </div>
                 <div>
@@ -247,11 +264,11 @@ export default function Page() {
                   <input type="number" value={form.stock} placeholder="0" onChange={(e) => {
                     const s = Number(e.target.value);
                     setForm({ ...form, stock: e.target.value, badge: s === 0 && form.badge !== "out of stock" ? "out of stock" : s > 0 && s <= 5 && form.badge !== "limited stock" ? "limited stock" : s > 5 && (form.badge === "limited stock" || form.badge === "out of stock") ? "none" : form.badge });
-                  }} required={form.badge === "limited stock" || form.badge === "out of stock"} className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
+                  }} required={form.badge === "limited stock" || form.badge === "out of stock"} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-[12px] font-semibold text-gray-700 mb-1">Image</label>
-                  <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl px-4 py-3 bg-gray-50 hover:border-brand-orange hover:bg-orange-50/30 transition-all cursor-pointer text-center group">
+                  <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl px-4 py-3 bg-brand-cream hover:border-brand-orange hover:bg-orange-50/30 transition-all cursor-pointer text-center group">
                     <span className="text-xl mb-0.5">🖼️</span>
                     <span className="text-[12px] text-gray-500 font-medium"><span className="text-brand-orange font-semibold group-hover:underline">Click to upload</span></span>
                     <input type="file" className="hidden" onChange={(e) => setForm({ ...form, image: e.target.files[0] })} required />
@@ -262,7 +279,7 @@ export default function Page() {
                   <button type="submit" className="flex-1 py-2 bg-brand-dark text-white rounded-xl text-[13px] font-bold hover:opacity-90 transition-all">
                     + Add Product
                   </button>
-                  <button type="button" onClick={closeAdd} className="py-2 px-5 border border-gray-200 text-gray-600 rounded-xl text-[13px] font-medium hover:bg-gray-50 transition-all">
+                  <button type="button" onClick={closeAdd} className="py-2 px-5 border border-gray-200 text-gray-600 rounded-xl text-[13px] font-medium hover:bg-brand-cream transition-all">
                     Cancel
                   </button>
                 </div>

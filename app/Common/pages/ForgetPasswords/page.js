@@ -51,8 +51,8 @@ const Page = () => {
 };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 w-full max-w-sm shadow-sm">
+    <div className="min-h-screen bg-brand-cream flex items-center justify-center p-4">
+      <div className="bg-brand-light border border-gray-200 rounded-2xl p-8 w-full max-w-sm shadow-sm">
 
         {/* Header */}
         <div className="mb-6">
@@ -88,7 +88,7 @@ const Page = () => {
                   if (error) setError("");
                   if (success) setSuccess(false);
                 }}
-                className={`w-full pl-9 pr-4 py-2.5 border-[1.5px] rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 transition-all bg-gray-50 focus:bg-white ${
+                className={`w-full pl-9 pr-4 py-2.5 border-[1.5px] rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 transition-all bg-brand-cream focus:bg-brand-light ${
                   error
                     ? "border-red-300 focus:border-red-400 focus:ring-red-500/10"
                     : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/10"

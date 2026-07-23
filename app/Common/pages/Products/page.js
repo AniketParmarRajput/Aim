@@ -46,13 +46,13 @@ const Page = () => {
   const activeCount = [category !== "All", badge !== "All", priceMin || priceMax].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-30 flex items-center justify-between">
+    <div className="min-h-screen bg-brand-cream">
+      <div className="bg-brand-light border-b border-gray-200 px-6 py-4 sticky top-0 z-30 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Products</h1>
           <p className="text-sm text-gray-400">{filtered.length} items</p>
         </div>
-        <button onClick={() => setFilterOpen(true)} className="flex items-center gap-1.5 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95">
+        <button onClick={() => setFilterOpen(true)} className="flex items-center gap-1.5 text-sm font-medium text-gray-600 bg-brand-muted hover:bg-brand-muted px-3 py-2 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95">
           <span>⚙️</span> Filters
           {activeCount > 0 && <span className="bg-brand-orange text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{activeCount}</span>}
         </button>
@@ -74,10 +74,10 @@ const Page = () => {
           <div
             key={item.id}
             onClick={() => router.push(`/Common/pages/Products/${item.id}`)}
-            className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 cursor-pointer animate-slide-up"
+            className="bg-brand-light rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 cursor-pointer animate-slide-up"
             style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}
           >
-            <div className="relative aspect-square bg-gray-50 flex items-center justify-center text-4xl">
+            <div className="relative aspect-square bg-brand-cream flex items-center justify-center text-4xl">
               {item.image ? (
                 <img src={`http://localhost:5000/uploads/${item.image}`} alt={item.itemName} className="w-full h-full object-cover" />
               ) : (
@@ -117,7 +117,7 @@ const Page = () => {
       {filterOpen && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40 animate-fade-in" onClick={() => setFilterOpen(false)} />
-          <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-xl z-50 p-5 overflow-y-auto animate-slide-in">
+          <div className="fixed top-0 right-0 h-full w-72 bg-brand-light shadow-xl z-50 p-5 overflow-y-auto animate-slide-in">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-gray-900">Filters</h2>
               <button onClick={() => setFilterOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>

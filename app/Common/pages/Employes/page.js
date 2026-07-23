@@ -2,8 +2,11 @@
 import React, { useEffect, useState } from "react";
 import ServerTable from "@/app/Components/Resuable/ServerTable";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../Context/AuthContext";
 
 const Page = () => {
+  const { user } = useAuth();
+  const router = useRouter();
   const [employees, setEmployees] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", mobile: "", position: "", salary: "" });
@@ -11,7 +14,21 @@ const Page = () => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([]);
-  const router = useRouter();
+
+  if (user && user.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
+        <div className="text-center animate-fade-in max-w-md">
+          <span className="text-6xl">🚫</span>
+          <h1 className="text-xl font-bold text-gray-900 mt-4">Access Denied</h1>
+          <p className="text-sm text-gray-400 mt-2">Only admin users can manage employees.</p>
+          <button onClick={() => router.push("/Common/pages/home")} className="mt-6 bg-brand-orange text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl hover:bg-brand-orange-hover transition-all">
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const fetchEmployees = async () => {
     try {
@@ -89,8 +106,8 @@ const Page = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-brand-cream">
+      <div className="bg-brand-light border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Employees</h1>
           <p className="text-sm text-gray-400">{employees.length} total</p>
@@ -120,7 +137,7 @@ const Page = () => {
       {showForm && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setShowForm(false)} />
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-xl z-50 p-6">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-brand-light rounded-2xl shadow-xl z-50 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">Add Employee</h2>
               <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>

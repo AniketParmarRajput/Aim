@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
 
@@ -18,16 +18,13 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
     : amount;
 
   return (
-    <div
-      onClick={() => onBuy(product)}
-      className="bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
-    >
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-5xl overflow-hidden">
+    <div className="bg-brand-light border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group">
+      <div onClick={() => onBuy(product)} className="relative aspect-square bg-gradient-to-br from-brand-cream to-brand-muted flex items-center justify-center text-5xl overflow-hidden">
         {product.image ? (
           <img
             src={`http://localhost:5000/uploads/${product.image}`}
             alt={product.itemName}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
           <span>🛍️</span>
@@ -36,36 +33,43 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
           <span className="absolute top-2 left-2 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">New</span>
         )}
         {product.badge === "sale" && (
-          <span className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Sale</span>
+          <span className="absolute top-2 left-2 bg-brand-dark text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Sale</span>
         )}
         {product.badge === "out of stock" && (
           <span className="absolute top-2 left-2 bg-gray-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Out of Stock</span>
         )}
         {product.badge === "limited stock" && (
-          <span className="absolute top-2 left-2 bg-yellow-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Limited - {product.stock ?? 0}</span>
+          <span className="absolute top-2 left-2 bg-yellow-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Limited</span>
         )}
         {discountPct > 0 && (
-          <span className="absolute top-2 right-2 bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">-{discountPct}%</span>
+          <span className="absolute top-2 right-2 bg-brand-dark text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">-{discountPct}%</span>
         )}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
       </div>
       <div className="p-3">
         <span className="text-[11px] text-brand-dark font-medium uppercase tracking-wide">{product.category || "General"}</span>
-        <h3 className="text-sm font-semibold text-gray-900 mt-0.5 line-clamp-1">{product.itemName}</h3>
+        <h3 onClick={() => onBuy(product)} className="text-sm font-semibold text-gray-900 mt-0.5 line-clamp-1 hover:text-brand-dark transition-colors">{product.itemName}</h3>
         <p className="text-xs text-gray-400 mt-1 line-clamp-2">{product.description}</p>
+        <div className="flex items-center gap-1 mt-1.5">
+          {[1,2,3,4,5].map((s) => (
+            <span key={s} className={`text-[11px] ${s <= 4 ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+          ))}
+          <span className="text-[10px] text-gray-400 ml-1">(24)</span>
+        </div>
         <div className="flex items-baseline gap-1.5 flex-wrap mt-2">
           <span className="text-[17px] font-bold text-gray-900">₹{fmt(discountedPrice)}</span>
           {discountPct > 0 && (
             <>
               <span className="text-[11px] text-gray-400 line-through">₹{fmt(amount)}</span>
-              <span className="text-[11px] text-red-600 font-medium">-{discountPct}%</span>
+              <span className="text-[11px] text-red-600 font-medium bg-red-50 px-1.5 py-0.5 rounded">-{discountPct}%</span>
             </>
           )}
         </div>
         <div className="flex gap-2 mt-3">
-          <button onClick={(e) => { e.stopPropagation(); onAdd(product); }} className="flex-1 bg-brand-orange hover:bg-brand-orange-hover text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">
+          <button onClick={(e) => { e.stopPropagation(); onAdd(product); }} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-2 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95">
             Add to cart
           </button>
-          <button onClick={(e) => { e.stopPropagation(); onBuy(product); }} className="flex-1 bg-brand-dark hover:bg-[#0a1230] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">
+          <button onClick={(e) => { e.stopPropagation(); onBuy(product); }} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-2 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95">
             Buy now
           </button>
         </div>
@@ -79,6 +83,8 @@ const Home = () => {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("All");
+  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -95,46 +101,91 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const categories = [...new Set(products.map((p) => p.category).filter(Boolean))];
+  const categories = useMemo(() => ["All", ...new Set(products.map((p) => p.category).filter(Boolean))], [products]);
+
+  const filtered = useMemo(() => {
+    return activeTab === "All" ? products : products.filter((p) => p.category === activeTab);
+  }, [products, activeTab]);
+
+  const deals = useMemo(() => products.filter((p) => Number(p.discount) > 0).sort((a, b) => Number(b.discount) - Number(a.discount)), [products]);
+
+  const visibleProducts = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
 
   return (
-    <div className="bg-gray-50 font-sans">
+    <div className="bg-brand-cream font-sans min-h-screen">
       {/* Hero */}
-      <div className="relative bg-gradient-to-br from-brand-dark via-[#0f1d4a] to-brand-dark px-6 pt-14 pb-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(249,115,22,0.12),transparent_60%)]" />
-        <div className="relative z-10 max-w-6xl mx-auto text-center md:text-left">
-          <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/80 text-[11px] font-medium px-3 py-1 rounded-full mb-4 animate-fade-in">
-            ⚡ New Collection 2026
-          </span>
-          <h1 className="text-white text-3xl md:text-4xl font-bold leading-snug mb-3 animate-slide-up">
-            Discover Your <br className="md:hidden" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-yellow-400">Perfect Style</span>
-          </h1>
-          <p className="text-white/50 text-[14px] mb-6 max-w-lg mx-auto md:mx-0 animate-slide-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
-            Shop the latest trends with exclusive discounts. Free delivery on your first order!
-          </p>
-          <div className="flex gap-3 justify-center md:justify-start animate-slide-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
-            <button onClick={() => router.push("/Common/pages/Products")} className="bg-brand-orange hover:bg-brand-orange-hover text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-brand-orange/25">
-              Shop Now
-            </button>
-            <button onClick={() => { const el = document.getElementById("products"); if (el) el.scrollIntoView({ behavior: "smooth" }); }} className="bg-white/10 hover:bg-white/15 text-white border border-white/20 text-[13px] px-6 py-2.5 rounded-xl transition-all duration-300">
-              Explore
-            </button>
+      <div className="relative bg-gradient-to-br from-brand-dark via-[#3D2B1F] to-brand-dark px-6 pt-16 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(139,115,85,0.15),transparent_60%)]" />
+        <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute -bottom-10 -right-10 w-56 h-56 rounded-full bg-white/5 blur-3xl" />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <span className="inline-flex items-center gap-1.5 bg-brand-light/10 border border-white/20 text-white/80 text-[11px] font-medium px-3 py-1 rounded-full mb-4 animate-fade-in">
+                ⚡ New Collection 2026
+              </span>
+              <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight mb-3 animate-slide-up">
+                Discover Your <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-yellow-300">Perfect Style</span>
+              </h1>
+              <p className="text-white/50 text-[15px] mb-6 max-w-lg animate-slide-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
+                Shop the latest trends with exclusive discounts up to 60% off. Free delivery on your first order!
+              </p>
+              <div className="flex gap-3 animate-slide-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
+                <button onClick={() => router.push("/Common/pages/Products")} className="bg-brand-dark hover:bg-[#1f0f08] text-white text-[13px] font-semibold px-7 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-black/20">
+                  Shop Now
+                </button>
+                <button onClick={() => { const el = document.getElementById("products"); if (el) el.scrollIntoView({ behavior: "smooth" }); }} className="bg-brand-light/10 hover:bg-brand-light/15 text-white border border-white/20 text-[13px] px-7 py-3 rounded-xl transition-all duration-300">
+                  Explore
+                </button>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center justify-center animate-slide-up" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
+              <div className="relative">
+                <div className="w-72 h-72 rounded-full bg-gradient-to-br from-white/5 to-transparent blur-2xl absolute -top-10 -left-10" />
+                <div className="relative grid grid-cols-2 gap-3">
+                  <div className="bg-brand-light/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-center">
+                    <span className="text-3xl">🛍️</span>
+                    <p className="text-white text-sm font-semibold mt-1">New Arrivals</p>
+                    <p className="text-white/50 text-[10px]">2026 Collection</p>
+                  </div>
+                  <div className="bg-brand-light/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-center mt-6">
+                    <span className="text-3xl">🏷️</span>
+                    <p className="text-white text-sm font-semibold mt-1">Big Sale</p>
+                    <p className="text-white/50 text-[10px]">Up to 60% off</p>
+                  </div>
+                  <div className="bg-brand-light/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-center -mt-3">
+                    <span className="text-3xl">🚚</span>
+                    <p className="text-white text-sm font-semibold mt-1">Free Ship</p>
+                    <p className="text-white/50 text-[10px]">On first order</p>
+                  </div>
+                  <div className="bg-brand-light/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-center">
+                    <span className="text-3xl">⭐</span>
+                    <p className="text-white text-sm font-semibold mt-1">Top Rated</p>
+                    <p className="text-white/50 text-[10px]">4.8 avg rating</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Categories */}
-        {categories.length > 0 && (
+        {categories.length > 1 && (
           <div className="mb-8 animate-fade-in">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4">Shop by Category</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[16px] font-bold text-gray-900">Shop by Category</h2>
+              <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline">View All</button>
+            </div>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {categories.map((cat) => (
-                <button key={cat} onClick={() => router.push("/Common/pages/Products")} className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-2xl px-5 py-3 hover:border-brand-orange hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 shrink-0 group">
+              {categories.filter((c) => c !== "All").map((cat) => (
+                <button key={cat} onClick={() => { setActiveTab(cat); document.getElementById("products")?.scrollIntoView({ behavior: "smooth" }); }} className="flex items-center gap-2.5 bg-brand-light border border-gray-200 rounded-2xl px-5 py-3 hover:border-brand-dark/30 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 shrink-0 group">
                   <span className="text-2xl">{CATEGORY_ICONS[cat] || "📦"}</span>
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-gray-900 group-hover:text-brand-orange transition-colors">{cat}</p>
+                    <p className="text-sm font-semibold text-gray-900 group-hover:text-brand-dark transition-colors">{cat}</p>
                     <p className="text-[11px] text-gray-400">{products.filter((p) => p.category === cat).length} items</p>
                   </div>
                 </button>
@@ -143,68 +194,115 @@ const Home = () => {
           </div>
         )}
 
-        {/* Promo */}
+        {/* Promo Banner */}
         {products.length > 0 && (
-          <div className="relative bg-gradient-to-r from-brand-orange to-orange-500 rounded-2xl px-6 py-5 flex items-center justify-between gap-4 mb-8 overflow-hidden animate-slide-up">
-            <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/5" />
+          <div className="relative bg-gradient-to-r from-brand-dark via-[#3D2B1F] to-brand-dark rounded-2xl px-6 py-6 flex items-center justify-between gap-4 mb-8 overflow-hidden animate-slide-up">
+            <div className="absolute -right-6 -bottom-6 w-40 h-40 rounded-full bg-brand-light/5" />
+            <div className="absolute -left-4 -top-4 w-24 h-24 rounded-full bg-brand-light/5" />
             <div>
               <p className="text-white/80 text-[11px] mb-0.5 font-medium">🔥 Limited Time Offer</p>
-              <p className="text-white text-[16px] font-bold">Up to 60% off on All Items</p>
+              <p className="text-white text-lg font-bold">Up to 60% off on All Items</p>
+              <p className="text-white/60 text-[11px] mt-1">Use code: <span className="text-white font-bold">SAVE60</span></p>
             </div>
-            <button onClick={() => router.push("/Common/pages/Products")} className="bg-white text-brand-orange text-[12px] font-bold px-5 py-2.5 rounded-xl hover:bg-orange-50 transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 shadow-lg">
-              Shop Now
+            <button onClick={() => router.push("/Common/pages/Products")} className="bg-brand-light text-brand-dark text-[12px] font-bold px-6 py-3 rounded-xl hover:bg-brand-cream transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 shadow-lg">
+              Shop Now →
             </button>
           </div>
         )}
 
-        {/* Products */}
-        <div id="products" className="flex items-center justify-between mb-4">
-          <h2 className="text-[16px] font-bold text-gray-900">Our Products</h2>
-          {products.length > 0 && (
-            <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-orange font-medium hover:underline">See all →</button>
-          )}
-        </div>
+        {/* Top Deals */}
+        {deals.length > 0 && (
+          <div className="mb-8 animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-[16px] font-bold text-gray-900">🔥 Top Deals</h2>
+                <p className="text-[11px] text-gray-400 mt-0.5">Best discounts available now</p>
+              </div>
+              <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline">See all →</button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {deals.slice(0, 6).map((product, i) => (
+                <div key={product.id} className="min-w-[180px] animate-slide-up" style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}>
+                  <ProductCard
+                    product={product}
+                    onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                    onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {loading ? (
-            <div className="col-span-full flex flex-col items-center gap-3 py-20 animate-fade-in">
-              <div className="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-400 font-medium">Loading products...</p>
+        {/* Category Tabs + Products */}
+        <div id="products">
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-[16px] font-bold text-gray-900">
+                {activeTab === "All" ? "All Products" : activeTab}
+              </h2>
+              <p className="text-[11px] text-gray-400 mt-0.5">{filtered.length} items available</p>
             </div>
-          ) : products.length === 0 ? (
-            <div className="col-span-full text-center py-16 text-gray-400 animate-fade-in">
-              <p className="text-5xl mb-3">📭</p>
-              <p className="text-sm font-medium">No products found</p>
-              <p className="text-xs text-gray-300 mt-1">Check back later for new arrivals</p>
+            <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+              {categories.map((cat) => (
+                <button key={cat} onClick={() => { setActiveTab(cat); setVisibleCount(8); }} className={`text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all duration-200 shrink-0 ${activeTab === cat ? "bg-brand-dark text-white shadow-md" : "bg-brand-light text-gray-600 border border-gray-200 hover:border-brand-dark/30 hover:text-brand-dark"}`}>
+                  {cat}
+                </button>
+              ))}
             </div>
-          ) : products.slice(0, 8).map((product, i) => (
-            <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}>
-              <ProductCard
-                product={product}
-                onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
-                onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
-              />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {loading ? (
+              <div className="col-span-full flex flex-col items-center gap-3 py-20 animate-fade-in">
+                <div className="w-10 h-10 border-3 border-brand-dark/30 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-gray-400 font-medium">Loading products...</p>
+              </div>
+            ) : visibleProducts.length === 0 ? (
+              <div className="col-span-full text-center py-16 text-gray-400 animate-fade-in">
+                <p className="text-5xl mb-3">📭</p>
+                <p className="text-sm font-medium">No products found in this category</p>
+                <p className="text-xs text-gray-300 mt-1">Try selecting a different category</p>
+              </div>
+            ) : visibleProducts.map((product, i) => (
+              <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                <ProductCard
+                  product={product}
+                  onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                  onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                />
+              </div>
+            ))}
+          </div>
+
+          {hasMore && (
+            <div className="flex justify-center mt-6">
+              <button onClick={() => setVisibleCount((prev) => prev + 8)} className="bg-brand-light border border-gray-200 text-gray-700 text-[13px] font-medium px-8 py-3 rounded-xl hover:border-brand-dark/30 hover:text-brand-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                Load More ({filtered.length - visibleCount} remaining)
+              </button>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Features */}
         {products.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 mb-8">
             {[
               { icon: "🚚", label: "Free Delivery", sub: "Orders above ₹499" },
               { icon: "🔄", label: "Easy Returns", sub: "30-day return policy" },
               { icon: "🔒", label: "Secure Payment", sub: "100% secure checkout" },
               { icon: "💬", label: "24/7 Support", sub: "Dedicated customer care" },
             ].map((s, i) => (
-              <div key={s.label} className="bg-white border border-gray-100 rounded-xl px-4 py-4 text-center hover:shadow-md transition-all duration-300 animate-slide-up" style={{ animationDelay: `${i * 0.1}s`, animationFillMode: "both" }}>
-                <span className="text-2xl">{s.icon}</span>
+              <div key={s.label} className="bg-brand-light border border-gray-100 rounded-xl px-4 py-5 text-center hover:shadow-md transition-all duration-300 animate-slide-up group" style={{ animationDelay: `${i * 0.1}s`, animationFillMode: "both" }}>
+                <span className="text-2xl group-hover:scale-110 inline-block transition-transform duration-300">{s.icon}</span>
                 <p className="text-sm font-semibold text-gray-900 mt-1">{s.label}</p>
                 <p className="text-[11px] text-gray-400 mt-0.5">{s.sub}</p>
               </div>
             ))}
           </div>
         )}
+
+
       </div>
     </div>
   );
