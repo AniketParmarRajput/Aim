@@ -107,6 +107,7 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editOrder, setEditOrder] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("All");
   const [form, setForm] = useState({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null });
 
   const isAdmin = user?.role === "admin";
@@ -156,6 +157,7 @@ const AdminPage = () => {
 
   const totalRevenue = orders.reduce((sum, o) => sum + Number(o.price || 0) * Number(o.quantity || 1), 0);
   const pendingOrders = orders.filter((o) => o.status === "pending").length;
+  const filteredOrders = statusFilter === "All" ? orders : orders.filter((o) => o.status === statusFilter);
 
   const closeAdd = () => {
     setShowAdd(false);
@@ -452,16 +454,29 @@ const AdminPage = () => {
             {/* Orders Tab */}
             {tab === "orders" && (
               <div className="animate-fade-in">
-                <p className="text-[12px] text-gray-400 mb-4">{orders.length} orders</p>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[12px] text-gray-400">{orders.length} orders &middot; {new Set(orders.map((o) => o.email).filter(Boolean)).size} customers</p>
+                </div>
 
-                {orders.length === 0 ? (
+                <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide">
+                  <button onClick={() => setStatusFilter("All")} className={`text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all shrink-0 ${statusFilter === "All" ? "bg-brand-dark text-white" : "bg-brand-light text-gray-600 border border-gray-200 hover:border-brand-orange"}`}>All</button>
+                  {STATUS_OPTIONS.map((s) => (
+                    <button key={s} onClick={() => setStatusFilter(s)} className={`text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all shrink-0 capitalize ${statusFilter === s ? "bg-brand-dark text-white" : "bg-brand-light text-gray-600 border border-gray-200 hover:border-brand-orange"}`}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+
+                {filteredOrders.length === 0 ? (
                   <div className="text-center py-16 text-gray-400">
                     <p className="text-5xl mb-3">📦</p>
                     <p className="text-sm font-medium">No orders found</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {orders.map((o, i) => (
+                    {filteredOrders.map((o, i) => {
+                      const totalAmount = Number(o.price) * Number(o.quantity || 1);
+                      return (
                       <div key={o.id} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
                         <div className="flex items-start justify-between mb-3">
                           <div className="min-w-0 flex-1">
@@ -482,14 +497,18 @@ const AdminPage = () => {
                             </span>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                           <div>
-                            <p className="text-gray-400">Price</p>
+                            <p className="text-gray-400">Unit Price</p>
                             <p className="font-semibold text-gray-900">₹{Number(o.price).toLocaleString("en-IN")}</p>
                           </div>
                           <div>
                             <p className="text-gray-400">Qty</p>
                             <p className="font-semibold text-gray-900">{o.quantity}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Total</p>
+                            <p className="font-semibold text-brand-orange">₹{totalAmount.toLocaleString("en-IN")}</p>
                           </div>
                           <div>
                             <p className="text-gray-400">Payment</p>
@@ -500,11 +519,18 @@ const AdminPage = () => {
                             <p className="font-semibold text-gray-900">{o.deliveryDate || "N/A"}</p>
                           </div>
                         </div>
+                        {(o.address || o.mobile) && (
+                          <div className="mt-2 grid grid-cols-2 gap-3 text-[11px] text-gray-500 bg-brand-cream rounded-lg px-3 py-2">
+                            {o.mobile && <div><span className="text-gray-400">Mobile:</span> {o.mobile}</div>}
+                            {o.address && <div className="col-span-2"><span className="text-gray-400">Address:</span> {o.address}</div>}
+                          </div>
+                        )}
                         {o.createdAt && (
                           <p className="text-[10px] text-gray-300 mt-2">Ordered on {new Date(o.createdAt).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                         )}
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 

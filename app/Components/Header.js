@@ -17,7 +17,7 @@ const NAV_ITEMS = [
 
 const Header = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout: authLogout } = useAuth();
   const { items, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -25,7 +25,7 @@ const Header = () => {
   const adminOnly = ["Pricing", "Management", "Emp"];
   const visibleNavItems = NAV_ITEMS.filter((item) => !adminOnly.includes(item.label) || isAdmin);
 
-  const logout = () => router.push("/Common/pages/login");
+  const handleLogout = () => authLogout();
 
   return (
     <>
@@ -58,14 +58,25 @@ const Header = () => {
               </span>
             )}
           </div>
-          <button onClick={logout} className="w-full flex items-center gap-3 text-[13px] text-white/70 border border-white/20 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 hover:text-white transition-colors text-left">
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 text-[13px] text-white/70 border border-white/20 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 hover:text-white transition-colors text-left">
             <span>🚪</span>
-            <span>Log out</span>
+            <span>{user ? "Log out" : "Log in"}</span>
           </button>
-          <button onClick={() => router.push("/")} className="w-full flex items-center gap-3 text-[13px] font-medium text-blue-700 bg-brand-light px-3 py-2.5 rounded-lg hover:bg-blue-50 transition-colors text-left">
-            <span>📝</span>
-            <span>Sign up</span>
-          </button>
+          {user ? (
+            <div onClick={() => router.push("/Common/pages/user")} className="bg-brand-light/10 rounded-xl p-3 cursor-pointer hover:bg-brand-light/20 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-white text-sm font-bold shrink-0">
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </div>
+                <p className="text-white text-[13px] font-semibold truncate">{user.name || "User"}</p>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => router.push("/")} className="w-full flex items-center gap-3 text-[13px] font-medium text-blue-700 bg-brand-light px-3 py-2.5 rounded-lg hover:bg-blue-50 transition-colors text-left">
+              <span>📝</span>
+              <span>Sign up</span>
+            </button>
+          )}
         </div>
       </aside>
 

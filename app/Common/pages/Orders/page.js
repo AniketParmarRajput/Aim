@@ -76,12 +76,14 @@ const EditModal = ({ order, isAdmin, onClose, onSave }) => {
             <label className="block text-[12px] font-semibold text-gray-700 mb-1">Address</label>
             <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter delivery address" rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all resize-none" />
           </div>
-          <div>
-            <label className="block text-[12px] font-semibold text-gray-700 mb-1">Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all">
-              {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-            </select>
-          </div>
+          {isAdmin && (
+            <div>
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">Status</label>
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all">
+                {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+              </select>
+            </div>
+          )}
           <div className="flex gap-3 pt-2">
             <button onClick={handleSave} className="flex-1 py-2.5 bg-brand-dark text-white rounded-xl text-[13px] font-bold hover:opacity-90 transition-all">Save</button>
             <button onClick={onClose} className="py-2.5 px-5 border border-gray-200 text-gray-600 rounded-xl text-[13px] font-medium hover:bg-brand-cream transition-all">Cancel</button>
@@ -244,9 +246,11 @@ const OrdersPage = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                    <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
-                      Edit
-                    </button>
+                    {isAdmin && (
+                      <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
+                        Edit
+                      </button>
+                    )}
                     <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                     </span>
