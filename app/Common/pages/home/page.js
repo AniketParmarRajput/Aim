@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
 
@@ -11,15 +11,23 @@ const CATEGORY_ICONS = {
 };
 
 const ProductCard = ({ product, onAdd, onBuy }) => {
+  const [added, setAdded] = useState(false);
   const amount = Number(product.amount);
   const discountPct = Number(product.discount);
   const discountedPrice = discountPct > 0
     ? Math.round(amount - (amount * discountPct) / 100)
     : amount;
 
+  const handleAdd = (e) => {
+    e.stopPropagation();
+    onAdd(product);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 3000);
+  };
+
   return (
-    <div className="bg-brand-light border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group">
-      <div onClick={() => onBuy(product)} className="relative aspect-square bg-gradient-to-br from-brand-cream to-brand-muted flex items-center justify-center text-5xl overflow-hidden">
+    <div className="w-full bg-brand-light border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group">
+      <div onClick={() => onBuy(product)} className="relative aspect-[4/3] bg-gradient-to-br from-brand-cream to-brand-muted flex items-center justify-center text-4xl overflow-hidden">
         {product.image ? (
           <img
             src={`http://localhost:5000/uploads/${product.image}`}
@@ -45,6 +53,16 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
           <span className="absolute top-2 right-2 bg-brand-dark text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">-{discountPct}%</span>
         )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {added ? (
+            <div className="text-center text-white text-[11px] font-medium py-1.5">Added ✓</div>
+          ) : (
+            <div className="flex gap-2">
+              <button onClick={handleAdd} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">Add to cart</button>
+              <button disabled={product.badge === "out of stock" || Number(product.stock) === 0} onClick={(e) => { if (product.badge !== "out of stock" && Number(product.stock) !== 0) { e.stopPropagation(); onBuy(product); } }} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:scale-100">{product.badge === "out of stock" || Number(product.stock) === 0 ? "Out of Stock" : "Buy now"}</button>
+            </div>
+          )}
+        </div>
       </div>
       <div className="p-3">
         <span className="text-[11px] text-brand-dark font-medium uppercase tracking-wide">{product.category || "General"}</span>
@@ -65,14 +83,6 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
             </>
           )}
         </div>
-        <div className="flex gap-2 mt-3">
-          <button onClick={(e) => { e.stopPropagation(); onAdd(product); }} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-2 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95">
-            Add to cart
-          </button>
-          <button onClick={(e) => { e.stopPropagation(); onBuy(product); }} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-2 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95">
-            Buy now
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -85,6 +95,18 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [visibleCount, setVisibleCount] = useState(8);
+
+  // Refs for scroll containers
+  const bigSaleScrollRef = useRef(null);
+  const topDealsScrollRef = useRef(null);
+
+  // Scroll functions
+  const scrollContainer = (ref, direction, amount = 320) => {
+    if (ref.current) {
+      const scrollAmount = direction === 'left' ? -amount : amount;
+      ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -108,6 +130,7 @@ const Home = () => {
   }, [products, activeTab]);
 
   const deals = useMemo(() => products.filter((p) => Number(p.discount) > 0).sort((a, b) => Number(b.discount) - Number(a.discount)), [products]);
+  const bigDeals = useMemo(() => products.filter((p) => Number(p.discount) >= 50).sort((a, b) => Number(b.discount) - Number(a.discount)), [products]);
 
   const visibleProducts = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -210,6 +233,53 @@ const Home = () => {
           </div>
         )}
 
+        {/* Big Sale */}
+        {bigDeals.length > 0 && (
+          <div className="mb-8 animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-[16px] font-bold text-gray-900">🔥 Big Sale</h2>
+                <p className="text-[11px] text-gray-400 mt-0.5">50% or more off — grab them fast!</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => scrollContainer(bigSaleScrollRef, 'left')}
+                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  ‹
+                </button>
+                <button 
+                  onClick={() => scrollContainer(bigSaleScrollRef, 'right')}
+                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+            <div 
+              ref={bigSaleScrollRef} 
+              className="flex gap-3 overflow-x-auto pb-4 scroll-smooth"
+              style={{
+                scrollbarWidth: 'auto',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {bigDeals.map((product, i) => (
+                <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                  <ProductCard
+                    product={product}
+                    onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                    onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                  />
+                </div>
+              ))}
+              <div className="shrink-0 flex items-center">
+                <button onClick={() => router.push("/Common/pages/Products")} className="text-[11px] text-brand-orange font-medium border border-brand-orange px-4 py-2 rounded-lg hover:bg-brand-orange hover:text-white transition-all whitespace-nowrap">View All →</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Top Deals */}
         {deals.length > 0 && (
           <div className="mb-8 animate-slide-up">
@@ -218,11 +288,32 @@ const Home = () => {
                 <h2 className="text-[16px] font-bold text-gray-900">🔥 Top Deals</h2>
                 <p className="text-[11px] text-gray-400 mt-0.5">Best discounts available now</p>
               </div>
-              <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline">See all →</button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => scrollContainer(topDealsScrollRef, 'left')}
+                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  ‹
+                </button>
+                <button 
+                  onClick={() => scrollContainer(topDealsScrollRef, 'right')}
+                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  ›
+                </button>
+                <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline ml-2">See all →</button>
+              </div>
             </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {deals.slice(0, 6).map((product, i) => (
-                <div key={product.id} className="min-w-[180px] animate-slide-up" style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}>
+            <div 
+              ref={topDealsScrollRef} 
+              className="flex gap-3 overflow-x-auto pb-4 scroll-smooth"
+              style={{
+                scrollbarWidth: 'auto',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {deals.slice(0, 8).map((product, i) => (
+                <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
                   <ProductCard
                     product={product}
                     onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
@@ -301,8 +392,6 @@ const Home = () => {
             ))}
           </div>
         )}
-
-
       </div>
     </div>
   );

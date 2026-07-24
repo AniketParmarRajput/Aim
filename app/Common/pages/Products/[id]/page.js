@@ -180,9 +180,10 @@ const Page = () => {
 
               <button
                 onClick={() => { setPaymentMethod("cash on delivery"); setShowPayment(true); }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-white bg-brand-orange hover:bg-brand-orange-hover transition-colors"
+                disabled={product.data?.badge === "out of stock" || Number(product.data?.stock) === 0}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-white bg-brand-orange hover:bg-brand-orange-hover transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
               >
-                💳 Buy Now
+                💳 {product.data?.badge === "out of stock" || Number(product.data?.stock) === 0 ? "Out of Stock" : "Buy Now"}
               </button>
 
               <div className="w-full pt-3 border-t border-gray-100 flex flex-col gap-2 text-xs text-gray-400">

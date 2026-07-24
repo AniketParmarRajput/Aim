@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
 
 const CATEGORIES = ["All", "Men", "Women", "Childs", "Other"];
-const BADGE_FILTERS = ["All", "New", "Sale", "Out of Stock", "Discounted"];
+const BADGE_FILTERS = ["All", "New", "Sale", "Out of Stock", "Discounted", "Big Discount"];
 
 const Page = () => {
   const [products, setProducts] = useState([]);
@@ -14,8 +14,18 @@ const Page = () => {
   const [badge, setBadge] = useState("All");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
+  const [addedItems, setAddedItems] = useState({});
   const router = useRouter();
   const { addToCart } = useCart();
+
+  const handleAddToCart = (e, item) => {
+    e.stopPropagation();
+    addToCart({ id: item.id, itemName: item.itemName, amount: item.amount, image: item.image, discount: item.discount });
+    setAddedItems((prev) => ({ ...prev, [item.id]: true }));
+    setTimeout(() => {
+      setAddedItems((prev) => ({ ...prev, [item.id]: false }));
+    }, 3000);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -36,7 +46,7 @@ const Page = () => {
     const matchCat = category === "All" || p.category === category;
     const matchBadge =
       badge === "All" ||
-      (badge === "Discounted" ? Number(p.discount) > 0 : p.badge === badge.toLowerCase());
+      (badge === "Discounted" ? Number(p.discount) > 0 : badge === "Big Discount" ? Number(p.discount) >= 50 : p.badge === badge.toLowerCase());
     const amt = Number(p.amount);
     const matchMin = !priceMin || amt >= Number(priceMin);
     const matchMax = !priceMax || amt <= Number(priceMax);
@@ -59,58 +69,85 @@ const Page = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="px-6 py-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div className="px-6 py-6">
         {loading ? (
-          <div className="col-span-full flex flex-col items-center gap-3 py-20 animate-fade-in">
+          <div className="flex flex-col items-center gap-3 py-20 animate-fade-in">
             <div className="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin" />
             <p className="text-sm text-gray-400 font-medium">Loading products...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="col-span-full text-center py-16 text-gray-400 animate-fade-in">
+          <div className="text-center py-16 text-gray-400 animate-fade-in">
             <p className="text-4xl mb-2">📭</p>
             <p className="text-sm">No products found.</p>
           </div>
-        ) : filtered.map((item, i) => (
-          <div
-            key={item.id}
-            onClick={() => router.push(`/Common/pages/Products/${item.id}`)}
-            className="bg-brand-light rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 cursor-pointer animate-slide-up"
-            style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}
-          >
-            <div className="relative aspect-square bg-brand-cream flex items-center justify-center text-4xl">
-              {item.image ? (
-                <img src={`http://localhost:5000/uploads/${item.image}`} alt={item.itemName} className="w-full h-full object-cover" />
-              ) : (
-                <span>📦</span>
-              )}
-              {item.badge === "new" && <span className="absolute top-2 left-2 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">New</span>}
-              {item.badge === "sale" && <span className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Sale</span>}
-              {item.badge === "out of stock" && <span className="absolute top-2 left-2 bg-gray-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>}
-              {item.badge === "limited stock" && <span className="absolute top-2 left-2 bg-yellow-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Limited Stock - {item.stock ?? 0}</span>}
-              {Number(item.discount) > 0 && <span className="absolute top-2 right-2 bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-{item.discount}%</span>}
-            </div>
-            <div className="p-3">
-              <span className="text-[11px] text-brand-dark font-medium uppercase">{item.category || "General"}</span>
-              <h3 className="text-sm font-semibold text-gray-900 mt-0.5 line-clamp-1">{item.itemName}</h3>
-              <p className="text-xs text-gray-400 mt-1 line-clamp-2">{item.description}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-lg font-bold text-gray-900">₹{Math.round(Number(item.amount) * (1 - Number(item.discount) / 100)).toLocaleString("en-IN")}</span>
-                {Number(item.discount) > 0 && (
-                  <>
-                    <span className="text-xs text-gray-400 line-through">
-                      ₹{Number(item.amount).toLocaleString("en-IN")}
-                    </span>
-                    <span className="text-xs text-red-600 font-medium">-{item.discount}%</span>
-                  </>
-                )}
+        ) : (
+          (() => {
+            const groups = {};
+            filtered.forEach((p) => {
+              const cat = p.category || "General";
+              if (!groups[cat]) groups[cat] = [];
+              groups[cat].push(p);
+            });
+            return Object.entries(groups).map(([cat, items]) => (
+              <div key={cat} className="mb-8 last:mb-0">
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-[17px] font-bold text-gray-900">{cat}</h2>
+                  <div className="h-px flex-1 bg-gray-200" />
+                  <span className="text-[11px] text-gray-400">{items.length} items</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {items.map((item, i) => (
+                    <div
+                      key={item.id}
+                      onClick={() => router.push(`/Common/pages/Products/${item.id}`)}
+                      className="group bg-brand-light rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 cursor-pointer animate-slide-up"
+                      style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}
+                    >
+                      <div className="relative aspect-[4/3] bg-brand-cream flex items-center justify-center text-4xl">
+                        {item.image ? (
+                          <img src={`http://localhost:5000/uploads/${item.image}`} alt={item.itemName} className="w-full h-full object-cover" />
+                        ) : (
+                          <span>📦</span>
+                        )}
+                        {item.badge === "new" && <span className="absolute top-2 left-2 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">New</span>}
+                        {item.badge === "sale" && <span className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Sale</span>}
+                        {item.badge === "out of stock" && <span className="absolute top-2 left-2 bg-gray-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Out of Stock</span>}
+                        {item.badge === "limited stock" && <span className="absolute top-2 left-2 bg-yellow-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Limited Stock - {item.stock ?? 0}</span>}
+                        {Number(item.discount) >= 50 && <span className="absolute top-10 right-2 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BIG SALE</span>}
+                        {Number(item.discount) > 0 && <span className="absolute top-2 right-2 bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-{item.discount}%</span>}
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          {addedItems[item.id] ? (
+                            <div className="text-center text-white text-[11px] font-medium py-1.5">Added ✓</div>
+                          ) : (
+                            <div className="flex gap-2">
+                              <button onClick={(e) => handleAddToCart(e, item)} className="flex-1 bg-brand-orange hover:bg-brand-orange-hover text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">Add to cart</button>
+                              <button disabled={item.badge === "out of stock" || Number(item.stock) === 0} onClick={(e) => { if (item.badge !== "out of stock" && Number(item.stock) !== 0) { e.stopPropagation(); router.push(`/Common/pages/Products/${item.id}`); } }} className="flex-1 bg-brand-dark hover:bg-[#0a1230] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:scale-100">{item.badge === "out of stock" || Number(item.stock) === 0 ? "Out of Stock" : "Buy now"}</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="p-2.5">
+                        <h3 className="text-[13px] font-semibold text-gray-900 line-clamp-1">{item.itemName}</h3>
+                        <p className="text-[11px] text-gray-400 mt-0.5 line-clamp-1">{item.description}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="text-base font-bold text-gray-900">₹{Math.round(Number(item.amount) * (1 - Number(item.discount) / 100)).toLocaleString("en-IN")}</span>
+                          {Number(item.discount) > 0 && (
+                            <>
+                              <span className="text-xs text-gray-400 line-through">
+                                ₹{Number(item.amount).toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-xs text-red-600 font-medium">-{item.discount}%</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex gap-2 mt-3">
-                <button onClick={(e) => { e.stopPropagation(); addToCart({ id: item.id, itemName: item.itemName, amount: item.amount, image: item.image, discount: item.discount }); }} className="flex-1 bg-brand-orange hover:bg-brand-orange-hover text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">Add to cart</button>
-                <button onClick={(e) => { e.stopPropagation(); router.push(`/Common/pages/Products/${item.id}`); }} className="flex-1 bg-brand-dark hover:bg-[#0a1230] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">Buy now</button>
-              </div>
-            </div>
-          </div>
-        ))}
+            ));
+          })()
+        )}
       </div>
 
       {/* Filter Side Modal */}
