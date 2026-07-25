@@ -105,7 +105,7 @@ const Page = () => {
                     >
                       <div className="relative aspect-[4/3] bg-brand-cream flex items-center justify-center text-4xl">
                         {item.image ? (
-                          <img src={`http://localhost:5000/uploads/${item.image}`} alt={item.itemName} className="w-full h-full object-cover" />
+                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
                         ) : (
                           <span>📦</span>
                         )}

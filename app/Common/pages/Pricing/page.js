@@ -127,7 +127,7 @@ export default function Page() {
                       <td className="px-4 py-3">
                         <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
                           {p.image ? (
-                            <img src={`http://localhost:5000/uploads/${p.image}`} alt="" className="w-full h-full object-cover" />
+                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-sm">📦</span>
                           )}

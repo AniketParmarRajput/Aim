@@ -2,27 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  PayPalScriptProvider,
-  PayPalButtons,
-} from "@paypal/react-paypal-js";
 import { useCart } from "@/app/Common/Context/CartContext";
-import { useAuth } from "@/app/Common/Context/AuthContext";
 
 const Page = () => {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
   const id = params.id;
 
   const [product, setProduct] = useState(null);
   const [offers, setOffers] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState("cash on delivery");
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [address, setAddress] = useState("");
-  const [mobile, setMobile] = useState("");
   const maxStock = Number(product?.data?.stock) || 999;
 
   useEffect(() => {
@@ -57,52 +46,6 @@ const Page = () => {
       discount: product.data?.discount,
       quantity,
     });
-  };
-
-  const saveOrder = async () => {
-    if (!user?.email) {
-      alert("Please login to place an order");
-      router.push("/Common/pages/login");
-      return false;
-    }
-    try {
-      const res = await fetch("http://localhost:5000/api/order/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: user.email,
-          itemName: product.data?.itemName,
-          sku: product.data?.sku,
-          price: finalPrice,
-          quantity,
-          paymentMethod,
-          productId: product.data?.id,
-          address: address || null,
-          mobile: mobile || null,
-        }),
-      });
-      const result = await res.json();
-      if (result.success) {
-        setOrderPlaced(true);
-        setShowPayment(false);
-        return true;
-      } else {
-        alert(result.message);
-        return false;
-      }
-    } catch (err) {
-      console.error("Order error:", err);
-      alert("Failed to place order");
-      return false;
-    }
-  };
-
-  const handleCOD = async () => {
-    setPaymentMethod("cash on delivery");
-    const ok = await saveOrder();
-    if (ok) {
-      setTimeout(() => router.push("/Common/pages/Orders"), 2500);
-    }
   };
 
   if (!product) {
@@ -158,7 +101,7 @@ const Page = () => {
 
               <div className="w-44 h-44 rounded-2xl bg-brand-cream border border-gray-100 flex items-center justify-center text-5xl">
                 {product.data?.image ? (
-                  <img src={`http://localhost:5000/uploads/${product.data.image}`} alt={product.data.itemName} className="w-full h-full object-cover rounded-2xl" />
+                  <img src={(() => { const u = Array.isArray(product.data.image) ? product.data.image[0] : product.data.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt={product.data.itemName} className="w-full h-full object-cover rounded-2xl" />
                 ) : (
                   <span>🛍️</span>
                 )}
@@ -179,7 +122,7 @@ const Page = () => {
               </button>
 
               <button
-                onClick={() => { setPaymentMethod("cash on delivery"); setShowPayment(true); }}
+                onClick={() => router.push(`/Common/pages/checkout?productId=${product.data.id}&quantity=${quantity}`)}
                 disabled={product.data?.badge === "out of stock" || Number(product.data?.stock) === 0}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-white bg-brand-orange hover:bg-brand-orange-hover transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
               >
@@ -322,121 +265,7 @@ const Page = () => {
         </div>
       </div>
 
-      {showPayment && !orderPlaced && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 animate-fade-in">
-          <div className="bg-white rounded-2xl p-5 w-[380px] relative shadow-xl animate-scale-in">
-            <button
-              onClick={() => setShowPayment(false)}
-              className="absolute top-3 right-4 text-xl text-gray-500 hover:text-brand-orange transition-colors"
-            >
-              ✕
-            </button>
-            <h2 className="text-lg font-semibold text-brand-dark text-center mb-4">
-              Choose Payment Method
-            </h2>
-            <div className="mb-4 bg-brand-cream border border-gray-100 rounded-xl p-4 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Product</span>
-                <span className="font-medium text-brand-dark">{product.data?.itemName}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">SKU</span>
-                <span className="font-medium text-brand-dark">{product.data?.sku}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Quantity</span>
-                <span className="font-medium text-brand-dark">{quantity}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Email</span>
-                <span className="font-medium text-brand-dark">{user?.email || "Not logged in"}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Total</span>
-                <span className="font-semibold text-brand-orange">₹{finalPrice.toLocaleString("en-IN")}</span>
-              </div>
-              <hr className="border-gray-200" />
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-500 mb-1">Mobile Number</label>
-                <input type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="Enter mobile number" className="w-full px-3 py-2 border border-gray-200 bg-white rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-500 mb-1">Delivery Address</label>
-                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter full delivery address" rows={2} className="w-full px-3 py-2 border border-gray-200 bg-white rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all resize-none" />
-              </div>
-            </div>
 
-            <div className="flex flex-col gap-2 mb-4">
-              <button onClick={() => setPaymentMethod("cash on delivery")} className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${paymentMethod === "cash on delivery" ? "border-brand-orange bg-orange-50" : "border-gray-200 bg-white hover:border-gray-300"}`}>
-                <span className="text-xl">💵</span>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Cash on Delivery</p>
-                  <p className="text-[11px] text-gray-400">Pay when you receive</p>
-                </div>
-                {paymentMethod === "cash on delivery" && <span className="ml-auto text-brand-orange text-sm">✓</span>}
-              </button>
-              <button onClick={() => setPaymentMethod("online")} className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${paymentMethod === "online" ? "border-brand-orange bg-orange-50" : "border-gray-200 bg-white hover:border-gray-300"}`}>
-                <span className="text-xl">🌐</span>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Pay Online</p>
-                  <p className="text-[11px] text-gray-400">Credit card / PayPal</p>
-                </div>
-                {paymentMethod === "online" && <span className="ml-auto text-brand-orange text-sm">✓</span>}
-              </button>
-            </div>
-
-            {paymentMethod === "cash on delivery" ? (
-              <button onClick={handleCOD} className="w-full py-2.5 bg-brand-orange hover:bg-brand-orange-hover text-white rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
-                Place Order (COD)
-              </button>
-            ) : (
-              <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID, currency: "USD" }}>
-                <PayPalButtons
-                  style={{ layout: "vertical", color: "gold", shape: "rect", label: "paypal" }}
-                  createOrder={async () => {
-                    const res = await fetch("http://localhost:5000/api/paypal/create-order", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ amount: finalPrice, itemName: product.data?.itemName, quantity }),
-                    });
-                    const data = await res.json();
-                    return data.id;
-                  }}
-                  onApprove={async (data) => {
-                    const res = await fetch("http://localhost:5000/api/paypal/capture-order", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ orderID: data.orderID, quantity }),
-                    });
-                    const result = await res.json();
-                    if (result.success) {
-                      await saveOrder();
-                      alert("Payment successful! Order placed. Delivery in 7 days.");
-                    } else {
-                      alert("Payment failed");
-                    }
-                    setShowPayment(false);
-                  }}
-                  onError={(err) => { console.log(err); alert("Payment Failed"); }}
-                />
-              </PayPalScriptProvider>
-            )}
-          </div>
-        </div>
-      )}
-
-      {orderPlaced && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 text-center animate-scale-in max-w-sm mx-4">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <span className="text-3xl">✅</span>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Order Placed!</h2>
-            <p className="text-sm text-gray-400">Your order will be delivered in 7 days.</p>
-            <p className="text-xs text-gray-300 mt-3 animate-pulse">Redirecting to your orders...</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
