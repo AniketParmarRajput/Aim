@@ -21,8 +21,20 @@ const Header = () => {
   const { user, logout: authLogout } = useAuth();
   const { items, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    if (user?.email) {
+      fetch(`http://localhost:5000/api/employees/get-by-email/${user.email}`)
+        .then((r) => r.json())
+        .then((res) => { if (res.success) setUserData(res.data); })
+        .catch(() => {});
+    }
+  }, [user?.email]);
+
+  const displayName = userData?.name || user?.name || "User";
 
   const isAdmin = mounted && user?.role === "admin";
   const adminOnly = ["Pricing", "Management", "Emp"];
@@ -38,7 +50,7 @@ const Header = () => {
           <span className="text-white text-[14px] font-medium">Easy Shop</span>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto scrollbar-hide px-2 py-4 space-y-1">
           {visibleNavItems.map(({ label, route, icon }) => (
             <button
               key={label}
@@ -69,9 +81,9 @@ const Header = () => {
             <div onClick={() => router.push("/Common/pages/user")} className="bg-brand-light/10 rounded-xl p-3 cursor-pointer hover:bg-brand-light/20 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-white text-sm font-bold shrink-0">
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
-                <p className="text-white text-[13px] font-semibold truncate">{user.name || "User"}</p>
+                <p className="text-white text-[13px] font-semibold truncate">{displayName}</p>
               </div>
             </div>
           ) : (
@@ -96,7 +108,7 @@ const Header = () => {
               <p className="text-gray-500 text-sm text-center py-10">Your cart is empty.</p>
             ) : (
               <>
-                <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 mb-4">
                   {items.map((item) => (
                     <div key={item.id} onClick={() => { setCartOpen(false); router.push(`/Common/pages/Products/${item.id}`); }} className="flex gap-3 bg-brand-cream rounded-lg p-2.5 cursor-pointer hover:bg-brand-cream transition-colors">
                       <div className="w-14 h-14 rounded-lg bg-brand-muted flex items-center justify-center text-xl shrink-0 overflow-hidden">

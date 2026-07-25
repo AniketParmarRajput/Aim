@@ -260,9 +260,10 @@ const Home = () => {
             </div>
             <div 
               ref={bigSaleScrollRef} 
-              className="flex gap-3 overflow-x-auto pb-4 scroll-smooth"
+              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
               style={{
-                scrollbarWidth: 'auto',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch'
               }}
             >
@@ -308,9 +309,10 @@ const Home = () => {
             </div>
             <div 
               ref={topDealsScrollRef} 
-              className="flex gap-3 overflow-x-auto pb-4 scroll-smooth"
+              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
               style={{
-                scrollbarWidth: 'auto',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch'
               }}
             >
@@ -395,6 +397,17 @@ const Home = () => {
           </div>
         )}
       </div>
+
+      {/* CSS for scrollbar hiding */}
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
