@@ -52,7 +52,7 @@ export default function Page() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Email address</label>
+            <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Email</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">✉</span>
               <input type="email" name="email" value={form.email} onChange={handleValues} placeholder="you@example.com" required className="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />

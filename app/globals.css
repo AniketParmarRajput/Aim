@@ -14,6 +14,13 @@
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out;
   }
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
   .animate-pulse-slow {
     animation: pulse 2s ease-in-out infinite;
   }
