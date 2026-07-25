@@ -10,6 +10,8 @@ const CATEGORY_ICONS = {
   Men: "👔", Women: "👗", Childs: "🧸", Other: "📦",
 };
 
+const getImg = (img) => Array.isArray(img) ? img[0] : img;
+
 const ProductCard = ({ product, onAdd, onBuy }) => {
   const [added, setAdded] = useState(false);
   const amount = Number(product.amount);
@@ -30,7 +32,7 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
       <div onClick={() => onBuy(product)} className="relative aspect-[4/3] bg-gradient-to-br from-brand-cream to-brand-muted flex items-center justify-center text-4xl overflow-hidden">
         {product.image ? (
           <img
-            src={`http://localhost:5000/uploads/${product.image}`}
+            src={(() => { const u = getImg(product.image); return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()}
             alt={product.itemName}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />

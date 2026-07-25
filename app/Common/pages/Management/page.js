@@ -270,7 +270,7 @@ const AdminPage = () => {
                           <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                             <div className="flex items-center gap-2 min-w-0">
                               <div className="w-8 h-8 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
-                                {p.image ? <img src={`http://localhost:5000/uploads/${p.image}`} alt="" className="w-full h-full object-cover" /> : <span className="text-xs">📦</span>}
+                                {p.image ? <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-xs">📦</span>}
                               </div>
                               <p className="text-[13px] font-medium text-gray-900 truncate">{p.itemName}</p>
                             </div>
@@ -323,7 +323,7 @@ const AdminPage = () => {
                             <tr key={p.id} className="border-b border-gray-100 hover:bg-brand-cream transition-colors text-[13px] animate-fade-in" style={{ animationDelay: `${i * 0.02}s`, animationFillMode: "both" }}>
                               <td className="px-4 py-3">
                                 <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
-                                  {p.image ? <img src={`http://localhost:5000/uploads/${p.image}`} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
+                                  {p.image ? <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
                                 </div>
                               </td>
                               <td className="px-4 py-3 font-mono text-[12px] text-brand-dark font-semibold">{p.sku || <span className="text-gray-300">-</span>}</td>

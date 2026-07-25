@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "../Common/Context/CartContext";
 import { useAuth } from "../Common/Context/AuthContext";
@@ -16,12 +16,15 @@ const NAV_ITEMS = [
 ];
 
 const Header = () => {
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const { user, logout: authLogout } = useAuth();
   const { items, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
 
-  const isAdmin = user?.role === "admin";
+  useEffect(() => { setMounted(true); }, []);
+
+  const isAdmin = mounted && user?.role === "admin";
   const adminOnly = ["Pricing", "Management", "Emp"];
   const visibleNavItems = NAV_ITEMS.filter((item) => !adminOnly.includes(item.label) || isAdmin);
 
@@ -60,9 +63,9 @@ const Header = () => {
           </div>
           <button onClick={handleLogout} className="w-full flex items-center gap-3 text-[13px] text-white/70 border border-white/20 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 hover:text-white transition-colors text-left">
             <span>🚪</span>
-            <span>{user ? "Log out" : "Log in"}</span>
+            <span>{mounted && user ? "Log out" : "Log in"}</span>
           </button>
-          {user ? (
+          {mounted && user ? (
             <div onClick={() => router.push("/Common/pages/user")} className="bg-brand-light/10 rounded-xl p-3 cursor-pointer hover:bg-brand-light/20 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -98,7 +101,7 @@ const Header = () => {
                     <div key={item.id} onClick={() => { setCartOpen(false); router.push(`/Common/pages/Products/${item.id}`); }} className="flex gap-3 bg-brand-cream rounded-lg p-2.5 cursor-pointer hover:bg-brand-cream transition-colors">
                       <div className="w-14 h-14 rounded-lg bg-brand-muted flex items-center justify-center text-xl shrink-0 overflow-hidden">
                         {item.image ? (
-                          <img src={`http://localhost:5000/uploads/${item.image}`} alt={item.itemName} className="w-full h-full object-cover" />
+                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
                         ) : (
                           <span>📦</span>
                         )}
@@ -127,7 +130,7 @@ const Header = () => {
                     <span className="text-sm font-semibold text-gray-900">Total</span>
                     <span className="text-lg font-bold text-brand-dark">₹{cartTotal.toLocaleString("en-IN")}</span>
                   </div>
-                  <button className="w-full py-2.5 bg-brand-dark text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-colors">
+                  <button onClick={() => { setCartOpen(false); router.push("/Common/pages/checkout"); }} className="w-full py-2.5 bg-brand-dark text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-colors">
                     Checkout
                   </button>
                 </div>

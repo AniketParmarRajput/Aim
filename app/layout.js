@@ -3,8 +3,7 @@ import ReduxProvider from "@/Redux/provider";
 import "./globals.css";
 import { AuthProvider } from "./Common/Context/AuthContext";
 import { CartProvider } from "./Common/Context/CartContext";
-import Header from "./Components/Header";
-import Footer from "./Components/Footer";
+import LayoutWrapper from "./Components/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +27,7 @@ export default function RootLayout({ children }) {
        <ReduxProvider>
         <AuthProvider>
           <CartProvider>
-            <Header />
-            <main className="flex-1 ml-56">{children}</main>
-            <Footer />
+            <LayoutWrapper>{children}</LayoutWrapper>
           </CartProvider>
         </AuthProvider>
        </ReduxProvider>

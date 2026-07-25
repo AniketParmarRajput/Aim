@@ -22,10 +22,13 @@ const EditModal = ({ order, isAdmin, onClose, onSave }) => {
   const [status, setStatus] = useState(order.status);
   const [address, setAddress] = useState(order.address || "");
   const [mobile, setMobile] = useState(order.mobile || "");
+  const [state, setState] = useState(order.state || "");
+  const [district, setDistrict] = useState(order.district || "");
+  const [pincode, setPincode] = useState(order.pincode || "");
   const newTotal = unitPrice * Number(quantity);
 
   const handleSave = async () => {
-    const body = { quantity: Number(quantity), deliveryDate, address, mobile, status };
+    const body = { quantity: Number(quantity), deliveryDate, address, mobile, state, district, pincode, status };
     const res = await fetch(`http://localhost:5000/api/order/update/${order.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -75,6 +78,18 @@ const EditModal = ({ order, isAdmin, onClose, onSave }) => {
           <div>
             <label className="block text-[12px] font-semibold text-gray-700 mb-1">Address</label>
             <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter delivery address" rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all resize-none" />
+          </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-gray-700 mb-1">State</label>
+            <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
+          </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-gray-700 mb-1">District</label>
+            <input type="text" value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="District" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
+          </div>
+          <div>
+            <label className="block text-[12px] font-semibold text-gray-700 mb-1">Pincode</label>
+            <input type="text" value={pincode} onChange={(e) => setPincode(e.target.value)} placeholder="Pincode" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
           </div>
           {isAdmin && (
             <div>
@@ -274,10 +289,13 @@ const OrdersPage = () => {
                     <p className="font-semibold text-gray-900">{order.deliveryDate}</p>
                   </div>
                 </div>
-                {(order.address || order.mobile) && (
-                  <div className="mt-2 grid grid-cols-2 gap-3 text-[11px] text-gray-500 bg-brand-cream rounded-lg px-3 py-2">
+                {(order.address || order.mobile || order.state || order.district || order.pincode) && (
+                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-gray-500 bg-brand-cream rounded-lg px-3 py-2">
                     {order.mobile && <div><span className="text-gray-400">Mobile:</span> {order.mobile}</div>}
-                    {order.address && <div className="col-span-2"><span className="text-gray-400">Address:</span> {order.address}</div>}
+                    {order.address && <div className="col-span-2 sm:col-span-3"><span className="text-gray-400">Address:</span> {order.address}</div>}
+                    {order.state && <div><span className="text-gray-400">State:</span> {order.state}</div>}
+                    {order.district && <div><span className="text-gray-400">District:</span> {order.district}</div>}
+                    {order.pincode && <div><span className="text-gray-400">Pincode:</span> {order.pincode}</div>}
                   </div>
                 )}
                 {order.cancelReason && (
