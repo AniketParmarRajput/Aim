@@ -15,6 +15,8 @@ const statusColors = {
 
 const STATUS_OPTIONS = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
 
+const getImg = (img) => Array.isArray(img) ? img[0] : img;
+
 const EditModal = ({ order, isAdmin, onClose, onSave }) => {
   const unitPrice = Math.round(Number(order.price) / Number(order.quantity));
   const [quantity, setQuantity] = useState(order.quantity);
@@ -174,6 +176,7 @@ const OrdersPage = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState([]);
+  const [productsMap, setProductsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [editOrder, setEditOrder] = useState(null);
   const [cancelOrder, setCancelOrder] = useState(null);
@@ -181,9 +184,27 @@ const OrdersPage = () => {
 
   const isAdmin = user?.role === "admin";
 
+  const getOrderImage = (order) => {
+    const product = productsMap[order.productId];
+    if (product?.image) {
+      const u = getImg(product.image);
+      return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`;
+    }
+    return null;
+  };
+
   const fetchOrders = async () => {
     try {
       if (!user) return;
+      const [prodRes] = await Promise.all([
+        fetch("http://localhost:5000/api/prizing/getPrizing"),
+      ]);
+      const prodResult = await prodRes.json();
+      const allProducts = prodResult.data || [];
+      const map = {};
+      allProducts.forEach((p) => { map[p.id] = p; });
+      setProductsMap(map);
+
       if (isAdmin) {
         const res = await fetch("http://localhost:5000/api/order/all");
         const result = await res.json();
@@ -194,7 +215,7 @@ const OrdersPage = () => {
         if (result.success) setOrders(result.data);
       }
     } catch (err) {
-      console.error("Error fetching orders:", err);
+      console.error("Error fetching data:", err);
     } finally {
       setLoading(false);
     }
@@ -250,25 +271,36 @@ const OrdersPage = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {filteredOrders.map((order, i) => (
+            {filteredOrders.map((order, i) => {
+              const orderImg = getOrderImage(order);
+              return (
               <div key={order.id} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start gap-3 mb-3">
+                  {orderImg && (
+                    <div className="w-12 h-12 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
+                      <img src={orderImg} alt={order.itemName} className="w-full h-full object-cover" />
+                    </div>
+                  )}
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-semibold text-brand-dark">{order.itemName}</h3>
-                    <p className="text-[11px] text-gray-400 mt-0.5">
-                      {isAdmin && <><span className="font-medium text-gray-600">{order.email}</span> &middot; </>}
-                      SKU: {order.sku} &middot; #{order.id}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 ml-2">
-                    {isAdmin && (
-                      <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
-                        Edit
-                      </button>
-                    )}
-                    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-sm font-semibold text-brand-dark">{order.itemName}</h3>
+                        <p className="text-[11px] text-gray-400 mt-0.5">
+                          {isAdmin && <><span className="font-medium text-gray-600">{order.email}</span> &middot; </>}
+                          SKU: {order.sku} &middot; #{order.id}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        {isAdmin && (
+                          <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
+                            Edit
+                          </button>
+                        )}
+                        <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
+                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
@@ -311,7 +343,8 @@ const OrdersPage = () => {
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
