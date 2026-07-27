@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import ServerTable from "@/app/components/Resuable/ServerTable";
+import ServerTable from "@/app/Components/Resuable/ServerTable";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../Context/AuthContext";
 

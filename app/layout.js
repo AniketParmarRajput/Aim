@@ -3,7 +3,7 @@ import ReduxProvider from "@/Redux/provider";
 import "./globals.css";
 import { AuthProvider } from "./Common/Context/AuthContext";
 import { CartProvider } from "./Common/Context/CartContext";
-import LayoutWrapper from "./components/LayoutWrapper";
+import LayoutWrapper from "./Components/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
