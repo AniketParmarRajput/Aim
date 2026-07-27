@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Common/Context/AuthContext";
 import { useCart } from "@/app/Common/Context/CartContext";
 
-export default function CheckoutPage() {
-  const searchParams = useSearchParams();
+export default function CheckoutContent({ productId: propProductId, quantity: propQuantity }) {
   const router = useRouter();
   const { user } = useAuth();
   const { items, clearCart } = useCart();
 
-  const productId = searchParams.get("productId");
-  const qty = Number(searchParams.get("quantity")) || 1;
+  const productId = propProductId || null;
+  const qty = Number(propQuantity) || 1;
 
   const [product, setProduct] = useState(null);
   const [form, setForm] = useState({ mobile: "", address: "", state: "", district: "", pincode: "" });
