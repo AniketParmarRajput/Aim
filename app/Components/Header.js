@@ -38,7 +38,12 @@ const Header = () => {
 
   const isAdmin = mounted && user?.role === "admin";
   const adminOnly = ["Pricing", "Management", "Emp"];
-  const visibleNavItems = NAV_ITEMS.filter((item) => !adminOnly.includes(item.label) || isAdmin);
+  const userOnly = ["Orders"];
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (userOnly.includes(item.label) && isAdmin) return false;
+    if (adminOnly.includes(item.label) && !isAdmin) return false;
+    return true;
+  });
 
   const handleLogout = () => authLogout();
 

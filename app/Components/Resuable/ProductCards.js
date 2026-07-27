@@ -23,7 +23,7 @@ const Card = ({
   return (
     <div
       onClick={onClick}
-      className="group flex h-80 w-67.5 cursor-pointer flex-col justify-between rounded-2xl bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group flex h-80 w-67.5 cursor-pointer flex-col justify-between rounded-2xl bg-brand-light p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       <div className="relative flex h-45 items-center justify-center rounded-xl bg-slate-100 overflow-hidden">
         {noValueImage && showImageOnNoValue ? (

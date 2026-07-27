@@ -8,26 +8,35 @@ const Page = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
   const [offers, setOffers] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const maxStock = Number(product?.data?.stock) || 999;
 
   useEffect(() => {
-    const fetchProductDetails = async () => {
+    const fetchAll = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/prizing/getPrizing/${id}`
-        );
-        const result = await response.json();
-        setProduct(result);
+        const [prodRes, allRes] = await Promise.all([
+          fetch(`http://localhost:5000/api/prizing/getPrizing/${id}`),
+          fetch("http://localhost:5000/api/prizing/getPrizing"),
+        ]);
+        const prodResult = await prodRes.json();
+        const allResult = await allRes.json();
+        setProduct(prodResult);
+        setAllProducts((allResult.data || []).filter((p) => p.active !== false));
       } catch (err) {
-        console.error("Error fetching product:", err);
+        console.error("Error fetching data:", err);
       }
     };
-    if (id) fetchProductDetails();
+    if (id) fetchAll();
   }, [id]);
+
+  const related = allProducts.filter(
+    (p) => p.category === product?.data?.category && p.id !== product?.data?.id
+  );
 
   const totalPrice = Number(product?.data?.amount || 0) * quantity;
   const discount = Number(product?.data?.discount || 0);
@@ -36,7 +45,6 @@ const Page = () => {
     : totalPrice;
   const finalPrice = discount > 0 ? discountedPrice : totalPrice;
 
-  const { addToCart } = useCart();
   const handleAddtoCart = () => {
     addToCart({
       id: product.data?.id,

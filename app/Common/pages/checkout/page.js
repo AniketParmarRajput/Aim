@@ -106,7 +106,7 @@ export default function CheckoutPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 text-center max-w-sm mx-4">
+        <div className="bg-brand-light rounded-3xl shadow-2xl p-8 text-center max-w-sm mx-4">
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">✅</span>
           </div>
