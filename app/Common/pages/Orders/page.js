@@ -175,6 +175,7 @@ const CancelModal = ({ order, onClose, onSave }) => {
 const OrdersPage = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [orders, setOrders] = useState([]);
   const [productsMap, setProductsMap] = useState({});
   const [loading, setLoading] = useState(true);
@@ -182,9 +183,15 @@ const OrdersPage = () => {
   const [cancelOrder, setCancelOrder] = useState(null);
   const [searchEmail, setSearchEmail] = useState("");
 
+  useEffect(() => { setMounted(true); }, []);
+
   const isAdmin = user?.role === "admin";
 
   const getOrderImage = (order) => {
+    if (order.image) {
+      const u = Array.isArray(order.image) ? order.image[0] : order.image;
+      return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`;
+    }
     const product = productsMap[order.productId];
     if (product?.image) {
       const u = getImg(product.image);
@@ -234,7 +241,7 @@ const OrdersPage = () => {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold text-brand-dark">{isAdmin ? "All Orders" : "My Orders"}</h1>
+            <h1 className="text-xl font-bold text-brand-dark">{mounted ? (isAdmin ? "All Orders" : "My Orders") : "Orders"}</h1>
             <p className="text-xs text-gray-400 mt-1">{orders.length} order{orders.length !== 1 ? "s" : ""}</p>
           </div>
           <button onClick={() => router.push("/Common/pages/Products")} className="text-xs font-medium text-brand-orange border border-brand-orange px-4 py-2 rounded-lg hover:bg-brand-orange hover:text-white transition-all">

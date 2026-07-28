@@ -19,6 +19,7 @@ export default function EditProduct() {
     sku: "",
     active: true,
     image: null,
+    imageUrl: "",
   });
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function EditProduct() {
             sku: p.sku || "",
             active: p.active !== false,
             image: null,
+            imageUrl: "",
           });
         }
       } catch (err) {
@@ -62,6 +64,7 @@ export default function EditProduct() {
     fd.append("stock", form.stock);
     fd.append("active", form.active);
     if (form.image) fd.append("image", form.image);
+    if (form.imageUrl) fd.append("imageUrl", form.imageUrl);
 
     await fetch(`http://localhost:5000/api/prizing/updatePrizing/${id}`, { method: "PUT", body: fd });
     router.push("/Common/pages/Pricing");
@@ -146,7 +149,11 @@ export default function EditProduct() {
               </button>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Image (leave empty to keep current)</label>
+              <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Image URL (leave empty to keep current)</label>
+              <input type="url" value={form.imageUrl} placeholder="https://example.com/image.jpg" onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Or upload Image (leave empty to keep current)</label>
               <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl px-4 py-4 bg-brand-cream hover:border-brand-orange hover:bg-orange-50/30 transition-all cursor-pointer text-center group">
                 <span className="text-2xl mb-1">🖼️</span>
                 <span className="text-[12.5px] text-gray-500 font-medium"><span className="text-brand-orange font-semibold group-hover:underline">Click to upload</span> new image</span>

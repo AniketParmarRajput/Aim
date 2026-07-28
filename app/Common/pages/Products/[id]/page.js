@@ -52,6 +52,7 @@ const Page = () => {
       amount: product.data?.amount,
       image: product.data?.image,
       discount: product.data?.discount,
+      stock: product.data?.stock,
       quantity,
     });
   };
