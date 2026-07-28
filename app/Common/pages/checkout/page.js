@@ -1,17 +1,33 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/Common/Context/AuthContext";
 import { useCart } from "@/app/Common/Context/CartContext";
 
-export default function CheckoutContent({ productId: propProductId, quantity: propQuantity }) {
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-gray-400 font-medium">Loading checkout...</p>
+        </div>
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { items, clearCart } = useCart();
 
-  const productId = propProductId || null;
-  const qty = Number(propQuantity) || 1;
+  const productId = searchParams.get("productId") || null;
+  const qty = Number(searchParams.get("quantity")) || 1;
 
   const [product, setProduct] = useState(null);
   const [form, setForm] = useState({ mobile: "", address: "", state: "", district: "", pincode: "" });
@@ -59,11 +75,27 @@ export default function CheckoutContent({ productId: propProductId, quantity: pr
     setError("");
 
     try {
+      const stockCheck = orderItems.map((item) => {
+        const q = isFromCart ? item.quantity : qty;
+        if (item.stock !== undefined && item.stock < q) {
+          return `Insufficient stock for "${item.itemName}". Available: ${item.stock}, requested: ${q}`;
+        }
+        return null;
+      }).filter(Boolean);
+
+      if (stockCheck.length > 0) {
+        setError(stockCheck.join(". "));
+        setLoading(false);
+        return;
+      }
+
       const promises = orderItems.map((item) => {
         const amount = Number(item.amount || item.price || 0);
         const discount = Number(item.discount || 0);
         const q = isFromCart ? item.quantity : qty;
         const price = discount > 0 ? Math.round(amount - (amount * discount) / 100) * q : amount * q;
+
+        const itemImage = Array.isArray(item.image) ? item.image[0] : item.image;
 
         return fetch("http://localhost:5000/api/order/create", {
           method: "POST",
@@ -75,6 +107,7 @@ export default function CheckoutContent({ productId: propProductId, quantity: pr
             price,
             quantity: q,
             productId: item.id,
+            image: itemImage || null,
             paymentMethod,
             address: form.address,
             mobile: form.mobile,

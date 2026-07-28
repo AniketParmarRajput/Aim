@@ -108,7 +108,7 @@ const AdminPage = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [editOrder, setEditOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
-  const [form, setForm] = useState({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null });
+  const [form, setForm] = useState({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null, imageUrl: "" });
 
   const isAdmin = user?.role === "admin";
 
@@ -161,7 +161,7 @@ const AdminPage = () => {
 
   const closeAdd = () => {
     setShowAdd(false);
-    setForm({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null });
+    setForm({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null, imageUrl: "" });
   };
 
   const handleAddSubmit = async (e) => {
@@ -177,6 +177,7 @@ const AdminPage = () => {
     fd.append("stock", form.stock);
     if (skuPreview) fd.append("sku", skuPreview);
     if (form.image) fd.append("image", form.image);
+    if (form.imageUrl) fd.append("imageUrl", form.imageUrl);
     await fetch("http://localhost:5000/api/prizing/addPrizing", { method: "POST", body: fd });
     closeAdd();
     fetchProducts();
@@ -431,11 +432,15 @@ const AdminPage = () => {
                             }} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange transition-all" />
                           </div>
                           <div className="md:col-span-2">
-                            <label className="block text-[12px] font-semibold text-gray-700 mb-1">Image</label>
+                            <label className="block text-[12px] font-semibold text-gray-700 mb-1">Image URL</label>
+                            <input type="url" value={form.imageUrl} placeholder="https://example.com/image.jpg" onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} className="w-full px-3 py-2 border border-gray-200 bg-brand-cream rounded-xl text-[13px] focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-[12px] font-semibold text-gray-700 mb-1">Or upload Image</label>
                             <label className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl px-4 py-3 bg-brand-cream hover:border-brand-orange hover:bg-orange-50/30 transition-all cursor-pointer text-center group">
                               <span className="text-xl mb-0.5">🖼️</span>
                               <span className="text-[12px] text-gray-500 font-medium"><span className="text-brand-orange font-semibold group-hover:underline">Click to upload</span></span>
-                              <input type="file" className="hidden" onChange={(e) => setForm({ ...form, image: e.target.files[0] })} required />
+                              <input type="file" className="hidden" onChange={(e) => setForm({ ...form, image: e.target.files[0] })} />
                             </label>
                             {form.image && <p className="text-[11px] text-brand-orange font-medium mt-1">✅ {form.image.name}</p>}
                           </div>
@@ -481,6 +486,9 @@ const AdminPage = () => {
                         <div className="flex items-start justify-between mb-3">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
+                              <div className="w-9 h-9 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
+                                {o.image ? <img src={(() => { const u = Array.isArray(o.image) ? o.image[0] : o.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
+                              </div>
                               <h3 className="text-sm font-semibold text-brand-dark">{o.itemName}</h3>
                               <span className="text-[10px] text-gray-400">#{o.id}</span>
                             </div>
@@ -519,10 +527,13 @@ const AdminPage = () => {
                             <p className="font-semibold text-gray-900">{o.deliveryDate || "N/A"}</p>
                           </div>
                         </div>
-                        {(o.address || o.mobile) && (
-                          <div className="mt-2 grid grid-cols-2 gap-3 text-[11px] text-gray-500 bg-brand-cream rounded-lg px-3 py-2">
+                        {(o.address || o.mobile || o.state || o.district || o.pincode) && (
+                          <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-gray-500 bg-brand-cream rounded-lg px-3 py-2">
                             {o.mobile && <div><span className="text-gray-400">Mobile:</span> {o.mobile}</div>}
-                            {o.address && <div className="col-span-2"><span className="text-gray-400">Address:</span> {o.address}</div>}
+                            {o.address && <div className="col-span-2 sm:col-span-3"><span className="text-gray-400">Address:</span> {o.address}</div>}
+                            {o.state && <div><span className="text-gray-400">State:</span> {o.state}</div>}
+                            {o.district && <div><span className="text-gray-400">District:</span> {o.district}</div>}
+                            {o.pincode && <div><span className="text-gray-400">Pincode:</span> {o.pincode}</div>}
                           </div>
                         )}
                         {o.createdAt && (

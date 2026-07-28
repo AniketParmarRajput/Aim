@@ -27,7 +27,7 @@ const Page = () => {
 
   const handleAddToCart = (e, item) => {
     e.stopPropagation();
-    addToCart({ id: item.id, itemName: item.itemName, amount: item.amount, image: item.image, discount: item.discount });
+    addToCart({ id: item.id, itemName: item.itemName, amount: item.amount, image: item.image, discount: item.discount, stock: item.stock });
     setAddedItems((prev) => ({ ...prev, [item.id]: true }));
     setTimeout(() => {
       setAddedItems((prev) => ({ ...prev, [item.id]: false }));
