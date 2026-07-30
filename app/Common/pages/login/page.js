@@ -37,11 +37,11 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-full bg-brand-cream flex items-center justify-center px-4 py-10 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
       <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-brand-dark/5 blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md bg-brand-cream border border-gray-200 rounded-2xl shadow-lg px-9 py-9">
+      <div className="relative z-10 w-full max-w-md bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-9 py-9">
         <div className="flex items-center gap-2.5 mb-7">
           <div className="w-9 h-9 rounded-xl bg-brand-dark flex items-center justify-center shadow-md text-lg text-white">⚡</div>
           <span className="text-[16px] font-bold text-gray-900 tracking-tight">Easy Shop</span>
