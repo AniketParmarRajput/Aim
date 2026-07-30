@@ -25,7 +25,7 @@ export default function EditProduct() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/prizing/getPrizing/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing/${id}`);
         const result = await res.json();
         const p = result.data;
         if (p) {
@@ -66,7 +66,7 @@ export default function EditProduct() {
     if (form.image) fd.append("image", form.image);
     if (form.imageUrl) fd.append("imageUrl", form.imageUrl);
 
-    await fetch(`http://localhost:5000/api/prizing/updatePrizing/${id}`, { method: "PUT", body: fd });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/updatePrizing/${id}`, { method: "PUT", body: fd });
     router.push("/Common/pages/Pricing");
   };
 

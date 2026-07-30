@@ -20,8 +20,8 @@ const Page = () => {
     const fetchAll = async () => {
       try {
         const [prodRes, allRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/prizing/getPrizing/${id}`),
-          fetch("http://localhost:5000/api/prizing/getPrizing"),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing/${id}`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`),
         ]);
         const prodResult = await prodRes.json();
         const allResult = await allRes.json();
@@ -110,7 +110,7 @@ const Page = () => {
 
               <div className="w-44 h-44 rounded-2xl bg-brand-cream border border-gray-100 flex items-center justify-center text-5xl">
                 {product.data?.image ? (
-                  <img src={(() => { const u = Array.isArray(product.data.image) ? product.data.image[0] : product.data.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt={product.data.itemName} className="w-full h-full object-cover rounded-2xl" />
+                  <img src={(() => { const u = Array.isArray(product.data.image) ? product.data.image[0] : product.data.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={product.data.itemName} className="w-full h-full object-cover rounded-2xl" />
                 ) : (
                   <span>🛍️</span>
                 )}

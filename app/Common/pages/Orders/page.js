@@ -31,7 +31,7 @@ const EditModal = ({ order, isAdmin, onClose, onSave }) => {
 
   const handleSave = async () => {
     const body = { quantity: Number(quantity), deliveryDate, address, mobile, state, district, pincode, status };
-    const res = await fetch(`http://localhost:5000/api/order/update/${order.id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/update/${order.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -126,7 +126,7 @@ const CancelModal = ({ order, onClose, onSave }) => {
   const handleCancel = async () => {
     const finalReason = reason === "Other" ? otherReason : reason;
     if (!finalReason) return alert("Please select or enter a reason");
-    const res = await fetch(`http://localhost:5000/api/order/cancel/${order.id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/cancel/${order.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reason: finalReason }),
@@ -190,12 +190,12 @@ const OrdersPage = () => {
   const getOrderImage = (order) => {
     if (order.image) {
       const u = Array.isArray(order.image) ? order.image[0] : order.image;
-      return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`;
+      return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`;
     }
     const product = productsMap[order.productId];
     if (product?.image) {
       const u = getImg(product.image);
-      return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`;
+      return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`;
     }
     return null;
   };
@@ -204,7 +204,7 @@ const OrdersPage = () => {
     try {
       if (!user) return;
       const [prodRes] = await Promise.all([
-        fetch("http://localhost:5000/api/prizing/getPrizing"),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`),
       ]);
       const prodResult = await prodRes.json();
       const allProducts = prodResult.data || [];
@@ -213,11 +213,11 @@ const OrdersPage = () => {
       setProductsMap(map);
 
       if (isAdmin) {
-        const res = await fetch("http://localhost:5000/api/order/all");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/all`);
         const result = await res.json();
         if (result.success) setOrders(result.data);
       } else if (user.email) {
-        const res = await fetch(`http://localhost:5000/api/order/by-email/${user.email}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/by-email/${user.email}`);
         const result = await res.json();
         if (result.success) setOrders(result.data);
       }

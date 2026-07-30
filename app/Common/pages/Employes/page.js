@@ -32,7 +32,7 @@ const Page = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/employees/get", { method: "GET", credentials: "include" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get`, { method: "GET", credentials: "include" });
       const result = await res.json();
       if (Array.isArray(result)) setEmployees(result);
       else if (Array.isArray(result?.data)) setEmployees(result.data);
@@ -47,7 +47,7 @@ const Page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/employees/add", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -67,7 +67,7 @@ const Page = () => {
 
   const handledelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/employees/delete/${id}`, { method: "DELETE" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/delete/${id}`, { method: "DELETE" });
       const result = await res.json();
       if (res.ok) {
         setEmployees((prev) => prev.filter((emp) => emp.id !== id));

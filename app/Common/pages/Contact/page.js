@@ -14,7 +14,7 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await fetch("http://localhost:5000/api/contact/create", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contact/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),

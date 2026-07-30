@@ -14,7 +14,7 @@ const Page = () => {
     if (!user) { router.push("/Common/pages/login"); return; }
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/employees/get-by-email/${user.email}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get-by-email/${user.email}`);
         if (res.ok) {
           const result = await res.json();
           if (result.success && result.data) {

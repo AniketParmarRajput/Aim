@@ -32,7 +32,7 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
       <div onClick={() => onBuy(product)} className="relative aspect-[4/3] bg-gradient-to-br from-brand-cream to-brand-muted flex items-center justify-center text-4xl overflow-hidden">
         {product.image ? (
           <img
-            src={(() => { const u = getImg(product.image); return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()}
+            src={(() => { const u = getImg(product.image); return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()}
             alt={product.itemName}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
@@ -113,7 +113,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/prizing/getPrizing");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`);
         const result = await res.json();
         setProducts((result.data || []).filter((p) => p.active !== false));
       } catch (err) {

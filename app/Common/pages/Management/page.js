@@ -32,7 +32,7 @@ const EditOrderModal = ({ order, onClose, onSave }) => {
 
   const handleSave = async () => {
     const body = { quantity: Number(quantity), deliveryDate, address, mobile, status };
-    const res = await fetch(`http://localhost:5000/api/order/update/${order.id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/update/${order.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -118,7 +118,7 @@ const AdminPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/prizing/getPrizing");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`);
       const result = await res.json();
       setProducts(result.data || []);
     } catch (err) { console.error(err); }
@@ -126,7 +126,7 @@ const AdminPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/order/all");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/all`);
       const result = await res.json();
       if (result.success) setOrders(result.data);
     } catch (err) { console.error(err); }
@@ -178,7 +178,7 @@ const AdminPage = () => {
     if (skuPreview) fd.append("sku", skuPreview);
     if (form.image) fd.append("image", form.image);
     if (form.imageUrl) fd.append("imageUrl", form.imageUrl);
-    await fetch("http://localhost:5000/api/prizing/addPrizing", { method: "POST", body: fd });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/addPrizing`, { method: "POST", body: fd });
     closeAdd();
     fetchProducts();
   };
@@ -271,7 +271,7 @@ const AdminPage = () => {
                           <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                             <div className="flex items-center gap-2 min-w-0">
                               <div className="w-8 h-8 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
-                                {p.image ? <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-xs">📦</span>}
+                                {p.image ? <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-xs">📦</span>}
                               </div>
                               <p className="text-[13px] font-medium text-gray-900 truncate">{p.itemName}</p>
                             </div>
@@ -324,7 +324,7 @@ const AdminPage = () => {
                             <tr key={p.id} className="border-b border-gray-100 hover:bg-brand-cream transition-colors text-[13px] animate-fade-in" style={{ animationDelay: `${i * 0.02}s`, animationFillMode: "both" }}>
                               <td className="px-4 py-3">
                                 <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
-                                  {p.image ? <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
+                                  {p.image ? <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
                                 </div>
                               </td>
                               <td className="px-4 py-3 font-mono text-[12px] text-brand-dark font-semibold">{p.sku || <span className="text-gray-300">-</span>}</td>
@@ -339,14 +339,14 @@ const AdminPage = () => {
                               </td>
                               <td className="px-4 py-3"><span className="text-gray-600">{p.category || "-"}</span></td>
                               <td className="px-4 py-3">
-                                <button onClick={async () => { await fetch(`http://localhost:5000/api/prizing/toggleActive/${p.id}`, { method: "PATCH" }); fetchProducts(); }} className={`text-[11px] font-medium px-2.5 py-1 rounded-full transition-all duration-300 ${p.active ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100" : "bg-red-50 text-red-500 border border-red-200 hover:bg-red-100"}`}>
+                                <button onClick={async () => { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/toggleActive/${p.id}`, { method: "PATCH" }); fetchProducts(); }} className={`text-[11px] font-medium px-2.5 py-1 rounded-full transition-all duration-300 ${p.active ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100" : "bg-red-50 text-red-500 border border-red-200 hover:bg-red-100"}`}>
                                   {p.active ? "Active" : "Inactive"}
                                 </button>
                               </td>
                               <td className="px-4 py-3 text-right">
                                 <div className="flex items-center justify-end gap-2">
                                   <button onClick={() => router.push(`/Common/pages/Pricing/edit/${p.id}`)} className="text-[12px] font-medium text-brand-orange hover:text-brand-orange-hover border border-brand-orange px-3 py-1 rounded-lg hover:bg-orange-50 transition-colors">Edit</button>
-                                  <button onClick={async () => { if (confirm("Delete this product?")) { await fetch(`http://localhost:5000/api/prizing/deletePrizing/${p.id}`, { method: "DELETE" }); fetchProducts(); } }} className="text-[12px] font-medium text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">Delete</button>
+                                  <button onClick={async () => { if (confirm("Delete this product?")) { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/deletePrizing/${p.id}`, { method: "DELETE" }); fetchProducts(); } }} className="text-[12px] font-medium text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">Delete</button>
                                 </div>
                               </td>
                             </tr>
@@ -487,7 +487,7 @@ const AdminPage = () => {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <div className="w-9 h-9 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
-                                {o.image ? <img src={(() => { const u = Array.isArray(o.image) ? o.image[0] : o.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
+                                {o.image ? <img src={(() => { const u = Array.isArray(o.image) ? o.image[0] : o.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
                               </div>
                               <h3 className="text-sm font-semibold text-brand-dark">{o.itemName}</h3>
                               <span className="text-[10px] text-gray-400">#{o.id}</span>

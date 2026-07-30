@@ -219,7 +219,7 @@ const Page = () => {
                             <img
                               src={(() => {
                                 const u = Array.isArray(item.image) ? item.image[0] : item.image;
-                                return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`;
+                                return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`;
                               })()}
                               alt={item.itemName}
                               loading="lazy"

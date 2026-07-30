@@ -40,7 +40,7 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (productId) {
-      fetch(`http://localhost:5000/api/prizing/getPrizing/${productId}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing/${productId}`)
         .then((r) => r.json())
         .then((res) => setProduct(res.data || res))
         .catch(() => {});
@@ -239,7 +239,7 @@ function CheckoutContent() {
                     <div key={item.id || idx} className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-lg overflow-hidden shrink-0">
                         {item.image ? (
-                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
+                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
                         ) : (
                           <span>📦</span>
                         )}
