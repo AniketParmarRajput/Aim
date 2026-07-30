@@ -34,10 +34,13 @@ const Page = () => {
     }, 3000);
   };
 
+  console.log(process.env.NEXT_PUBLIC_API_URL,)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/prizing/getPrizing");
+      const res = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`
+);
         const result = await res.json();
         setProducts((result.data || []).filter((p) => p.active !== false));
       } catch (err) {

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/Common/Context/AuthContext";
 import { useCart } from "@/app/Common/Context/CartContext";
 
+
+
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
@@ -97,7 +99,7 @@ function CheckoutContent() {
 
         const itemImage = Array.isArray(item.image) ? item.image[0] : item.image;
 
-        return fetch("http://localhost:5000/api/order/create", {
+        return fetch("/api/order/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
