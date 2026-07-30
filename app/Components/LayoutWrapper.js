@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import Footer from "./Footer";
+import { SidebarProvider } from "../Common/Context/SidebarContext";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -12,10 +13,10 @@ export default function LayoutWrapper({ children }) {
   }
 
   return (
-    <>
+    <SidebarProvider>
       <Header />
-      <main className="flex-1 ml-56">{children}</main>
+      <main className="flex-1 md:ml-56">{children}</main>
       <Footer />
-    </>
+    </SidebarProvider>
   );
 }

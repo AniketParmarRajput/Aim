@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "../Common/Context/CartContext";
 import { useAuth } from "../Common/Context/AuthContext";
+import { useSidebar } from "../Common/Context/SidebarContext";
 
 const NAV_ITEMS = [
   { label: "Home", route: "/Common/pages/home", icon: "🏠" },
@@ -20,6 +21,7 @@ const Header = () => {
   const router = useRouter();
   const { user, logout: authLogout } = useAuth();
   const { items, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
+  const { sidebarOpen, setSidebarOpen, closeSidebar } = useSidebar();
   const [cartOpen, setCartOpen] = useState(false);
   const [userData, setUserData] = useState(null);
 
@@ -45,12 +47,36 @@ const Header = () => {
     return true;
   });
 
-  const handleLogout = () => authLogout();
+  const handleLogout = () => { closeSidebar(); authLogout(); };
+  const navigateAndClose = (route) => { router.push(route); closeSidebar(); };
 
   return (
     <>
-      <aside className="fixed top-0 left-0 h-full w-56 bg-brand-dark z-50 flex flex-col py-4 shadow-lg">
-        <div className="flex items-center gap-2 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => router.push("/Common/pages/home")}>
+      {/* Hamburger button - mobile only */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="fixed top-4 left-4 z-40 md:hidden bg-brand-dark text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-lg hover:bg-brand-dark/90 transition-colors"
+        aria-label="Open menu"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
+      <aside
+        className={`fixed top-0 left-0 h-full w-56 bg-brand-dark z-50 flex flex-col py-4 shadow-lg transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
+        <div className="flex items-center gap-2 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => navigateAndClose("/Common/pages/home")}>
           <div className="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-white text-sm">⚡</div>
           <span className="text-white text-[14px] font-medium">Easy Shop</span>
         </div>
@@ -59,7 +85,7 @@ const Header = () => {
           {visibleNavItems.map(({ label, route, icon }) => (
             <button
               key={label}
-              onClick={() => router.push(route)}
+              onClick={() => navigateAndClose(route)}
               className="w-full flex items-center gap-3 text-white/60 hover:text-white hover:bg-brand-light/10 text-[13px] px-3 py-2.5 rounded-lg transition-colors text-left"
             >
               <span className="text-base">{icon}</span>
@@ -69,7 +95,7 @@ const Header = () => {
         </nav>
 
         <div className="px-4 pt-4 border-t border-white/10 space-y-2">
-          <div className="relative cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 transition-colors" onClick={() => setCartOpen(true)}>
+          <div className="relative cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 transition-colors" onClick={() => { setCartOpen(true); closeSidebar(); }}>
             <span className="text-white text-xl">🛒</span>
             <span className="text-white/60 text-[13px]">Cart</span>
             {cartCount > 0 && (
@@ -83,7 +109,7 @@ const Header = () => {
             <span>{mounted && user ? "Log out" : "Log in"}</span>
           </button>
           {mounted && user ? (
-            <div onClick={() => router.push("/Common/pages/user")} className="bg-brand-light/10 rounded-xl p-3 cursor-pointer hover:bg-brand-light/20 transition-colors">
+            <div onClick={() => navigateAndClose("/Common/pages/user")} className="bg-brand-light/10 rounded-xl p-3 cursor-pointer hover:bg-brand-light/20 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-brand-orange flex items-center justify-center text-white text-sm font-bold shrink-0">
                   {displayName.charAt(0).toUpperCase()}
@@ -92,7 +118,7 @@ const Header = () => {
               </div>
             </div>
           ) : (
-            <button onClick={() => router.push("/")} className="w-full flex items-center gap-3 text-[13px] font-medium text-blue-700 bg-brand-light px-3 py-2.5 rounded-lg hover:bg-blue-50 transition-colors text-left">
+            <button onClick={() => navigateAndClose("/")} className="w-full flex items-center gap-3 text-[13px] font-medium text-blue-700 bg-brand-light px-3 py-2.5 rounded-lg hover:bg-blue-50 transition-colors text-left">
               <span>📝</span>
               <span>Sign up</span>
             </button>
