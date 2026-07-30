@@ -27,7 +27,7 @@ const Header = () => {
 
   useEffect(() => {
     if (user?.email) {
-      fetch(`http://localhost:5000/api/employees/get-by-email/${user.email}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get-by-email/${user.email}`)
         .then((r) => r.json())
         .then((res) => { if (res.success) setUserData(res.data); })
         .catch(() => {});
@@ -118,7 +118,7 @@ const Header = () => {
                     <div key={item.id} onClick={() => { setCartOpen(false); router.push(`/Common/pages/Products/${item.id}`); }} className="flex gap-3 bg-brand-cream rounded-lg p-2.5 cursor-pointer hover:bg-brand-cream transition-colors">
                       <div className="w-14 h-14 rounded-lg bg-brand-muted flex items-center justify-center text-xl shrink-0 overflow-hidden">
                         {item.image ? (
-                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
+                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
                         ) : (
                           <span>📦</span>
                         )}

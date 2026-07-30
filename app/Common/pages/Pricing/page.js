@@ -28,7 +28,7 @@ export default function Page() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/prizing/getPrizing");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`);
       const result = await res.json();
       setProducts(result.data || []);
     } catch (err) {
@@ -73,7 +73,7 @@ export default function Page() {
     if (skuPreview) fd.append("sku", skuPreview);
     if (form.image) fd.append("image", form.image);
 
-    await fetch("http://localhost:5000/api/prizing/addPrizing", { method: "POST", body: fd });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/addPrizing`, { method: "POST", body: fd });
     closeAdd();
     fetchProducts();
   };
@@ -127,7 +127,7 @@ export default function Page() {
                       <td className="px-4 py-3">
                         <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
                           {p.image ? (
-                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `http://localhost:5000/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" />
+                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-sm">📦</span>
                           )}
@@ -169,7 +169,7 @@ export default function Page() {
                         ) : <span className="text-gray-300">-</span>}
                       </td>
                       <td className="px-4 py-3">
-                        <button onClick={async () => { await fetch(`http://localhost:5000/api/prizing/toggleActive/${p.id}`, { method: "PATCH" }); fetchProducts(); }} className={`text-[11px] font-medium px-2.5 py-1 rounded-full transition-all duration-300 ${p.active ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100" : "bg-red-50 text-red-500 border border-red-200 hover:bg-red-100"}`}>
+                        <button onClick={async () => { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/toggleActive/${p.id}`, { method: "PATCH" }); fetchProducts(); }} className={`text-[11px] font-medium px-2.5 py-1 rounded-full transition-all duration-300 ${p.active ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100" : "bg-red-50 text-red-500 border border-red-200 hover:bg-red-100"}`}>
                           {p.active ? "Active" : "Inactive"}
                         </button>
                       </td>
@@ -178,7 +178,7 @@ export default function Page() {
                           <button onClick={() => router.push(`/Common/pages/Pricing/edit/${p.id}`)} className="text-[12px] font-medium text-brand-orange hover:text-brand-orange-hover border border-brand-orange px-3 py-1 rounded-lg hover:bg-orange-50 transition-colors">
                             Edit
                           </button>
-                          <button onClick={async () => { if (confirm("Delete this product?")) { await fetch(`http://localhost:5000/api/prizing/deletePrizing/${p.id}`, { method: "DELETE" }); fetchProducts(); } }} className="text-[12px] font-medium text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">
+                          <button onClick={async () => { if (confirm("Delete this product?")) { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/deletePrizing/${p.id}`, { method: "DELETE" }); fetchProducts(); } }} className="text-[12px] font-medium text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">
                             Delete
                           </button>
                         </div>

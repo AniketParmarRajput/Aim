@@ -30,7 +30,7 @@ export default function AddProduct() {
     fd.append("stock", form.stock);
     if (form.image) fd.append("image", form.image);
 
-    await fetch("http://localhost:5000/api/prizing/addPrizing", { method: "POST", body: fd });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/addPrizing`, { method: "POST", body: fd });
     router.push("/Common/pages/Pricing");
   };
 

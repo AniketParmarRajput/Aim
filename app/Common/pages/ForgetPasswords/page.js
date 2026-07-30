@@ -23,7 +23,7 @@ const Page = () => {
 
   try {
     const response = await fetch(
-      "http://localhost:5000/api/employees/update-password",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/employees/update-password`,
       {
         method: "POST",
         headers: {
