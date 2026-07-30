@@ -101,6 +101,7 @@ const EditOrderModal = ({ order, onClose, onSave }) => {
 const AdminPage = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [tab, setTab] = useState("dashboard");
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -132,12 +133,24 @@ const AdminPage = () => {
     } catch (err) { console.error(err); }
   };
 
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     if (!user) return;
     if (!isAdmin) return;
     setLoading(true);
     Promise.all([fetchProducts(), fetchOrders()]).finally(() => setLoading(false));
   }, [user]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-brand-cream">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
+          <div className="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   if (!user) return null;
   if (!isAdmin) {

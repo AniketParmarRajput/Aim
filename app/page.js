@@ -57,7 +57,7 @@ const Page = () => {
     "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all";
 
   return (
-    <div className="min-h-0 bg-brand-cream px-4 py-10 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 relative overflow-hidden">
 
       {/* Blobs */}
       <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
