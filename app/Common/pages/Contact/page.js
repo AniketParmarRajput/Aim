@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import PageHero from '@/app/Components/Reusable/PageHero';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -25,24 +26,33 @@ const Contact = () => {
   const inputClass = "w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all";
 
   return (
-    <div className="min-h-screen bg-brand-cream py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-brand-cream relative overflow-hidden">
+      <PageHero
+        badge="✉️ Get in Touch"
+        title="We Would Love To"
+        titleGradient="Hear From You"
+        subtitle="Have a question, feedback, or need help with your order? Our team is here to assist you anytime."
+        showExplore={false}
+        features={[
+          { icon: "💬", title: "24/7 Support", sub: "Always here to help" },
+          { icon: "📧", title: "Fast Reply", sub: "Within 24 hours" },
+          { icon: "📍", title: "Reach Us", sub: "Anywhere, anytime" },
+          { icon: "🤝", title: "Friendly Team", sub: "Customer first" },
+        ]}
+      />
+      <div className="py-10 px-4">
+        <div className="relative z-10 max-w-2xl mx-auto">
 
-      {/* Blobs */}
-      <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-16 -left-12 w-60 h-60 rounded-full bg-brand-dark/5 blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 max-w-2xl mx-auto">
-
-        {/* Page Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 bg-orange-50 text-brand-orange text-[11.5px] font-semibold px-3 py-1.5 rounded-full mb-3">
-            ✉️ Get in Touch
+          {/* Page Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-1.5 bg-orange-50 text-brand-orange text-[11.5px] font-semibold px-3 py-1.5 rounded-full mb-3">
+              ✉️ Get in Touch
+            </div>
+            <h1 className="text-[26px] font-bold text-gray-900 tracking-tight">Contact Us</h1>
+            <p className="text-[13px] text-gray-400 mt-2">
+              Wed love to hear from you. Send us a message and well respond shortly.
+            </p>
           </div>
-          <h1 className="text-[26px] font-bold text-gray-900 tracking-tight">Contact Us</h1>
-          <p className="text-[13px] text-gray-400 mt-2">
-            Wed love to hear from you. Send us a message and well respond shortly.
-          </p>
-        </div>
 
         {/* Form Card */}
         <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-8 py-8 mb-4">
@@ -136,6 +146,7 @@ const Contact = () => {
           ))}
         </div>
 
+      </div>
       </div>
     </div>
   );

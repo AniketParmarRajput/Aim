@@ -3,18 +3,27 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
+import { useAuth } from "@/app/Common/Context/AuthContext";
 
 const Page = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
   const [offers, setOffers] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const maxStock = Number(product?.data?.stock) || 999;
+
+  const fmt = (n) => n.toLocaleString("en-IN");
+  const getImg = (img) => (Array.isArray(img) ? img[0] : img);
+
+  const addToCartWithItem = (item) =>
+    addToCart({ id: item.id, itemName: item.itemName, amount: item.amount, image: item.image, discount: item.discount, stock: item.stock });
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -55,6 +64,85 @@ const Page = () => {
       stock: product.data?.stock,
       quantity,
     });
+  };
+
+  const SimilarCard = ({ item }) => {
+    const [added, setAdded] = useState(false);
+    const amount = Number(item.amount);
+    const discountPct = Number(item.discount);
+    const outOfStock = item.badge === "out of stock" || Number(item.stock) === 0;
+    const discountedPrice = discountPct > 0
+      ? Math.round(amount - (amount * discountPct) / 100)
+      : amount;
+
+    const handleAdd = (e) => {
+      e.stopPropagation();
+      addToCartWithItem(item);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 3000);
+    };
+
+    return (
+      <div className="w-full bg-brand-light border border-gray-100 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group">
+        <div onClick={() => router.push(`/Common/pages/Products/${item.id}`)} className="relative aspect-[4/3] bg-gradient-to-br from-brand-cream to-brand-muted flex items-center justify-center text-4xl overflow-hidden">
+          {item.image ? (
+            <img
+              src={(() => { const u = getImg(item.image); return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()}
+              alt={item.itemName}
+              className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${outOfStock ? "grayscale opacity-70" : ""}`}
+            />
+          ) : (
+            <span>🛍️</span>
+          )}
+          {item.badge === "new" && (
+            <span className="absolute top-2 left-2 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">New</span>
+          )}
+          {item.badge === "sale" && (
+            <span className="absolute top-2 left-2 bg-brand-dark text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Sale</span>
+          )}
+          {item.badge === "out of stock" && (
+            <span className="absolute top-2 left-2 bg-gray-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Out of Stock</span>
+          )}
+          {item.badge === "limited stock" && (
+            <span className="absolute top-2 left-2 bg-yellow-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Limited</span>
+          )}
+          {discountPct > 0 && (
+            <span className="absolute top-2 right-2 bg-brand-dark text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">-{discountPct}%</span>
+          )}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {added ? (
+              <div className="text-center text-white text-[11px] font-medium py-1.5">Added ✓</div>
+            ) : (
+              <div className="flex gap-2">
+                <button onClick={handleAdd} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">Add to cart</button>
+                <button disabled={item.badge === "out of stock" || Number(item.stock) === 0} onClick={(e) => { if (item.badge !== "out of stock" && Number(item.stock) !== 0) { e.stopPropagation(); router.push(`/Common/pages/Products/${item.id}`); } }} className="flex-1 bg-brand-dark hover:bg-[#1f0f08] text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:scale-100">{item.badge === "out of stock" || Number(item.stock) === 0 ? "Out of Stock" : "Buy now"}</button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="p-3">
+          <span className="text-[11px] text-brand-dark font-medium uppercase tracking-wide">{item.category || "General"}</span>
+          <h3 onClick={() => router.push(`/Common/pages/Products/${item.id}`)} className="text-sm font-semibold text-gray-900 mt-0.5 line-clamp-1 hover:text-brand-dark transition-colors">{item.itemName}</h3>
+          <p className="text-xs text-gray-400 mt-1 line-clamp-2">{item.description}</p>
+          <div className="flex items-center gap-1 mt-1.5">
+            {[1,2,3,4,5].map((s) => (
+              <span key={s} className={`text-[11px] ${s <= 4 ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+            ))}
+            <span className="text-[10px] text-gray-400 ml-1">(24)</span>
+          </div>
+          <div className="flex items-baseline gap-1.5 flex-wrap mt-2">
+            <span className="text-[17px] font-bold text-gray-900">₹{fmt(discountedPrice)}</span>
+            {discountPct > 0 && (
+              <>
+                <span className="text-[11px] text-gray-400 line-through">₹{fmt(amount)}</span>
+                <span className="text-[11px] text-red-600 font-medium bg-red-50 px-1.5 py-0.5 rounded">-{discountPct}%</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   if (!product) {
@@ -110,7 +198,7 @@ const Page = () => {
 
               <div className="w-44 h-44 rounded-2xl bg-brand-cream border border-gray-100 flex items-center justify-center text-5xl">
                 {product.data?.image ? (
-                  <img src={(() => { const u = Array.isArray(product.data.image) ? product.data.image[0] : product.data.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={product.data.itemName} className="w-full h-full object-cover rounded-2xl" />
+                  <img src={(() => { const u = Array.isArray(product.data.image) ? product.data.image[0] : product.data.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={product.data.itemName} className={`w-full h-full object-cover rounded-2xl ${product.data?.badge === "out of stock" || Number(product.data?.stock) === 0 ? "grayscale opacity-70" : ""}`} />
                 ) : (
                   <span>🛍️</span>
                 )}
@@ -216,23 +304,27 @@ const Page = () => {
 
               <hr className="border-gray-100 mb-5" />
 
-              <div className="mb-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                  Product ID
-                </p>
-                <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-dark bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-lg">
-                  🔑 {product.data?.id}
-                </div>
-              </div>
+              {isAdmin && (
+                <>
+                  <div className="mb-5">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                      Product ID
+                    </p>
+                    <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-dark bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-lg">
+                      🔑 {product.data?.id}
+                    </div>
+                  </div>
 
-              <div className="mb-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                  SKU
-                </p>
-                <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-dark bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-lg">
-                  🏷️ {product.data?.sku}
-                </div>
-              </div>
+                  <div className="mb-5">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                      SKU
+                    </p>
+                    <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-dark bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-lg">
+                      🏷️ {product.data?.sku}
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="mb-5">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
@@ -272,9 +364,54 @@ const Page = () => {
             </div>
           </div>
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-10 animate-slide-up">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <h2 className="text-[16px] font-bold text-gray-900">Similar Products</h2>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  More from {product.data?.category}
+                </p>
+              </div>
+              <button
+                onClick={() => router.push("/Common/pages/Products")}
+                className="text-[12px] text-brand-dark font-medium hover:underline"
+              >
+                View All →
+              </button>
+            </div>
+            <div
+              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              {related.map((item, i) => (
+                <div
+                  key={item.id}
+                  className="min-w-[190px] w-[190px] shrink-0 animate-slide-up"
+                  style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}
+                >
+                  <SimilarCard item={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };

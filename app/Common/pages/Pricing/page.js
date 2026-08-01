@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../Context/AuthContext";
+import PageHero from "@/app/Components/Reusable/PageHero";
 
 const CATEGORIES = ["Men", "Women", "Childs", "Other"];
 
@@ -79,7 +80,21 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream px-4 py-10">
+    <div className="min-h-screen bg-brand-cream">
+      <PageHero
+        badge="🏷️ Product Pricing"
+        title="Add & Manage Your"
+        titleGradient="Products"
+        subtitle="Create, update, and organize your product catalog with prices, discounts, stock, and more."
+        showExplore={false}
+        features={[
+          { icon: "➕", title: "Add Products", sub: "Easy creation" },
+          { icon: "✏️", title: "Edit Details", sub: "Update anytime" },
+          { icon: "📦", title: "Stock Control", sub: "Track inventory" },
+          { icon: "🏷️", title: "Discounts", sub: "Set offers" },
+        ]}
+      />
+      <div className="px-4 py-10">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -127,7 +142,7 @@ export default function Page() {
                       <td className="px-4 py-3">
                         <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
                           {p.image ? (
-                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" />
+                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className={`w-full h-full object-cover ${Number(p.stock) === 0 ? "grayscale opacity-70" : ""}`} />
                           ) : (
                             <span className="text-sm">📦</span>
                           )}
@@ -288,6 +303,7 @@ export default function Page() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
