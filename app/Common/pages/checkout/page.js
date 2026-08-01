@@ -99,7 +99,7 @@ function CheckoutContent() {
 
         const itemImage = Array.isArray(item.image) ? item.image[0] : item.image;
 
-        return fetch("/api/order/create", {
+        return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
