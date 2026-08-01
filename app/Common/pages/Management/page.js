@@ -248,19 +248,19 @@ const AdminPage = () => {
               <div className="space-y-6 animate-fade-in">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { label: "Total Products", value: products.length, icon: "🏷️", color: "from-blue-500 to-blue-600" },
-                    { label: "Total Orders", value: orders.length, icon: "📦", color: "from-green-500 to-green-600" },
-                    { label: "Pending Orders", value: pendingOrders, icon: "⏳", color: "from-yellow-500 to-yellow-600" },
-                    { label: "Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: "💰", color: "from-brand-orange to-orange-500" },
+                    { label: "Total Products", value: products.length, icon: "🏷️", color: "from-blue-500 to-blue-600", onClick: () => setTab("products") },
+                    { label: "Total Orders", value: orders.length, icon: "📦", color: "from-green-500 to-green-600", onClick: () => setTab("orders") },
+                    { label: "Pending Orders", value: pendingOrders, icon: "⏳", color: "from-yellow-500 to-yellow-600", onClick: () => setTab("orders") },
+                    { label: "Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: "💰", color: "from-brand-orange to-orange-500", onClick: () => setTab("orders") },
                   ].map((s) => (
-                    <div key={s.label} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all duration-300">
+                    <button key={s.label} onClick={s.onClick} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md hover:-translate-y-0.5 hover:border-brand-orange/30 text-left transition-all duration-300 cursor-pointer">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl">{s.icon}</span>
                         <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center opacity-20`} />
                       </div>
                       <p className="text-2xl font-bold text-gray-900">{s.value}</p>
                       <p className="text-[11px] text-gray-400 mt-0.5">{s.label}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
 
