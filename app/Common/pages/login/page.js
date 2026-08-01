@@ -97,7 +97,7 @@ export default function Page() {
 
         <p className="text-center text-[12.5px] text-gray-400 mt-6">
           Don&apos;t have an account?{" "}
-          <span className="text-brand-orange font-semibold cursor-pointer hover:underline">Sign up</span>
+          <span onClick={() => router.push("/")} className="text-brand-orange font-semibold cursor-pointer hover:underline">Sign up</span>
         </p>
       </div>
     </div>
