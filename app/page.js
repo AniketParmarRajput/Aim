@@ -67,17 +67,20 @@ const Page = () => {
         <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-8 py-8">
 
           {/* Header */}
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-brand-dark flex items-center justify-center shadow-md shrink-0 text-white text-lg">
-              👥
-            </div>
-            <div>
-              <h1 className="text-[19px] font-bold text-gray-900 tracking-tight">
-                {edit !== null ? "Edit Employee" : "Add New Employee"}
-              </h1>
-              <p className="text-[12px] text-gray-400 mt-0.5">
-                Fill in the details to add to your organization
-              </p>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center shadow-md shrink-0 text-white text-lg">
+                ⚡
+              </div>
+              <div>
+                <h1 className="text-[19px] font-bold tracking-tight">
+                  <span className="text-gray-900">Easy</span>{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-brand-orange">Shop</span>
+                </h1>
+                <p className="text-[12px] text-gray-400 mt-0.5">
+                  Create your account and start shopping
+                </p>
+              </div>
             </div>
           </div>
 
@@ -159,10 +162,10 @@ const Page = () => {
                 {isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Processing...
+                    Signing up...
                   </>
                 ) : (
-                  <>{edit !== null ? "✏️ Update Employee" : "+ Add Employee"}</>
+                  <>{edit !== null ? "✏️ Update Employee" : "Sign Up"}</>
                 )}
               </button>
 
@@ -196,7 +199,7 @@ const Page = () => {
           <div className="flex items-center gap-3 bg-green-50 border border-green-100 rounded-2xl px-5 py-3.5 mt-4 shadow-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
             <span className="text-[13px] font-semibold text-green-700">
-              Employese {edit !== null ? "updated" : "added"} successfully!
+              {edit !== null ? "Employee updated" : "Account created"} successfully!
             </span>
           </div>
         )}

@@ -17,16 +17,19 @@ export default function Page() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
     try {
-      login(form);
+      await login(form);
       setForm({ email: "", password: "" });
+      setTimeout(() => {
+        setIsLoading(false);
+        router.push("/Common/pages/home");
+      }, 2500);
     } catch (err) {
       setError(err.message);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -43,8 +46,10 @@ export default function Page() {
 
       <div className="relative z-10 w-full max-w-md bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-9 py-9">
         <div className="flex items-center gap-2.5 mb-7">
-          <div className="w-9 h-9 rounded-xl bg-brand-dark flex items-center justify-center shadow-md text-lg text-white">⚡</div>
-          <span className="text-[16px] font-bold text-gray-900 tracking-tight">Easy Shop</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center shadow-md text-lg text-white">⚡</div>
+          <span className="text-[16px] font-bold tracking-tight">
+            <span className="text-gray-900">Easy</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-brand-orange">Shop</span>
+          </span>
         </div>
 
         <h1 className="text-[22px] font-bold text-gray-900 tracking-tight mb-1">Log In</h1>
@@ -79,7 +84,14 @@ export default function Page() {
           )}
 
           <button type="submit" disabled={isLoading} className="w-full py-2.5 mt-1 bg-brand-dark text-white rounded-xl text-[14px] font-bold tracking-wide hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-            {isLoading ? "Logging in..." : "Log In"}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Logging in...
+              </span>
+            ) : (
+              "Log In"
+            )}
           </button>
         </form>
 

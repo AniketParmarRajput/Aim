@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
 import { useRouter } from "next/navigation";
+import PageHero from "@/app/Components/Reusable/PageHero";
 
 const Page = () => {
   const { user } = useAuth();
@@ -31,8 +32,22 @@ const Page = () => {
   }, [user, router]);
 
   return (
-    <div className="min-h-screen bg-brand-cream px-4 py-10">
-      <div className="max-w-xl mx-auto">
+    <div className="min-h-screen bg-brand-cream">
+      <PageHero
+        badge="👤 My Account"
+        title="Welcome To Your"
+        titleGradient="Profile"
+        subtitle="View your account details, manage your profile, and enjoy a personalized shopping experience."
+        showExplore={false}
+        features={[
+          { icon: "🛍️", title: "My Orders", sub: "Track purchases" },
+          { icon: "🔐", title: "Secure Account", sub: "Protected login" },
+          { icon: "⭐", title: "Rewards", sub: "Exclusive perks" },
+          { icon: "🎁", title: "Offers", sub: "Personal deals" },
+        ]}
+      />
+      <div className="px-4 py-10">
+        <div className="max-w-xl mx-auto">
         <div className="bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-8 py-8">
           {loading ? (
             <p className="text-center text-gray-400">Loading...</p>
@@ -80,6 +95,7 @@ const Page = () => {
           <button onClick={() => router.push("/Common/pages/home")} className="w-full py-2.5 bg-brand-dark text-white rounded-xl text-[14px] font-bold hover:opacity-90 transition-all">
             Back to Home
           </button>
+        </div>
         </div>
       </div>
     </div>

@@ -30,35 +30,31 @@ export const AuthProvider = ({ children }) => {
 
   // Login
 const login = async ({ email, password }) => {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/login/check`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // ✅ Very important for HTTP-only cookies
-        body: JSON.stringify({ email, password }),
-      }
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || "Login failed");
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/login/check`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // ✅ Very important for HTTP-only cookies
+      body: JSON.stringify({ email, password }),
     }
+  );
 
-    // ✅ Save user
-    setUser(data.user);
+  const data = await res.json();
 
-    // Optional (only if you're not relying solely on HTTP-only cookies)
-    Cookies.set("user", JSON.stringify(data.user));
-
-    router.push("/Common/pages/home");
-  } catch (err) {
-    alert(err.message);
+  if (!res.ok) {
+    throw new Error(data.message || "Login failed");
   }
+
+  // ✅ Save user
+  setUser(data.user);
+
+  // Optional (only if you're not relying solely on HTTP-only cookies)
+  Cookies.set("user", JSON.stringify(data.user));
+
+  return data.user;
 };
   // Logout
   const logout = () => {

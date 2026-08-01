@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
+import PageHero from "@/app/Components/Reusable/PageHero";
 
 const CATEGORIES = ["All", "Men", "Women", "Childs", "Other"];
 const BADGE_FILTERS = ["All", "New", "Sale", "Out of Stock", "Discounted", "Big Discount"];
@@ -113,6 +114,18 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-brand-cream">
+      <PageHero
+        badge="🛍️ Explore Our Products"
+        title="Shop Our Latest"
+        titleGradient="Collection"
+        subtitle="Browse the best products at unbeatable prices with exclusive discounts up to 60% off. Free delivery on your first order!"
+        features={[
+          { icon: "🏷️", title: "Best Prices", sub: "Unbeatable offers" },
+          { icon: "🔥", title: "Big Discounts", sub: "Up to 60% off" },
+          { icon: "🚚", title: "Free Ship", sub: "On first order" },
+          { icon: "⭐", title: "Top Rated", sub: "4.8 avg rating" },
+        ]}
+      />
       {/* Header */}
       <div className="bg-brand-light/95 backdrop-blur border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
         <div className="flex items-center justify-between gap-4">
@@ -319,7 +332,7 @@ const Page = () => {
                 <div className="space-y-2">
                   {CATEGORIES.map((cat) => (
                     <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="category" checked={category === cat} onChange={() => setCategory(cat)} className="accent-orange-500" />
+                      <input type="radio" name="category" checked={category === cat} onChange={() => setCategory(cat)} className="accent-black" />
                       <span className="text-sm text-gray-600">{cat}</span>
                     </label>
                   ))}
@@ -331,7 +344,7 @@ const Page = () => {
                 <div className="space-y-2">
                   {BADGE_FILTERS.map((b) => (
                     <label key={b} className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="badge" checked={badge === b} onChange={() => setBadge(b)} className="accent-orange-500" />
+                      <input type="radio" name="badge" checked={badge === b} onChange={() => setBadge(b)} className="accent-black" />
                       <span className="text-sm text-gray-600">{b}</span>
                     </label>
                   ))}

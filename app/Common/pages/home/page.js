@@ -16,6 +16,7 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
   const [added, setAdded] = useState(false);
   const amount = Number(product.amount);
   const discountPct = Number(product.discount);
+  const outOfStock = product.badge === "out of stock" || Number(product.stock) === 0;
   const discountedPrice = discountPct > 0
     ? Math.round(amount - (amount * discountPct) / 100)
     : amount;
@@ -34,7 +35,7 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
           <img
             src={(() => { const u = getImg(product.image); return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()}
             alt={product.itemName}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${outOfStock ? "grayscale opacity-70" : ""}`}
           />
         ) : (
           <span>🛍️</span>
@@ -101,6 +102,7 @@ const Home = () => {
   // Refs for scroll containers
   const bigSaleScrollRef = useRef(null);
   const topDealsScrollRef = useRef(null);
+  const newArrivalsScrollRef = useRef(null);
 
   // Scroll functions
   const scrollContainer = (ref, direction, amount = 320) => {
@@ -133,6 +135,7 @@ const Home = () => {
 
   const deals = useMemo(() => products.filter((p) => Number(p.discount) > 0).sort((a, b) => Number(b.discount) - Number(a.discount)), [products]);
   const bigDeals = useMemo(() => products.filter((p) => Number(p.discount) >= 50).sort((a, b) => Number(b.discount) - Number(a.discount)), [products]);
+  const newArrivals = useMemo(() => products.slice(-7).reverse(), [products]);
 
   const visibleProducts = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -279,6 +282,52 @@ const Home = () => {
               <div className="shrink-0 flex items-center">
                 <button onClick={() => router.push("/Common/pages/Products")} className="text-[11px] text-brand-orange font-medium border border-brand-orange px-4 py-2 rounded-lg hover:bg-brand-orange hover:text-white transition-all whitespace-nowrap">View All →</button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* New Arrivals */}
+        {newArrivals.length > 0 && (
+          <div className="mb-8 animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-[16px] font-bold text-gray-900">🆕 New Arrivals</h2>
+                <p className="text-[11px] text-gray-400 mt-0.5">Freshly added — the latest items</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => scrollContainer(newArrivalsScrollRef, 'left')}
+                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  ‹
+                </button>
+                <button 
+                  onClick={() => scrollContainer(newArrivalsScrollRef, 'right')}
+                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  ›
+                </button>
+                <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline ml-2">View All →</button>
+              </div>
+            </div>
+            <div 
+              ref={newArrivalsScrollRef} 
+              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {newArrivals.map((product, i) => (
+                <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                  <ProductCard
+                    product={product}
+                    onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                    onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}

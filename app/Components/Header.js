@@ -76,9 +76,11 @@ const Header = () => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        <div className="flex items-center gap-2 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => navigateAndClose("/Common/pages/home")}>
-          <div className="w-8 h-8 rounded-lg bg-brand-orange flex items-center justify-center text-white text-sm">⚡</div>
-          <span className="text-white text-[14px] font-medium">Easy Shop</span>
+        <div className="flex items-center gap-2.5 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => navigateAndClose("/Common/pages/home")}>
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center text-white text-base shadow-md">⚡</div>
+          <span className="text-[15px] font-bold tracking-tight">
+            <span className="text-white">Easy</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-yellow-300">Shop</span>
+          </span>
         </div>
 
         <nav className="flex-1 overflow-y-auto scrollbar-hide px-2 py-4 space-y-1">
@@ -144,7 +146,7 @@ const Header = () => {
                     <div key={item.id} onClick={() => { setCartOpen(false); router.push(`/Common/pages/Products/${item.id}`); }} className="flex gap-3 bg-brand-cream rounded-lg p-2.5 cursor-pointer hover:bg-brand-cream transition-colors">
                       <div className="w-14 h-14 rounded-lg bg-brand-muted flex items-center justify-center text-xl shrink-0 overflow-hidden">
                         {item.image ? (
-                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={item.itemName} className="w-full h-full object-cover" />
+                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={item.itemName} className={`w-full h-full object-cover ${Number(item.stock) === 0 ? "grayscale opacity-70" : ""}`} />
                         ) : (
                           <span>📦</span>
                         )}
