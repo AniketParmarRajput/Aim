@@ -142,7 +142,7 @@ export default function Page() {
                       <td className="px-4 py-3">
                         <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden">
                           {p.image ? (
-                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className={`w-full h-full object-cover ${Number(p.stock) === 0 ? "grayscale opacity-70" : ""}`} />
+                            <img src={(() => { const u = Array.isArray(p.image) ? p.image[0] : p.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={p.itemName} onClick={() => router.push(`/Common/pages/Products/${p.id}`)} className={`w-full h-full object-cover cursor-pointer hover:scale-110 transition-transform duration-300 ${Number(p.stock) === 0 ? "grayscale opacity-70" : ""}`} />
                           ) : (
                             <span className="text-sm">📦</span>
                           )}
