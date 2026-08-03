@@ -13,10 +13,12 @@ const CATEGORY_ICONS = {
 const getImg = (img) => Array.isArray(img) ? img[0] : img;
 
 const ProductCard = ({ product, onAdd, onBuy }) => {
+  const { isInCart, openCart } = useCart();
   const [added, setAdded] = useState(false);
   const amount = Number(product.amount);
   const discountPct = Number(product.discount);
   const outOfStock = product.badge === "out of stock" || Number(product.stock) === 0;
+  const inCart = isInCart(product.id);
   const discountedPrice = discountPct > 0
     ? Math.round(amount - (amount * discountPct) / 100)
     : amount;
@@ -26,6 +28,11 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
     onAdd(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 3000);
+  };
+
+  const handleGoToCart = (e) => {
+    e.stopPropagation();
+    openCart();
   };
 
   return (
@@ -57,7 +64,11 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
         )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          {added ? (
+          {inCart ? (
+            <button onClick={handleGoToCart} className="w-full bg-brand-orange hover:bg-brand-orange-hover text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">
+              Go to cart
+            </button>
+          ) : added ? (
             <div className="text-center text-white text-[11px] font-medium py-1.5">Added ✓</div>
           ) : (
             <div className="flex gap-2">
