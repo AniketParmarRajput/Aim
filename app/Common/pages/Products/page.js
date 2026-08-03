@@ -22,17 +22,17 @@ const Page = () => {
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [sortBy, setSortBy] = useState("default");
-  const [addedItems, setAddedItems] = useState({});
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, isInCart, openCart } = useCart();
 
   const handleAddToCart = (e, item) => {
     e.stopPropagation();
     addToCart({ id: item.id, itemName: item.itemName, amount: item.amount, image: item.image, discount: item.discount, stock: item.stock });
-    setAddedItems((prev) => ({ ...prev, [item.id]: true }));
-    setTimeout(() => {
-      setAddedItems((prev) => ({ ...prev, [item.id]: false }));
-    }, 3000);
+  };
+
+  const handleGoToCart = (e) => {
+    e.stopPropagation();
+    openCart();
   };
 
   console.log(process.env.NEXT_PUBLIC_API_URL,)
@@ -250,8 +250,13 @@ const Page = () => {
                           {Number(item.discount) > 0 && <span className="absolute top-2 right-2 bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-{item.discount}%</span>}
 
                           <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            {addedItems[item.id] ? (
-                              <div className="text-center text-white text-[11px] font-medium py-1.5">Added ✓</div>
+                            {isInCart(item.id) ? (
+                              <button
+                                onClick={handleGoToCart}
+                                className="w-full bg-brand-orange hover:bg-brand-orange-hover text-white text-[11px] font-medium py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                              >
+                                Go to cart
+                              </button>
                             ) : (
                               <div className="flex gap-2">
                                 <button

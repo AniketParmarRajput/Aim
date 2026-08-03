@@ -20,9 +20,8 @@ const Header = () => {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const { user, logout: authLogout } = useAuth();
-  const { items, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
+  const { items, cartCount, cartTotal, removeFromCart, updateQuantity, cartOpen, setCartOpen } = useCart();
   const { sidebarOpen, setSidebarOpen, closeSidebar } = useSidebar();
-  const [cartOpen, setCartOpen] = useState(false);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => { setMounted(true); }, []);
