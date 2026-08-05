@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-lg bg-brand-orange flex items-center justify-center text-white text-[10px]">⚡</div>
+            <div className="w-6 h-6 rounded-full bg-brand-orange flex items-center justify-center text-white text-[10px] overflow-hidden"><img src="/websitelogo-circle.png" alt="Easy Shop" className="w-full h-full object-cover" /></div>
             <span className="text-white font-medium">Easy Shop</span>
           </div>
           <p className="text-xs">Manage your store, employees and orders from one place.</p>

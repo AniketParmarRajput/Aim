@@ -26,10 +26,10 @@ function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const { items, clearCart } = useCart();
+  const { items, clearCart, updateQuantity } = useCart();
 
   const productId = searchParams.get("productId") || null;
-  const qty = Number(searchParams.get("quantity")) || 1;
+  const [qty, setQty] = useState(Number(searchParams.get("quantity")) || 1);
 
   const [product, setProduct] = useState(null);
   const [form, setForm] = useState({ mobile: "", address: "", state: "", district: "", pincode: "" });
@@ -246,7 +246,31 @@ function CheckoutContent() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-medium text-gray-900 truncate">{item.itemName}</p>
-                        <p className="text-[11px] text-gray-400">Qty: {q}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isFromCart) updateQuantity(item.id, -1);
+                              else setQty((prev) => Math.max(1, prev - 1));
+                            }}
+                            disabled={q <= 1}
+                            className="w-6 h-6 rounded-md border border-gray-200 bg-white hover:bg-brand-orange hover:text-white text-sm font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            -
+                          </button>
+                          <span className="text-[12px] font-semibold text-gray-900 w-5 text-center">Qty: {q}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isFromCart) updateQuantity(item.id, 1);
+                              else setQty((prev) => prev + 1);
+                            }}
+                            disabled={Number(item.stock) > 0 && q >= Number(item.stock)}
+                            className="w-6 h-6 rounded-md border border-gray-200 bg-white hover:bg-brand-orange hover:text-white text-sm font-semibold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                       <p className="text-[13px] font-semibold text-brand-dark">₹{itemTotal.toLocaleString("en-IN")}</p>
                     </div>

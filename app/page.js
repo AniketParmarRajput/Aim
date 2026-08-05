@@ -69,8 +69,8 @@ const Page = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center shadow-md shrink-0 text-white text-lg">
-                ⚡
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center shadow-md shrink-0 text-white text-lg overflow-hidden">
+                <img src="/websitelogo-circle.png" alt="Easy Shop logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 className="text-[19px] font-bold tracking-tight">

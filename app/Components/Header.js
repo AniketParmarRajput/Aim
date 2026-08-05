@@ -8,9 +8,7 @@ import { useSidebar } from "../Common/Context/SidebarContext";
 const NAV_ITEMS = [
   { label: "Home", route: "/Common/pages/home", icon: "🏠" },
   { label: "Products", route: "/Common/pages/Products", icon: "🛍️" },
-  { label: "Pricing", route: "/Common/pages/Pricing", icon: "💰" },
   { label: "About", route: "/Common/pages/About", icon: "ℹ️" },
-  { label: "Emp", route: "/Common/pages/Employes", icon: "👥" },
   { label: "Contact", route: "/Common/pages/Contact", icon: "📞" },
   { label: "Orders", route: "/Common/pages/Orders", icon: "📦" },
   { label: "Management", route: "/Common/pages/Management", icon: "⚙️" },
@@ -38,7 +36,7 @@ const Header = () => {
   const displayName = userData?.name || user?.name || "User";
 
   const isAdmin = mounted && user?.role === "admin";
-  const adminOnly = ["Pricing", "Management", "Emp"];
+  const adminOnly = ["Management"];
   const userOnly = ["Orders"];
   const visibleNavItems = NAV_ITEMS.filter((item) => {
     if (userOnly.includes(item.label) && isAdmin) return false;
@@ -76,7 +74,9 @@ const Header = () => {
         } md:translate-x-0`}
       >
         <div className="flex items-center gap-2.5 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => navigateAndClose("/Common/pages/home")}>
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center text-white text-base shadow-md">⚡</div>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center text-white text-base shadow-md overflow-hidden">
+            <img src="/websitelogo-circle.png" alt="Easy Shop logo" className="w-full h-full object-cover" />
+          </div>
           <span className="text-[15px] font-bold tracking-tight">
             <span className="text-white">Easy</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-yellow-300">Shop</span>
           </span>
