@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from "react";
+import { ArrowLeftIcon } from "lucide-react";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -132,8 +133,8 @@ const Page = () => {
         {/* Footer */}
         <p className="text-center text-xs text-gray-400 mt-4">
           Remember it?{" "}
-          <a href="/login" className="text-orange-500 font-semibold hover:text-orange-600 transition-colors">
-            Back to sign in
+          <a href="/login" className="text-orange-500 font-semibold hover:text-orange-600 transition-colors inline-flex items-center gap-1.5">
+            <ArrowLeftIcon size={13} /> Back to sign in
           </a>
         </p>
 

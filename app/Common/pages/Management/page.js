@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../Context/AuthContext";
 import PageHero from "@/app/Components/Reusable/PageHero";
@@ -110,6 +111,8 @@ const AdminPage = () => {
   const [showAdd, setShowAdd] = useState(false);
   const [editOrder, setEditOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
+  const [menuId, setMenuId] = useState(null);
+  const [menuPos, setMenuPos] = useState({ left: 0, top: 0 });
   const [form, setForm] = useState({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null, imageUrl: "" });
 
   const isAdmin = user?.role === "admin";
@@ -251,7 +254,7 @@ const AdminPage = () => {
                     { label: "Total Products", value: products.length, icon: "🏷️", color: "from-blue-500 to-blue-600", onClick: () => setTab("products") },
                     { label: "Total Orders", value: orders.length, icon: "📦", color: "from-green-500 to-green-600", onClick: () => setTab("orders") },
                     { label: "Pending Orders", value: pendingOrders, icon: "⏳", color: "from-yellow-500 to-yellow-600", onClick: () => setTab("orders") },
-                    { label: "Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: "💰", color: "from-brand-orange to-orange-500", onClick: () => setTab("orders") },
+                    { label: "Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: "💰", color: "from-brand-orange to-orange-500", onClick: () => router.push("/Common/pages/Management/overview") },
                   ].map((s) => (
                     <button key={s.label} onClick={s.onClick} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md hover:-translate-y-0.5 hover:border-brand-orange/30 text-left transition-all duration-300 cursor-pointer">
                       <div className="flex items-center justify-between mb-3">
@@ -371,9 +374,19 @@ const AdminPage = () => {
                                 </button>
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => router.push(`/Common/pages/Pricing/edit/${p.id}`)} className="text-[12px] font-medium text-brand-orange hover:text-brand-orange-hover border border-brand-orange px-3 py-1 rounded-lg hover:bg-orange-50 transition-colors">Edit</button>
-                                  <button onClick={async () => { if (confirm("Delete this product?")) { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/deletePrizing/${p.id}`, { method: "DELETE" }); fetchProducts(); } }} className="text-[12px] font-medium text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors">Delete</button>
+                                <div className="relative flex items-center justify-end">
+                                  <button
+                                    onClick={(e) => {
+                                      if (menuId === p.id) { setMenuId(null); return; }
+                                      const r = e.currentTarget.getBoundingClientRect();
+                                      setMenuPos({ left: r.right - 144, top: r.bottom + 6 });
+                                      setMenuId(p.id);
+                                    }}
+                                    className="w-8 h-8 rounded-lg border border-gray-200 bg-brand-light hover:bg-brand-cream hover:border-brand-orange text-gray-500 flex items-center justify-center transition-colors"
+                                    aria-label="Actions"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></svg>
+                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -578,6 +591,25 @@ const AdminPage = () => {
           </>
         )}
       </div>
+
+      {menuId && typeof document !== "undefined" && createPortal(
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setMenuId(null)} />
+          <div className="fixed z-50 bg-brand-light border border-gray-200 rounded-xl shadow-xl w-36 py-1.5 animate-scale-in" style={{ left: menuPos.left, top: menuPos.top }}>
+            {(() => { const mp = products.find((x) => x.id === menuId); return (
+              <>
+                <button onClick={() => { setMenuId(null); router.push(`/Common/pages/Pricing/edit/${mp.id}`); }} className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-gray-700 hover:bg-brand-cream transition-colors text-left">
+                  <span>✏️</span> Edit
+                </button>
+                <button onClick={async () => { setMenuId(null); if (confirm("Delete this product?")) { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/deletePrizing/${mp.id}`, { method: "DELETE" }); fetchProducts(); } }} className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-red-500 hover:bg-red-50 transition-colors text-left">
+                  <span>🗑️</span> Delete
+                </button>
+              </>
+            ); })()}
+          </div>
+        </>,
+        document.body
+      )}
     </div>
   );
 };

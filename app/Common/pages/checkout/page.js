@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "@/app/Common/Context/AuthContext";
 import { useCart } from "@/app/Common/Context/CartContext";
 
@@ -159,7 +160,7 @@ function CheckoutContent() {
     <div className="min-h-screen bg-brand-cream px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-orange hover:text-brand-orange transition-all">←</button>
+          <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-orange hover:text-brand-orange transition-all"><ArrowLeftIcon size={16} /></button>
           <h1 className="text-xl font-bold text-gray-900">Checkout</h1>
         </div>
 

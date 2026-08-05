@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
+import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PageHero from "@/app/Components/Reusable/PageHero";
 
@@ -92,8 +93,8 @@ const Page = () => {
 
           <div className="h-px bg-gray-100 my-5" />
 
-          <button onClick={() => router.push("/Common/pages/home")} className="w-full py-2.5 bg-brand-dark text-white rounded-xl text-[14px] font-bold hover:opacity-90 transition-all">
-            Back to Home
+          <button onClick={() => router.push("/Common/pages/home")} className="w-full py-2.5 bg-brand-dark text-white rounded-xl text-[14px] font-bold hover:opacity-90 transition-all inline-flex items-center justify-center gap-2">
+            <ArrowLeftIcon size={15} /> Back to Home
           </button>
         </div>
         </div>
