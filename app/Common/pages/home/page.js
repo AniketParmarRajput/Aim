@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
+import Reveal from "@/app/Components/Reusable/Reveal";
 
 const fmt = (n) => n.toLocaleString("en-IN");
 
@@ -214,7 +215,7 @@ const Home = () => {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Categories */}
         {categories.length > 1 && (
-          <div className="mb-8 animate-fade-in">
+          <Reveal direction="up" className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[16px] font-bold text-gray-900">Shop by Category</h2>
               <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline">View All</button>
@@ -230,182 +231,192 @@ const Home = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </Reveal>
         )}
 
         {/* Promo Banner */}
         {products.length > 0 && (
-          <div className="relative bg-gradient-to-r from-brand-dark via-[#3D2B1F] to-brand-dark rounded-2xl px-6 py-6 flex items-center justify-between gap-4 mb-8 overflow-hidden animate-slide-up">
-            <div className="absolute -right-6 -bottom-6 w-40 h-40 rounded-full bg-brand-light/5" />
-            <div className="absolute -left-4 -top-4 w-24 h-24 rounded-full bg-brand-light/5" />
-            <div>
-              <p className="text-white/80 text-[11px] mb-0.5 font-medium">🔥 Limited Time Offer</p>
-              <p className="text-white text-lg font-bold">Up to 60% off on All Items</p>
-              <p className="text-white/60 text-[11px] mt-1">Use code: <span className="text-white font-bold">SAVE60</span></p>
+          <Reveal direction="up" className="mb-8">
+            <div className="relative bg-gradient-to-r from-brand-dark via-[#3D2B1F] to-brand-dark rounded-2xl px-6 py-6 flex items-center justify-between gap-4 overflow-hidden">
+              <div className="absolute -right-6 -bottom-6 w-40 h-40 rounded-full bg-brand-light/5" />
+              <div className="absolute -left-4 -top-4 w-24 h-24 rounded-full bg-brand-light/5" />
+              <div>
+                <p className="text-white/80 text-[11px] mb-0.5 font-medium">🔥 Limited Time Offer</p>
+                <p className="text-white text-lg font-bold">Up to 60% off on All Items</p>
+                <p className="text-white/60 text-[11px] mt-1">Use code: <span className="text-white font-bold">SAVE60</span></p>
+              </div>
+              <button onClick={() => router.push("/Common/pages/Products")} className="bg-brand-light text-brand-dark text-[12px] font-bold px-6 py-3 rounded-xl hover:bg-brand-cream transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 shadow-lg">
+                Shop Now →
+              </button>
             </div>
-            <button onClick={() => router.push("/Common/pages/Products")} className="bg-brand-light text-brand-dark text-[12px] font-bold px-6 py-3 rounded-xl hover:bg-brand-cream transition-all duration-300 hover:scale-105 active:scale-95 shrink-0 shadow-lg">
-              Shop Now →
-            </button>
-          </div>
+          </Reveal>
         )}
 
         {/* Big Sale */}
         {bigDeals.length > 0 && (
-          <div className="mb-8 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-[16px] font-bold text-gray-900">🔥 Big Sale</h2>
-                <p className="text-[11px] text-gray-400 mt-0.5">50% or more off — grab them fast!</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => scrollContainer(bigSaleScrollRef, 'left')}
-                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
-                >
-                  ‹
-                </button>
-                <button 
-                  onClick={() => scrollContainer(bigSaleScrollRef, 'right')}
-                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
-                >
-                  ›
-                </button>
-              </div>
-            </div>
-            <div 
-              ref={bigSaleScrollRef} 
-              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              }}
-            >
-              {bigDeals.map((product, i) => (
-                <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
-                  <ProductCard
-                    product={product}
-                    onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
-                    onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
-                  />
+          <Reveal direction="up" className="mb-8">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-[16px] font-bold text-gray-900">🔥 Big Sale</h2>
+                  <p className="text-[11px] text-gray-400 mt-0.5">50% or more off — grab them fast!</p>
                 </div>
-              ))}
-              <div className="shrink-0 flex items-center">
-                <button onClick={() => router.push("/Common/pages/Products")} className="text-[11px] text-brand-orange font-medium border border-brand-orange px-4 py-2 rounded-lg hover:bg-brand-orange hover:text-white transition-all whitespace-nowrap">View All →</button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => scrollContainer(bigSaleScrollRef, 'left')}
+                    className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    ‹
+                  </button>
+                  <button 
+                    onClick={() => scrollContainer(bigSaleScrollRef, 'right')}
+                    className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+              <div 
+                ref={bigSaleScrollRef} 
+                className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                {bigDeals.map((product, i) => (
+                  <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                    <ProductCard
+                      product={product}
+                      onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                      onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                    />
+                  </div>
+                ))}
+                <div className="shrink-0 flex items-center">
+                  <button onClick={() => router.push("/Common/pages/Products")} className="text-[11px] text-brand-orange font-medium border border-brand-orange px-4 py-2 rounded-lg hover:bg-brand-orange hover:text-white transition-all whitespace-nowrap">View All →</button>
+                </div>
               </div>
             </div>
-          </div>
+          </Reveal>
         )}
 
         {/* New Arrivals */}
         {newArrivals.length > 0 && (
-          <div className="mb-8 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-[16px] font-bold text-gray-900">🆕 New Arrivals</h2>
-                <p className="text-[11px] text-gray-400 mt-0.5">Freshly added — the latest items</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => scrollContainer(newArrivalsScrollRef, 'left')}
-                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
-                >
-                  ‹
-                </button>
-                <button 
-                  onClick={() => scrollContainer(newArrivalsScrollRef, 'right')}
-                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
-                >
-                  ›
-                </button>
-                <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline ml-2">View All →</button>
-              </div>
-            </div>
-            <div 
-              ref={newArrivalsScrollRef} 
-              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              }}
-            >
-              {newArrivals.map((product, i) => (
-                <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
-                  <ProductCard
-                    product={product}
-                    onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
-                    onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
-                  />
+          <Reveal direction="up" className="mb-8">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-[16px] font-bold text-gray-900">🆕 New Arrivals</h2>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Freshly added — the latest items</p>
                 </div>
-              ))}
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => scrollContainer(newArrivalsScrollRef, 'left')}
+                    className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    ‹
+                  </button>
+                  <button 
+                    onClick={() => scrollContainer(newArrivalsScrollRef, 'right')}
+                    className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    ›
+                  </button>
+                  <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline ml-2">View All →</button>
+                </div>
+              </div>
+              <div 
+                ref={newArrivalsScrollRef} 
+                className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                {newArrivals.map((product, i) => (
+                  <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                    <ProductCard
+                      product={product}
+                      onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                      onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </Reveal>
         )}
 
         {/* Top Deals */}
         {deals.length > 0 && (
-          <div className="mb-8 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-[16px] font-bold text-gray-900">🔥 Top Deals</h2>
-                <p className="text-[11px] text-gray-400 mt-0.5">Best discounts available now</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => scrollContainer(topDealsScrollRef, 'left')}
-                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
-                >
-                  ‹
-                </button>
-                <button 
-                  onClick={() => scrollContainer(topDealsScrollRef, 'right')}
-                  className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
-                >
-                  ›
-                </button>
-                <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline ml-2">See all →</button>
-              </div>
-            </div>
-            <div 
-              ref={topDealsScrollRef} 
-              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              }}
-            >
-              {deals.slice(0, 8).map((product, i) => (
-                <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
-                  <ProductCard
-                    product={product}
-                    onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
-                    onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
-                  />
+          <Reveal direction="up" className="mb-8">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-[16px] font-bold text-gray-900">🔥 Top Deals</h2>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Best discounts available now</p>
                 </div>
-              ))}
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => scrollContainer(topDealsScrollRef, 'left')}
+                    className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    ‹
+                  </button>
+                  <button 
+                    onClick={() => scrollContainer(topDealsScrollRef, 'right')}
+                    className="w-8 h-8 rounded-full bg-brand-light border border-gray-200 flex items-center justify-center text-lg hover:bg-brand-dark hover:text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    ›
+                  </button>
+                  <button onClick={() => router.push("/Common/pages/Products")} className="text-[12px] text-brand-dark font-medium hover:underline ml-2">See all →</button>
+                </div>
+              </div>
+              <div 
+                ref={topDealsScrollRef} 
+                className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                {deals.slice(0, 8).map((product, i) => (
+                  <div key={product.id} className="min-w-[190px] w-[190px] shrink-0 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                    <ProductCard
+                      product={product}
+                      onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
+                      onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </Reveal>
         )}
 
         {/* Category Tabs + Products */}
         <div id="products">
-          <div className="flex items-end justify-between mb-4">
-            <div>
-              <h2 className="text-[16px] font-bold text-gray-900">
-                {activeTab === "All" ? "All Products" : activeTab}
-              </h2>
-              <p className="text-[11px] text-gray-400 mt-0.5">{filtered.length} items available</p>
+          <Reveal direction="up">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <h2 className="text-[16px] font-bold text-gray-900">
+                  {activeTab === "All" ? "All Products" : activeTab}
+                </h2>
+                <p className="text-[11px] text-gray-400 mt-0.5">{filtered.length} items available</p>
+              </div>
+              <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+                {categories.map((cat) => (
+                  <button key={cat} onClick={() => { setActiveTab(cat); setVisibleCount(8); }} className={`text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all duration-200 shrink-0 ${activeTab === cat ? "bg-brand-dark text-white shadow-md" : "bg-brand-light text-gray-600 border border-gray-200 hover:border-brand-dark/30 hover:text-brand-dark"}`}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-1 overflow-x-auto scrollbar-hide">
-              {categories.map((cat) => (
-                <button key={cat} onClick={() => { setActiveTab(cat); setVisibleCount(8); }} className={`text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all duration-200 shrink-0 ${activeTab === cat ? "bg-brand-dark text-white shadow-md" : "bg-brand-light text-gray-600 border border-gray-200 hover:border-brand-dark/30 hover:text-brand-dark"}`}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {loading ? (
@@ -420,13 +431,13 @@ const Home = () => {
                 <p className="text-xs text-gray-300 mt-1">Try selecting a different category</p>
               </div>
             ) : visibleProducts.map((product, i) => (
-              <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+              <Reveal key={product.id} direction="up" delay={Math.min(i * 0.05, 0.4)}>
                 <ProductCard
                   product={product}
                   onAdd={(product) => addToCart({ id: product.id, itemName: product.itemName, amount: product.amount, image: product.image, discount: product.discount })}
                   onBuy={(product) => router.push(`/Common/pages/Products/${product.id}`)}
                 />
-              </div>
+              </Reveal>
             ))}
           </div>
 
@@ -448,11 +459,13 @@ const Home = () => {
               { icon: "🔒", label: "Secure Payment", sub: "100% secure checkout" },
               { icon: "💬", label: "24/7 Support", sub: "Dedicated customer care" },
             ].map((s, i) => (
-              <div key={s.label} className="bg-brand-light border border-gray-100 rounded-xl px-4 py-5 text-center hover:shadow-md transition-all duration-300 animate-slide-up group" style={{ animationDelay: `${i * 0.1}s`, animationFillMode: "both" }}>
-                <span className="text-2xl group-hover:scale-110 inline-block transition-transform duration-300">{s.icon}</span>
-                <p className="text-sm font-semibold text-gray-900 mt-1">{s.label}</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">{s.sub}</p>
-              </div>
+              <Reveal key={s.label} direction="up" delay={i * 0.1} className="h-full">
+                <div className="bg-brand-light border border-gray-100 rounded-xl px-4 py-5 text-center hover:shadow-md transition-all duration-300 group h-full">
+                  <span className="text-2xl group-hover:scale-110 inline-block transition-transform duration-300">{s.icon}</span>
+                  <p className="text-sm font-semibold text-gray-900 mt-1">{s.label}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{s.sub}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         )}

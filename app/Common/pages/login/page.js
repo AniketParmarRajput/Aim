@@ -46,7 +46,7 @@ export default function Page() {
 
       <div className="relative z-10 w-full max-w-md bg-brand-light border border-gray-200 rounded-2xl shadow-lg px-9 py-9">
         <div className="flex items-center gap-2.5 mb-7">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center shadow-md text-lg text-white">⚡</div>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center shadow-md text-lg text-white overflow-hidden"><img src="/websitelogo-circle.png" alt="Easy Shop logo" className="w-full h-full object-cover" /></div>
           <span className="text-[16px] font-bold tracking-tight">
             <span className="text-gray-900">Easy</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-brand-orange">Shop</span>
           </span>

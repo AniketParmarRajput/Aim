@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
 import PageHero from "@/app/Components/Reusable/PageHero";
+import Reveal from "@/app/Components/Reusable/Reveal";
 
 const CATEGORIES = ["All", "Men", "Women", "Childs", "Other"];
 const BADGE_FILTERS = ["All", "New", "Sale", "Out of Stock", "Discounted", "Big Discount"];
@@ -221,11 +222,15 @@ const Page = () => {
                     const outOfStock = item.badge === "out of stock" || Number(item.stock) === 0;
                     const finalPrice = Math.round(Number(item.amount) * (1 - Number(item.discount) / 100));
                     return (
-                      <div
+                      <Reveal
                         key={item.id}
+                        direction="up"
+                        delay={Math.min(i * 0.05, 0.4)}
+                        className="h-full"
+                      >
+                      <div
                         onClick={() => router.push(`/Common/pages/Products/${item.id}`)}
-                        className="group bg-brand-light rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 cursor-pointer animate-slide-up"
-                        style={{ animationDelay: `${i * 0.05}s`, animationFillMode: "both" }}
+                        className="group bg-brand-light rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 cursor-pointer h-full"
                       >
                         <div className="relative aspect-[4/3] bg-brand-cream flex items-center justify-center text-4xl overflow-hidden">
                           {item.image ? (
@@ -297,6 +302,7 @@ const Page = () => {
                           </div>
                         </div>
                       </div>
+                      </Reveal>
                     );
                   })}
                 </div>
