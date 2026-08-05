@@ -276,10 +276,15 @@ const AdminPage = () => {
                     ) : (
                       <div className="space-y-2">
                         {orders.slice(0, 5).map((o) => (
-                          <div key={o.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                            <div className="min-w-0">
-                              <p className="text-[13px] font-medium text-gray-900 truncate">{o.itemName}</p>
-                              <p className="text-[11px] text-gray-400">{o.email}</p>
+                          <div key={o.id} onClick={() => router.push(`/Common/pages/Management/order/${o.id}`)} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 cursor-pointer hover:bg-brand-cream rounded-lg px-1.5 -mx-1.5 transition-colors">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
+                                {o.image ? <img src={(() => { const u = Array.isArray(o.image) ? o.image[0] : o.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-xs">📦</span>}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-[13px] font-medium text-gray-900 truncate">{o.itemName}</p>
+                                <p className="text-[11px] font-semibold text-brand-orange">Qty: {o.quantity ?? 1}</p>
+                              </div>
                             </div>
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ml-2 ${statusColors[o.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
                               {o.status}
@@ -526,9 +531,9 @@ const AdminPage = () => {
                         <div className="flex items-start justify-between mb-3">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <div className="w-9 h-9 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
+                              <button onClick={() => router.push(`/Common/pages/Management/order/${o.id}`)} className="w-9 h-9 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0 cursor-pointer hover:ring-2 hover:ring-brand-orange/60 transition-all" title="View order details">
                                 {o.image ? <img src={(() => { const u = Array.isArray(o.image) ? o.image[0] : o.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt="" className="w-full h-full object-cover" /> : <span className="text-sm">📦</span>}
-                              </div>
+                              </button>
                               <h3 className="text-sm font-semibold text-brand-dark">{o.itemName}</h3>
                               <span className="text-[10px] text-gray-400">#{o.id}</span>
                             </div>
