@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeftIcon } from "lucide-react";
 
 const CATEGORIES = ["Men", "Women", "Childs", "Other"];
 
@@ -97,8 +98,8 @@ export default function AddProduct() {
               <button type="submit" className="flex-1 py-2.5 bg-brand-dark text-white rounded-xl text-[14px] font-bold hover:opacity-90 active:scale-[0.98] transition-all">
                 + Add Product
               </button>
-              <button type="button" onClick={() => router.back()} className="py-2.5 px-6 border border-gray-200 text-gray-600 rounded-xl text-[14px] font-medium hover:bg-brand-cream transition-all">
-                Cancel
+              <button type="button" onClick={() => router.back()} className="py-2.5 px-6 border border-gray-200 text-gray-600 rounded-xl text-[14px] font-medium hover:bg-brand-cream transition-all inline-flex items-center gap-2">
+                <ArrowLeftIcon size={14} /> Cancel
               </button>
             </div>
           </form>

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeftIcon } from "lucide-react";
 
 const Page = () => {
   const [form, setForm] = useState({
@@ -186,9 +187,9 @@ const Page = () => {
                   setEdit(null);
                   setForm({ name: "", email: "", mobile: "", password: "" });
                 }}
-                className="w-full mt-3 text-[12.5px] font-semibold text-gray-400 hover:text-brand-orange transition-colors"
+                className="w-full mt-3 text-[12.5px] font-semibold text-gray-400 hover:text-brand-orange transition-colors inline-flex items-center justify-center gap-1.5"
               >
-                ← Cancel Edit
+                <ArrowLeftIcon size={13} /> Cancel Edit
               </button>
             )}
           </form>

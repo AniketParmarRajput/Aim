@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
 import { useRouter } from "next/navigation";
+import { ArrowLeftIcon, Eye, EyeOff } from "lucide-react";
 
 export default function Page() {
   const { login } = useAuth();
@@ -72,7 +73,7 @@ export default function Page() {
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base">🔒</span>
               <input type={showPassword ? "text" : "password"} name="password" value={form.password} onChange={handleValues} placeholder="••••••••" required className="w-full pl-9 pr-10 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all" />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">{showPassword ? "Hide" : "Show"}</button>
+              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 flex items-center" aria-label="Toggle password visibility">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
             </div>
           </div>
 

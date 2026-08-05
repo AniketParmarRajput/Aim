@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeftIcon } from "lucide-react";
 import { useCart } from "@/app/Common/Context/CartContext";
 import { useAuth } from "@/app/Common/Context/AuthContext";
 
@@ -174,7 +175,8 @@ const Page = () => {
           onClick={() => router.back()}
           className="mb-6 inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-brand-orange hover:text-white transition-colors"
         >
-          ← Back
+          <ArrowLeftIcon size={15} />
+          Back
         </button>
 
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
