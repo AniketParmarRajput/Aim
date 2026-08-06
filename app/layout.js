@@ -3,6 +3,7 @@ import ReduxProvider from "@/Redux/provider";
 import "./globals.css";
 import { AuthProvider } from "./Common/Context/AuthContext";
 import { CartProvider } from "./Common/Context/CartContext";
+import { WishlistProvider } from "./Common/Context/WishlistContext";
 import LayoutWrapper from "./Components/LayoutWrapper";
 
 const geistSans = Geist({
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
        <ReduxProvider>
         <AuthProvider>
           <CartProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
+            <WishlistProvider>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
        </ReduxProvider>

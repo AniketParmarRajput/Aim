@@ -24,6 +24,12 @@
   .animate-pulse-slow {
     animation: pulse 2s ease-in-out infinite;
   }
+  .animate-wishlist-pop {
+    animation: wishlistPop 0.45s cubic-bezier(0.36, 1.6, 0.38, 1);
+  }
+  .animate-wishlist-ring {
+    animation: wishlistRing 0.5s ease-out;
+  }
 }
 
 @keyframes slideIn {
@@ -44,6 +50,17 @@
 @keyframes scaleIn {
   from { transform: scale(0.95); opacity: 0; }
   to   { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes wishlistPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wishlistRing {
+  0%   { transform: scale(0.6); opacity: 0.6; }
+  100% { transform: scale(1.9); opacity: 0; }
 }
 
 @theme {

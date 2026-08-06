@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
 import Reveal from "@/app/Components/Reusable/Reveal";
+import WishlistButton from "@/app/Components/Resuable/WishlistButton";
 
 const fmt = (n) => n.toLocaleString("en-IN");
 
@@ -78,9 +79,13 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
             </div>
           )}
         </div>
+      
       </div>
       <div className="p-3">
         <span className="text-[11px] text-brand-dark font-medium uppercase tracking-wide">{product.category || "General"}</span>
+          <div className="absolute bottom-2 right-2 z-10">
+          <WishlistButton product={product} />
+        </div>
         <h3 onClick={() => onBuy(product)} className="text-sm font-semibold text-gray-900 mt-0.5 line-clamp-1 hover:text-brand-dark transition-colors">{product.itemName}</h3>
         <p className="text-xs text-gray-400 mt-1 line-clamp-2">{product.description}</p>
         <div className="flex items-center gap-1 mt-1.5">
