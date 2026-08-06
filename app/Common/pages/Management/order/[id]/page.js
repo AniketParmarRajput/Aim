@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "@/app/Common/Context/AuthContext";
+ import {downloadOrderBill} from "@/app/Common/pages/Orders/bill";
 
 const statusColors = {
   pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
@@ -99,6 +100,19 @@ export default function OrderDetail() {
 
   const totalAmount = Number(order.price) * Number(order.quantity || 1);
 
+  const handleDownloadBill = async () => {
+    try {
+      let customerName = "";
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get-by-email/${order.email}`);
+      const result = await res.json();
+      if (result.success && result.data?.name) customerName = result.data.name;
+      await downloadOrderBill(order, customerName);
+    } catch (err) {
+      console.error("Error downloading bill:", err);
+      alert("Could not download the bill. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-cream px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -106,9 +120,14 @@ export default function OrderDetail() {
           <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-[13px] font-medium text-gray-600 bg-brand-light border border-gray-200 px-4 py-2.5 rounded-xl hover:border-brand-orange hover:text-brand-orange transition-all">
             <ArrowLeftIcon size={14} /> Back
           </button>
-          <span className={`text-[11px] font-semibold px-3 py-1.5 rounded-full border capitalize ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
-            {order.status}
-          </span>
+          <div className="flex items-center gap-2">
+            <button onClick={handleDownloadBill} className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-green-700 bg-green-50 border border-green-600 px-4 py-2.5 rounded-xl hover:bg-green-600 hover:text-white transition-all">
+              🧾 Download Bill
+            </button>
+            <span className={`text-[11px] font-semibold px-3 py-1.5 rounded-full border capitalize ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
+              {order.status}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 mb-6">
