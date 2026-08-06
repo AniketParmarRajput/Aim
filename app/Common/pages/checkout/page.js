@@ -32,12 +32,32 @@ function CheckoutContent() {
   const productId = searchParams.get("productId") || null;
   const [qty, setQty] = useState(Number(searchParams.get("quantity")) || 1);
 
+  const formatDate = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+  const addDays = (date, n) => {
+    const d = new Date(date);
+    d.setDate(d.getDate() + n);
+    return d;
+  };
+  const minDeliveryDate = formatDate(addDays(new Date(), 7));
+  const prettyDate = (d) => {
+    if (!d) return "";
+    const dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  };
+
   const [product, setProduct] = useState(null);
   const [form, setForm] = useState({ mobile: "", address: "", state: "", district: "", pincode: "" });
   const [paymentMethod, setPaymentMethod] = useState("cash on delivery");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [deliveryDate, setDeliveryDate] = useState(minDeliveryDate);
 
   useEffect(() => {
     if (productId) {
@@ -63,7 +83,7 @@ function CheckoutContent() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!user?.email) {
       router.push("/Common/pages/login");
@@ -74,6 +94,14 @@ function CheckoutContent() {
       return;
     }
 
+    setShowDateModal(true);
+  };
+
+  const placeOrder = async () => {
+    if (!deliveryDate) {
+      setError("Please select a delivery date");
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -112,6 +140,7 @@ function CheckoutContent() {
             productId: item.id,
             image: itemImage || null,
             paymentMethod,
+            deliveryDate,
             address: form.address,
             mobile: form.mobile,
             state: form.state,
@@ -146,7 +175,7 @@ function CheckoutContent() {
             <span className="text-3xl">✅</span>
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-1">Order Placed!</h2>
-          <p className="text-sm text-gray-400">Your order will be delivered in 7 days.</p>
+          <p className="text-sm text-gray-400">Your order will be delivered on {prettyDate(deliveryDate)}.</p>
           <p className="text-xs text-gray-300 mt-3 animate-pulse">Redirecting to your orders...</p>
         </div>
       </div>
@@ -286,6 +315,48 @@ function CheckoutContent() {
             </div>
           </div>
         </div>
+
+        {showDateModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in" onClick={() => setShowDateModal(false)}>
+            <div className="bg-brand-light rounded-2xl shadow-xl w-full max-w-sm mx-4 p-6 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[17px] font-bold text-gray-900">Select Delivery Date</h2>
+                <button onClick={() => setShowDateModal(false)} className="w-8 h-8 rounded-full bg-brand-muted flex items-center justify-center text-gray-500 transition-colors">✕</button>
+              </div>
+              <p className="text-[12.5px] text-gray-400 mb-4">
+                Orders are delivered a minimum of <span className="font-semibold text-brand-orange">7 days</span> after placing. Pick your preferred delivery date.
+              </p>
+              <div>
+                <label className="block text-[12.5px] font-semibold text-gray-700 mb-1.5">Delivery Date</label>
+                <input
+                  type="date"
+                  value={deliveryDate}
+                  min={minDeliveryDate}
+                  onChange={(e) => setDeliveryDate(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 bg-brand-cream rounded-xl text-[13.5px] text-gray-900 focus:outline-none focus:border-brand-orange focus:bg-brand-light transition-all"
+                />
+              </div>
+              {deliveryDate && (
+                <div className="mt-3 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 text-center">
+                  <p className="text-[12.5px] text-gray-600">Estimated delivery date</p>
+                  <p className="text-[15px] font-bold text-brand-dark mt-0.5">{prettyDate(deliveryDate)}</p>
+                </div>
+              )}
+              {error && (
+                <div className="mt-3 flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5">
+                  <span className="text-red-400 text-sm">⚠</span>
+                  <p className="text-red-600 text-[12.5px] font-medium">{error}</p>
+                </div>
+              )}
+              <div className="flex gap-3 pt-4">
+                <button onClick={placeOrder} disabled={loading} className="flex-1 py-2.5 bg-brand-dark text-white rounded-xl text-[13px] font-bold hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                  {loading ? "Placing order..." : `Confirm & Place Order — ₹${totalAmount.toLocaleString("en-IN")}`}
+                </button>
+                <button onClick={() => setShowDateModal(false)} className="py-2.5 px-5 border border-gray-200 text-gray-600 rounded-xl text-[13px] font-medium hover:bg-brand-cream transition-all">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
