@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/app/Common/Context/CartContext";
 import PageHero from "@/app/Components/Reusable/PageHero";
 import Reveal from "@/app/Components/Reusable/Reveal";
+import ChatAssistant from "@/app/Components/ChatAssistant";
+import WishlistButton from "@/app/Components/Resuable/WishlistButton";
 
 const CATEGORIES = ["All", "Men", "Women", "Childs", "Other"];
 const BADGE_FILTERS = ["All", "New", "Sale", "Out of Stock", "Discounted", "Big Discount"];
@@ -254,6 +256,7 @@ const Page = () => {
                           {Number(item.discount) >= 50 && <span className="absolute top-10 right-2 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BIG SALE</span>}
                           {Number(item.discount) > 0 && <span className="absolute top-2 right-2 bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-{item.discount}%</span>}
 
+
                           <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             {isInCart(item.id) ? (
                               <button
@@ -290,6 +293,10 @@ const Page = () => {
 
                         <div className="p-2.5">
                           <h3 className="text-[13px] font-semibold text-gray-900 line-clamp-1">{item.itemName}</h3>
+                          
+                          <div className="absolute bottom-2 right-2">
+                            <WishlistButton product={item} />
+                          </div>
                           <p className="text-[11px] text-gray-400 mt-0.5 line-clamp-1">{item.description}</p>
                           <div className="flex items-center gap-2 mt-1.5">
                             <span className="text-base font-bold text-gray-900">₹{finalPrice.toLocaleString("en-IN")}</span>
@@ -386,6 +393,7 @@ const Page = () => {
           </div>
         </>
       )}
+      <ChatAssistant />
     </div>
   );
 };

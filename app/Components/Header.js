@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useCart } from "../Common/Context/CartContext";
 import { useAuth } from "../Common/Context/AuthContext";
 import { useSidebar } from "../Common/Context/SidebarContext";
+import { useWishlist } from "../Common/Context/WishlistContext";
 
 const NAV_ITEMS = [
   { label: "Home", route: "/Common/pages/home", icon: "🏠" },
@@ -18,9 +19,11 @@ const Header = () => {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const { user, logout: authLogout } = useAuth();
-  const { items, cartCount, cartTotal, removeFromCart, updateQuantity, cartOpen, setCartOpen } = useCart();
+  const { items, cartCount, cartTotal, removeFromCart, updateQuantity, cartOpen, setCartOpen, clearCart } = useCart();
+  const { items: wishlistItems, wishlistCount, removeFromWishlist, clearWishlist } = useWishlist();
   const { sidebarOpen, setSidebarOpen, closeSidebar } = useSidebar();
   const [userData, setUserData] = useState(null);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -96,6 +99,15 @@ const Header = () => {
         </nav>
 
         <div className="px-4 pt-4 border-t border-white/10 space-y-2">
+          <div className="relative cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 transition-colors" onClick={() => { setWishlistOpen(true); closeSidebar(); }}>
+            <span className="text-white text-xl">❤️</span>
+            <span className="text-white/60 text-[13px]">Wishlist</span>
+            {wishlistCount > 0 && (
+              <span className="bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center ml-auto">
+                {wishlistCount}
+              </span>
+            )}
+          </div>
           <div className="relative cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 transition-colors" onClick={() => { setCartOpen(true); closeSidebar(); }}>
             <span className="text-white text-xl">🛒</span>
             <span className="text-white/60 text-[13px]">Cart</span>
@@ -127,13 +139,75 @@ const Header = () => {
         </div>
       </aside>
 
+      {wishlistOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setWishlistOpen(false)} />
+          <div className="fixed top-0 right-0 h-full w-80 bg-brand-light shadow-xl z-50 p-5 flex flex-col animate-slide-in">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Your Wishlist ({wishlistCount})</h2>
+              <div className="flex items-center gap-2">
+                {wishlistItems.length > 0 && (
+                  <button onClick={() => clearWishlist()} className="text-xs font-medium text-red-500 hover:text-red-700">
+                    Clear all
+                  </button>
+                )}
+                <button onClick={() => setWishlistOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              </div>
+            </div>
+
+            {wishlistItems.length === 0 ? (
+              <p className="text-gray-500 text-sm text-center py-10">Your wishlist is empty.</p>
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 mb-4">
+                  {wishlistItems.map((item) => (
+                    <div key={item.id} onClick={() => { setWishlistOpen(false); router.push(`/Common/pages/Products/${item.id}`); }} className="flex gap-3 bg-brand-cream rounded-lg p-2.5 cursor-pointer hover:bg-brand-cream transition-colors">
+                      <div className="w-14 h-14 rounded-lg bg-brand-muted flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                        {item.image ? (
+                          <img src={(() => { const u = Array.isArray(item.image) ? item.image[0] : item.image; return u?.startsWith("http") ? u : `${process.env.NEXT_PUBLIC_API_URL}/uploads/${u}`; })()} alt={item.itemName} className={`w-full h-full object-cover ${Number(item.stock) === 0 ? "grayscale opacity-70" : ""}`} />
+                        ) : (
+                          <span>📦</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{item.itemName}</p>
+                        <div className="flex items-center gap-1.5">
+                          {Number(item.discount) > 0 && (
+                            <span className="text-[11px] text-gray-400 line-through">₹{Number(item.amount).toLocaleString("en-IN")}</span>
+                          )}
+                          <p className="text-sm font-bold text-brand-dark">₹{Math.round(Number(item.amount) * (1 - (Number(item.discount) || 0) / 100)).toLocaleString("en-IN")}</p>
+                        </div>
+                        <button onClick={(e) => { e.stopPropagation(); removeFromWishlist(item.id); }} className="mt-1 text-red-400 hover:text-red-600 text-xs">Remove</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-brand-muted pt-3">
+                  <button onClick={() => { setWishlistOpen(false); router.push("/Common/pages/Products"); }} className="w-full py-2.5 bg-brand-dark text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-colors">
+                    Continue Shopping
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      )}
+
       {cartOpen && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setCartOpen(false)} />
           <div className="fixed top-0 right-0 h-full w-80 bg-brand-light shadow-xl z-50 p-5 flex flex-col animate-slide-in">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">Your Cart ({cartCount})</h2>
-              <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <div className="flex items-center gap-2">
+                {items.length > 0 && (
+                  <button onClick={() => clearCart()} className="text-xs font-medium text-red-500 hover:text-red-700">
+                    Clear all
+                  </button>
+                )}
+                <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              </div>
             </div>
 
             {items.length === 0 ? (
