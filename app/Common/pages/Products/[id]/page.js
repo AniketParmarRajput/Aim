@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { useCart } from "@/app/Common/Context/CartContext";
 import { useAuth } from "@/app/Common/Context/AuthContext";
-import ChatAssistant from "@/app/Components/ChatAssistant";
 import WishlistButton from "@/app/Components/Resuable/WishlistButton";
 
 const fmt = (n) => n.toLocaleString("en-IN");
@@ -435,7 +434,6 @@ const Page = () => {
           display: none;
         }
       `}</style>
-      <ChatAssistant />
     </div>
   );
 };
