@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
 import { useRouter } from "next/navigation";
+import { downloadOrderBill } from "./bill";
 
 const statusColors = {
   pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
@@ -236,6 +237,19 @@ const OrdersPage = () => {
 
   const canCancel = (status) => isAdmin || ["pending", "confirmed"].includes(status);
 
+  const handleDownloadBill = async (order) => {
+    try {
+      let customerName = "";
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get-by-email/${order.email}`);
+      const result = await res.json();
+      if (result.success && result.data?.name) customerName = result.data.name;
+      await downloadOrderBill(order, customerName);
+    } catch (err) {
+      console.error("Error downloading bill:", err);
+      alert("Could not download the bill. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-cream px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -301,6 +315,11 @@ const OrdersPage = () => {
                         {isAdmin && (
                           <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
                             Edit
+                          </button>
+                        )}
+                        {isAdmin && (
+                          <button onClick={() => handleDownloadBill(order)} className="text-[11px] text-green-700 border border-green-600 px-2.5 py-1 rounded-lg bg-green-50 hover:bg-green-600 hover:text-white transition-all">
+                            🧾 Download Bill
                           </button>
                         )}
                         <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
