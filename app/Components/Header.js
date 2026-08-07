@@ -130,7 +130,7 @@ const Header = () => {
         <div className="px-4 pt-4 border-t border-white/10 space-y-2">
           <div 
             className="relative cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 transition-colors" 
-            onClick={() => { setWishlistOpen(true); closeSidebar(); }}
+            onClick={() => { setWishlistOpen(true); setCartOpen(false); closeSidebar(); }}
           >
             <span className="text-white text-xl">❤️</span>
             <span className="text-white/60 text-[13px]">Wishlist</span>
@@ -142,7 +142,7 @@ const Header = () => {
           </div>
           <div 
             className="relative cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-brand-light/10 transition-colors" 
-            onClick={() => { setCartOpen(true); closeSidebar(); }}
+            onClick={() => { setCartOpen(true); setWishlistOpen(false); closeSidebar(); }}
           >
             <span className="text-white text-xl">🛒</span>
             <span className="text-white/60 text-[13px]">Cart</span>
