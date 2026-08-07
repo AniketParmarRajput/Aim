@@ -14,9 +14,93 @@ const statusColors = {
   cancelled: "bg-red-50 text-red-700 border-red-200",
 };
 
+const STATUS_STEPS = ["pending", "confirmed", "processing", "shipped", "delivered"];
+const STATUS_ICONS = {
+  pending: "📥",
+  confirmed: "✅",
+  processing: "⚙️",
+  shipped: "🚚",
+  delivered: "📦",
+  cancelled: "❌",
+};
+
 const STATUS_OPTIONS = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
 
+const PLUS_THRESHOLD = 20;
+
 const getImg = (img) => Array.isArray(img) ? img[0] : img;
+
+const MembershipCard = ({ completed }) => {
+  const isMember = completed >= PLUS_THRESHOLD;
+  const pct = Math.min(100, Math.round((completed / PLUS_THRESHOLD) * 100));
+
+  return (
+    <div className="mb-4 relative overflow-hidden rounded-2xl p-5 text-white shadow-lg bg-linear-to-br from-brand-tan to-brand-orange">
+      <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-white/10" />
+      <div className="absolute right-10 -bottom-8 w-24 h-24 rounded-full bg-white/10" />
+      <div className="relative flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 ${isMember ? "bg-green-500/30" : "bg-white/20"}`}>
+            {isMember ? "👑" : "⭐"}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold">{isMember ? "easyShop Plus Member" : `easyShop Plus · ${completed}/${PLUS_THRESHOLD} orders to unlock`}</p>
+            <p className="text-[11px] text-white/80 mt-0.5">
+              {isMember
+                ? "👑 You've earned FREE delivery on every order. Enjoy!"
+                : "Complete 20 orders to unlock easyShop Plus with FREE delivery."}
+            </p>
+          </div>
+        </div>
+        <div className="shrink-0 text-right hidden sm:block">
+          <p className="text-2xl font-bold leading-none">{completed}</p>
+          <p className="text-[11px] text-white/80 mt-0.5">completed</p>
+        </div>
+      </div>
+
+      {!isMember && (
+        <div className="relative mt-3.5">
+          <div className="h-2 rounded-full bg-white/25 overflow-hidden">
+            <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${pct}%` }} />
+          </div>
+          <div className="flex items-center justify-between mt-1.5 text-[10px] text-white/80">
+            <span>{pct}% complete</span>
+            <span>{Math.max(0, PLUS_THRESHOLD - completed)} more to go 🎯</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const StatusProgress = ({ status }) => {
+  if (status === "cancelled") return null;
+  const currentIdx = STATUS_STEPS.indexOf(status);
+  return (
+    <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="relative flex items-center justify-between">
+        <div className="absolute left-0 right-0 top-3.5 h-0.5 bg-gray-200 translate-y-[-50%]" />
+        <div
+          className="absolute left-0 top-3.5 h-0.5 bg-brand-orange translate-y-[-50%] transition-all duration-500"
+          style={{ width: `${(currentIdx / (STATUS_STEPS.length - 1)) * 100}%` }}
+        />
+        {STATUS_STEPS.map((step, i) => {
+          const done = i <= currentIdx;
+          return (
+            <div key={step} className="relative flex flex-col items-center">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] z-10 transition-all ${done ? "bg-brand-orange text-white shadow" : "bg-white border-2 border-gray-300 text-gray-400"}`}>
+                {done ? "✓" : STATUS_ICONS[step]}
+              </div>
+              <span className={`text-[9px] mt-1 hidden sm:block ${done ? "text-brand-dark font-medium" : "text-gray-400"}`}>
+                {step.charAt(0).toUpperCase() + step.slice(1)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const EditModal = ({ order, isAdmin, onClose, onSave }) => {
   const unitPrice = Math.round(Number(order.price) / Number(order.quantity));
@@ -184,6 +268,7 @@ const OrdersPage = () => {
   const [editOrder, setEditOrder] = useState(null);
   const [cancelOrder, setCancelOrder] = useState(null);
   const [searchEmail, setSearchEmail] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -240,13 +325,30 @@ const OrdersPage = () => {
   useEffect(() => { fetchOrders(); }, [user]);
 
   const getCustomer = (o) => (o.userId ? userMap[o.userId] : null);
-  const filteredOrders = isAdmin && searchEmail
-    ? orders.filter((o) => {
+  const filteredOrders = (() => {
+    if (isAdmin && searchEmail) {
+      return orders.filter((o) => {
         const u = getCustomer(o);
         const em = u?.email || o.email || "";
         return em.toLowerCase().includes(searchEmail.toLowerCase());
-      })
-    : orders;
+      });
+    }
+    if (!isAdmin && searchTerm.trim()) {
+      const q = searchTerm.trim().toLowerCase();
+      return orders.filter((o) =>
+        (o.itemName || "").toLowerCase().includes(q) ||
+        (o.sku || "").toLowerCase().includes(q) ||
+        (o.status || "").toLowerCase().includes(q) ||
+        (o.paymentMethod || "").toLowerCase().includes(q)
+      );
+    }
+    return orders;
+  })();
+
+  const activeOrders = orders.filter((o) => o.status !== "cancelled" && o.status !== "delivered").length;
+  const deliveredOrders = orders.filter((o) => o.status === "delivered").length;
+  const cancelledOrders = orders.filter((o) => o.status === "cancelled").length;
+  const completedCount = orders.filter((o) => o.status === "delivered").length;
 
   const canCancel = (status) => isAdmin || ["pending", "confirmed"].includes(status);
 
@@ -268,24 +370,45 @@ const OrdersPage = () => {
   return (
     <div className="min-h-screen bg-brand-cream px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-xl font-bold text-brand-dark">{mounted ? (isAdmin ? "All Orders" : "My Orders") : "Orders"}</h1>
-            <p className="text-xs text-gray-400 mt-1">{orders.length} order{orders.length !== 1 ? "s" : ""}</p>
+        <div className="relative overflow-hidden rounded-2xl bg-brand-dark text-white p-6 mb-6 shadow-lg">
+          <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-brand-orange/20" />
+          <div className="absolute right-16 -bottom-10 w-32 h-32 rounded-full bg-brand-tan/20" />
+          <div className="relative flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-xl">📦</div>
+              <div>
+                <h1 className="text-lg font-bold">{mounted ? (isAdmin ? "All Orders" : "My Orders") : "Orders"}</h1>
+                <p className="text-xs text-white/60">{orders.length} order{orders.length !== 1 ? "s" : ""} · {isAdmin ? "full order management" : "track & manage your purchases"}</p>
+              </div>
+            </div>
+            <button onClick={() => router.push("/Common/pages/Products")} className="shrink-0 text-xs font-medium bg-brand-orange hover:bg-brand-orange-hover text-white px-4 py-2.5 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow">
+              🛍️ Continue Shopping
+            </button>
           </div>
-          <button onClick={() => router.push("/Common/pages/Products")} className="text-xs font-medium text-brand-orange border border-brand-orange px-4 py-2 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
-            Continue Shopping
-          </button>
         </div>
 
-        {isAdmin && orders.length > 0 && (
-          <div className="mb-4">
+        {/* Stats row */}
+        {!loading && orders.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <StatCard icon="📥" label={isAdmin ? "Active" : "In Progress"} value={activeOrders} />
+            <StatCard icon="✅" label="Delivered" value={deliveredOrders} />
+            <StatCard icon="❌" label="Cancelled" value={cancelledOrders} />
+          </div>
+        )}
+
+        {/* easyShop Plus membership */}
+        {!isAdmin && !loading && <MembershipCard completed={completedCount} />}
+
+        {/* Search */}
+        {orders.length > 0 && (
+          <div className="mb-4 relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
             <input
               type="text"
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              placeholder="Search by customer email..."
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-[13px] bg-brand-light focus:outline-none focus:border-brand-orange transition-all"
+              value={isAdmin ? searchEmail : searchTerm}
+              onChange={(e) => isAdmin ? setSearchEmail(e.target.value) : setSearchTerm(e.target.value)}
+              placeholder={isAdmin ? "Search by customer email..." : "Search by product, status, payment..."}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-[13px] bg-brand-light focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange transition-all"
             />
           </div>
         )}
@@ -296,70 +419,76 @@ const OrdersPage = () => {
             <p className="text-sm text-gray-400 font-medium">Loading orders...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-20 animate-fade-in">
+          <div className="bg-brand-light border border-gray-100 rounded-2xl text-center py-16 px-4 animate-fade-in">
             <p className="text-5xl mb-3">📦</p>
-            <p className="text-sm font-medium text-gray-400">
-              {searchEmail ? "No orders match your search" : "No orders yet"}
+            <p className="text-sm font-semibold text-gray-600">
+              {searchEmail || searchTerm ? "No orders match your search" : "No orders yet"}
             </p>
-            <p className="text-xs text-gray-300 mt-1">
-              {searchEmail ? "Try a different email" : "Place your first order to see it here"}
+            <p className="text-xs text-gray-400 mt-1">
+              {searchEmail || searchTerm ? "Try a different keyword" : "Place your first order to see it here"}
             </p>
+            {!(searchEmail || searchTerm) && (
+              <button onClick={() => router.push("/Common/pages/Products")} className="mt-5 text-sm font-medium text-white bg-brand-orange hover:bg-brand-orange-hover px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95">
+                Start Shopping
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col gap-3">
             {filteredOrders.map((order, i) => {
               const orderImg = getOrderImage(order);
               return (
-              <div key={order.id} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
-                <div className="flex items-start gap-3 mb-3">
-                  {orderImg && (
-                    <div className="w-12 h-12 rounded-lg bg-brand-muted flex items-center justify-center overflow-hidden shrink-0">
+              <div key={order.id} className="bg-brand-light border border-gray-100 rounded-2xl p-4 hover:shadow-lg hover:border-gray-200 transition-all duration-300 animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-14 h-14 rounded-xl bg-brand-muted flex items-center justify-center overflow-hidden shrink-0 ${order.status === "cancelled" ? "opacity-60 grayscale" : ""}`}>
+                    {orderImg ? (
                       <img src={orderImg} alt={order.itemName} className="w-full h-full object-cover" />
-                    </div>
-                  )}
+                    ) : (
+                      <span className="text-xl">📦</span>
+                    )}
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-sm font-semibold text-brand-dark">{order.itemName}</h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-bold text-brand-dark truncate">{order.itemName}</h3>
                         <p className="text-[11px] text-gray-400 mt-0.5">
                           {isAdmin && <><span className="font-medium text-gray-600">{getCustomer(order)?.email || order.email}</span> &middot; </>}
                           SKU: {order.sku} &middot; #{order.id}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                      <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                         {isAdmin && (
-                          <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
+                          <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1.5 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
                             Edit
                           </button>
                         )}
-                        {isAdmin && (
-                          <button onClick={() => handleDownloadBill(order)} className="text-[11px] text-green-700 border border-green-600 px-2.5 py-1 rounded-lg bg-green-50 hover:bg-green-600 hover:text-white transition-all">
-                            🧾 Download Bill
-                          </button>
-                        )}
-                        <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        <button onClick={() => handleDownloadBill(order)} className="text-[11px] text-green-700 border border-green-600 px-2.5 py-1.5 rounded-lg bg-green-50 hover:bg-green-600 hover:text-white transition-all">
+                          🧾 Bill
+                        </button>
+                        <span className={`text-[10px] font-semibold px-2.5 py-1.5 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
+                          {STATUS_ICONS[order.status] || ""} {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div>
-                    <p className="text-gray-400">Price</p>
-                    <p className="font-semibold text-gray-900">₹{Number(order.price).toLocaleString("en-IN")}</p>
+
+                <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-gray-100 text-xs">
+                  <div className="flex flex-col">
+                    <span className="text-gray-400 text-[11px]">Order Total</span>
+                    <span className="font-bold text-brand-dark mt-0.5">₹{Number(order.price).toLocaleString("en-IN")}</span>
                   </div>
-                  <div>
-                    <p className="text-gray-400">Qty</p>
-                    <p className="font-semibold text-gray-900">{order.quantity}</p>
+                  <div className="flex flex-col">
+                    <span className="text-gray-400 text-[11px]">Quantity</span>
+                    <span className="font-semibold text-gray-900 mt-0.5">{order.quantity} item{order.quantity !== 1 ? "s" : ""}</span>
                   </div>
-                  <div>
-                    <p className="text-gray-400">Payment</p>
-                    <p className="font-semibold text-gray-900 capitalize">{order.paymentMethod}</p>
+                  <div className="flex flex-col">
+                    <span className="text-gray-400 text-[11px]">Payment</span>
+                    <span className="font-semibold text-gray-900 capitalize mt-0.5">{order.paymentMethod}</span>
                   </div>
-                  <div>
-                    <p className="text-gray-400">Delivery</p>
-                    <p className="font-semibold text-gray-900">{order.deliveryDate}</p>
+                  <div className="flex flex-col">
+                    <span className="text-gray-400 text-[11px]">Delivery</span>
+                    <span className="font-semibold text-gray-900 mt-0.5 flex items-center gap-1">🚚 {order.deliveryDate}</span>
                   </div>
                 </div>
                 {(order.address || order.mobile || order.state || order.district || order.pincode) && (
@@ -376,6 +505,9 @@ const OrdersPage = () => {
                     Cancelled: {order.cancelReason}
                   </div>
                 )}
+                {!isAdmin && order.status !== "cancelled" && (
+                  <StatusProgress status={order.status} />
+                )}
                 {canCancel(order.status) && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <button onClick={() => setCancelOrder(order)} className="text-[11px] text-red-500 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all">
@@ -391,9 +523,20 @@ const OrdersPage = () => {
       </div>
 
       {editOrder && <EditModal order={editOrder} isAdmin={isAdmin} onClose={() => setEditOrder(null)} onSave={(updated) => setOrders((prev) => prev.map((o) => o.id === updated.id ? updated : o))} />}
+      {editOrder && <EditModal order={editOrder} isAdmin={isAdmin} onClose={() => setEditOrder(null)} onSave={(updated) => setOrders((prev) => prev.map((o) => o.id === updated.id ? updated : o))} />}
       {cancelOrder && <CancelModal order={cancelOrder} onClose={() => setCancelOrder(null)} onSave={(updated) => setOrders((prev) => prev.map((o) => o.id === updated.id ? updated : o))} />}
     </div>
   );
 };
+
+const StatCard = ({ icon, label, value }) => (
+  <div className="bg-brand-light border border-gray-100 rounded-xl p-3 flex items-center gap-3 shadow-sm">
+    <div className="w-9 h-9 rounded-lg bg-brand-muted flex items-center justify-center text-base shrink-0">{icon}</div>
+    <div className="min-w-0">
+      <p className="text-lg font-bold text-brand-dark leading-none">{value}</p>
+      <p className="text-[11px] text-gray-400 mt-1">{label}</p>
+    </div>
+  </div>
+);
 
 export default OrdersPage;
