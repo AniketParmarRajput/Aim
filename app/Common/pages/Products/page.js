@@ -25,6 +25,7 @@ const Page = () => {
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [sortBy, setSortBy] = useState("default");
+  const [search, setSearch] = useState("");
   const router = useRouter();
   const { addToCart, isInCart, openCart } = useCart();
 
@@ -80,7 +81,14 @@ const Page = () => {
       const amt = Number(p.amount);
       const matchMin = !priceMin || amt >= Number(priceMin);
       const matchMax = !priceMax || amt <= Number(priceMax);
-      return matchCat && matchBadge && matchMin && matchMax;
+      const q = search.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        p.itemName?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.sku?.toLowerCase().includes(q);
+      return matchCat && matchBadge && matchMin && matchMax && matchSearch;
     });
 
     const withFinalPrice = (p) => Number(p.amount) * (1 - Number(p.discount || 0) / 100);
@@ -95,7 +103,7 @@ const Page = () => {
       default:
         return list;
     }
-  }, [products, category, badge, priceMin, priceMax, sortBy]);
+  }, [products, category, badge, priceMin, priceMax, sortBy, search]);
 
   const activeCount = [category !== "All", badge !== "All", priceMin || priceMax].filter(Boolean).length;
 
@@ -131,7 +139,7 @@ const Page = () => {
       />
       {/* Header */}
       <div className="bg-brand-light/95 backdrop-blur border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Products</h1>
             <p className="text-sm text-gray-400">
@@ -139,7 +147,26 @@ const Page = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0 sm:flex-none justify-end">
+            <div className="relative flex-1 sm:flex-none">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search…"
+                className="w-full sm:w-48 md:w-56 pl-8 pr-7 py-2 text-sm text-gray-700 bg-brand-cream border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange transition-all"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs leading-none"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -185,6 +212,8 @@ const Page = () => {
           </div>
         )}
       </div>
+
+      {/* Product Grid */}
 
       {/* Product Grid */}
       <div className="px-6 py-6">
