@@ -20,10 +20,9 @@ const Header = () => {
   const router = useRouter();
   const { user, logout: authLogout } = useAuth();
   const { items, cartCount, cartTotal, removeFromCart, updateQuantity, cartOpen, setCartOpen, clearCart } = useCart();
-  const { items: wishlistItems, wishlistCount, removeFromWishlist, clearWishlist } = useWishlist();
+  const { items: wishlistItems, wishlistCount, removeFromWishlist, clearWishlist, wishlistOpen, setWishlistOpen } = useWishlist();
   const { sidebarOpen, setSidebarOpen, closeSidebar } = useSidebar();
   const [userData, setUserData] = useState(null);
-  const [wishlistOpen, setWishlistOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -52,27 +51,43 @@ const Header = () => {
 
   return (
     <>
-      {/* Hamburger button - hidden on mobile (bottom nav replaces it) */}
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="hidden fixed top-4 left-4 z-40 bg-brand-dark text-white w-10 h-10 rounded-lg items-center justify-center shadow-lg hover:bg-brand-dark/90 transition-colors"
-        aria-label="Open menu"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+      {/* Mobile top header bar - logo + hamburger toggle */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-brand-dark flex items-center justify-between px-3 py-2.5 shadow-lg">
+        <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigateAndClose("/Common/pages/home")}>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center text-white text-sm shadow-md overflow-hidden">
+            <img src="/websitelogo-circle.png" alt="Easy Shop logo" className="w-full h-full object-cover" />
+          </div>
+          <span className="text-[15px] font-bold tracking-tight">
+            <span className="text-white">Easy</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-yellow-300">Shop</span>
+          </span>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="w-10 h-10 rounded-lg bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+          aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+        >
+          {sidebarOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
 
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="hidden fixed inset-0 bg-black/50 z-40"
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
           onClick={closeSidebar}
         />
       )}
 
       <aside
-        className="hidden md:flex fixed top-0 left-0 h-full w-56 bg-brand-dark z-50 flex-col py-4 shadow-lg"
+        className={`fixed top-0 left-0 h-full z-50 flex flex-col py-4 shadow-lg bg-brand-dark transition-transform duration-300 ease-in-out w-72 md:w-56 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         <div className="flex items-center gap-2.5 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => navigateAndClose("/Common/pages/home")}>
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center text-white text-base shadow-md overflow-hidden">
