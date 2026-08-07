@@ -15,7 +15,7 @@ export default function LayoutWrapper({ children }) {
   return (
     <SidebarProvider>
       <Header />
-      <main className="flex-1 md:ml-56">{children}</main>
+      <main className="flex-1 pt-[60px] md:pt-0 pb-20 md:pb-0 md:ml-56">{children}</main>
       <Footer />
     </SidebarProvider>
   );

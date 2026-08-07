@@ -9,6 +9,7 @@ export const useWishlist = () => useContext(WishlistContext);
 export const WishlistProvider = ({ children }) => {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
 
   const loadWishlist = async (userId) => {
     try {
@@ -90,6 +91,8 @@ export const WishlistProvider = ({ children }) => {
       value={{
         items,
         wishlistCount: items.length,
+        wishlistOpen,
+        setWishlistOpen,
         loadWishlist,
         isInWishlist,
         toggleWishlist,
