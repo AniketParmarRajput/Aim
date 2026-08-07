@@ -85,7 +85,7 @@ function CheckoutContent() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!user?.email) {
+    if (!user?.id) {
       router.push("/Common/pages/login");
       return;
     }
@@ -132,6 +132,7 @@ function CheckoutContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            userId: user.id,
             email: user.email,
             itemName: item.itemName,
             sku: item.sku,

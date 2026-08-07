@@ -55,8 +55,8 @@ const EditOrderModal = ({ order, onClose, onSave }) => {
           <h2 className="text-[17px] font-bold text-gray-900">Edit Order #{order.id}</h2>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-brand-muted hover:bg-brand-muted flex items-center justify-center text-gray-500 transition-colors">✕</button>
         </div>
-        {order.email && (
-          <p className="text-[12px] text-gray-400 mb-3">Customer: <span className="font-medium text-gray-700">{order.email}</span></p>
+        {order.userId && (
+          <p className="text-[12px] text-gray-400 mb-3">Customer: <span className="font-medium text-gray-700">{order.email || `#${order.userId}`}</span></p>
         )}
         <div className="space-y-3">
           <div className="bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 text-center">
@@ -107,6 +107,7 @@ const AdminPage = () => {
   const [tab, setTab] = useState("dashboard");
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [userMap, setUserMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editOrder, setEditOrder] = useState(null);
@@ -116,6 +117,9 @@ const AdminPage = () => {
   const [form, setForm] = useState({ itemName: "", amount: "", description: "", category: "Men", discount: "", badge: "none", colour: "", stock: "", image: null, imageUrl: "" });
 
   const isAdmin = user?.role === "admin";
+
+  const getUser = (o) => (o.userId ? userMap[o.userId] : null);
+  const getCustomerLabel = (o) => getUser(o)?.email || o.email || "—";
 
   const skuPreview = form.itemName && form.category
     ? (form.itemName.charAt(0).toUpperCase() + form.category.charAt(0).toUpperCase()) + String(products.length + 1).padStart(3, "0")
@@ -137,13 +141,23 @@ const AdminPage = () => {
     } catch (err) { console.error(err); }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get`);
+      const result = await res.json();
+      const map = {};
+      (result.data || []).forEach((u) => { if (u.id) map[u.id] = u; });
+      setUserMap(map);
+    } catch (err) { console.error(err); }
+  };
+
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!user) return;
     if (!isAdmin) return;
     setLoading(true);
-    Promise.all([fetchProducts(), fetchOrders()]).finally(() => setLoading(false));
+    Promise.all([fetchProducts(), fetchOrders(), fetchUsers()]).finally(() => setLoading(false));
   }, [user]);
 
   if (!mounted) {
@@ -172,7 +186,7 @@ const AdminPage = () => {
     );
   }
 
-  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.price || 0) * Number(o.quantity || 1), 0);
+  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.price || 0), 0);
   const pendingOrders = orders.filter((o) => o.status === "pending").length;
   const filteredOrders = statusFilter === "All" ? orders : orders.filter((o) => o.status === statusFilter);
 
@@ -505,7 +519,7 @@ const AdminPage = () => {
             {tab === "orders" && (
               <div className="animate-fade-in">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-[12px] text-gray-400">{orders.length} orders &middot; {new Set(orders.map((o) => o.email).filter(Boolean)).size} customers</p>
+                  <p className="text-[12px] text-gray-400">{orders.length} orders &middot; {new Set(orders.map((o) => (o.userId || o.email)).filter(Boolean)).size} customers</p>
                 </div>
 
                 <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide">
@@ -525,7 +539,7 @@ const AdminPage = () => {
                 ) : (
                   <div className="flex flex-col gap-3">
                     {filteredOrders.map((o, i) => {
-                      const totalAmount = Number(o.price) * Number(o.quantity || 1);
+                      const totalAmount = Number(o.price);
                       return (
                       <div key={o.id} className="bg-brand-light border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all animate-slide-up" style={{ animationDelay: `${i * 0.03}s`, animationFillMode: "both" }}>
                         <div className="flex items-start justify-between mb-3">
@@ -538,7 +552,7 @@ const AdminPage = () => {
                               <span className="text-[10px] text-gray-400">#{o.id}</span>
                             </div>
                             <p className="text-[11px] text-gray-400 mt-0.5">
-                              <span className="font-medium text-gray-600">{o.email}</span> &middot; SKU: {o.sku}
+                              <span className="font-medium text-gray-600">{getCustomerLabel(o)}</span> &middot; SKU: {o.sku}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-2">
@@ -553,7 +567,7 @@ const AdminPage = () => {
                         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                           <div>
                             <p className="text-gray-400">Unit Price</p>
-                            <p className="font-semibold text-gray-900">₹{Number(o.price).toLocaleString("en-IN")}</p>
+                            <p className="font-semibold text-gray-900">₹{Math.round(Number(o.price) / Math.max(1, Number(o.quantity))).toLocaleString("en-IN")}</p>
                           </div>
                           <div>
                             <p className="text-gray-400">Qty</p>

@@ -52,10 +52,10 @@ const Header = () => {
 
   return (
     <>
-      {/* Hamburger button - mobile only */}
+      {/* Hamburger button - hidden on mobile (bottom nav replaces it) */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="fixed top-4 left-4 z-40 md:hidden bg-brand-dark text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-lg hover:bg-brand-dark/90 transition-colors"
+        className="hidden fixed top-4 left-4 z-40 bg-brand-dark text-white w-10 h-10 rounded-lg items-center justify-center shadow-lg hover:bg-brand-dark/90 transition-colors"
         aria-label="Open menu"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,15 +66,13 @@ const Header = () => {
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="hidden fixed inset-0 bg-black/50 z-40"
           onClick={closeSidebar}
         />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-56 bg-brand-dark z-50 flex flex-col py-4 shadow-lg transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        className="hidden md:flex fixed top-0 left-0 h-full w-56 bg-brand-dark z-50 flex-col py-4 shadow-lg"
       >
         <div className="flex items-center gap-2.5 px-4 pb-4 border-b border-white/10 cursor-pointer shrink-0" onClick={() => navigateAndClose("/Common/pages/home")}>
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-tan to-brand-orange flex items-center justify-center text-white text-base shadow-md overflow-hidden">

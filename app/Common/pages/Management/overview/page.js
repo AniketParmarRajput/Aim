@@ -38,9 +38,9 @@ const OverviewPage = () => {
   }, [user]);
 
   const stats = useMemo(() => {
-    const totalRevenue = orders.reduce((s, o) => s + Number(o.price || 0) * Number(o.quantity || 1), 0);
+    const totalRevenue = orders.reduce((s, o) => s + Number(o.price || 0), 0);
     const pending = orders.filter((o) => o.status === "pending").length;
-    const customers = new Set(orders.map((o) => o.email).filter(Boolean)).size;
+    const customers = new Set(orders.map((o) => o.userId || o.email).filter(Boolean)).size;
     return { totalRevenue, pending, customers };
   }, [orders]);
 

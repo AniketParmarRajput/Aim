@@ -179,6 +179,7 @@ const OrdersPage = () => {
   const [mounted, setMounted] = useState(false);
   const [orders, setOrders] = useState([]);
   const [productsMap, setProductsMap] = useState({});
+  const [userMap, setUserMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [editOrder, setEditOrder] = useState(null);
   const [cancelOrder, setCancelOrder] = useState(null);
@@ -214,11 +215,18 @@ const OrdersPage = () => {
       setProductsMap(map);
 
       if (isAdmin) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/all`);
-        const result = await res.json();
-        if (result.success) setOrders(result.data);
-      } else if (user.email) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/by-email/${user.email}`);
+        const [ordersRes, usersRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/all`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get`),
+        ]);
+        const ordersResult = await ordersRes.json();
+        const usersResult = await usersRes.json();
+        const umap = {};
+        (usersResult.data || []).forEach((u) => { if (u.id) umap[u.id] = u; });
+        setUserMap(umap);
+        if (ordersResult.success) setOrders(ordersResult.data);
+      } else if (user.id) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/user/${user.id}`);
         const result = await res.json();
         if (result.success) setOrders(result.data);
       }
@@ -231,8 +239,13 @@ const OrdersPage = () => {
 
   useEffect(() => { fetchOrders(); }, [user]);
 
+  const getCustomer = (o) => (o.userId ? userMap[o.userId] : null);
   const filteredOrders = isAdmin && searchEmail
-    ? orders.filter((o) => o.email?.toLowerCase().includes(searchEmail.toLowerCase()))
+    ? orders.filter((o) => {
+        const u = getCustomer(o);
+        const em = u?.email || o.email || "";
+        return em.toLowerCase().includes(searchEmail.toLowerCase());
+      })
     : orders;
 
   const canCancel = (status) => isAdmin || ["pending", "confirmed"].includes(status);
@@ -240,9 +253,11 @@ const OrdersPage = () => {
   const handleDownloadBill = async (order) => {
     try {
       let customerName = "";
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get-by-email/${order.email}`);
-      const result = await res.json();
-      if (result.success && result.data?.name) customerName = result.data.name;
+      if (order.userId) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get/${order.userId}`);
+        const result = await res.json();
+        if (result.success && result.data?.name) customerName = result.data.name;
+      }
       await downloadOrderBill(order, customerName);
     } catch (err) {
       console.error("Error downloading bill:", err);
@@ -307,7 +322,7 @@ const OrdersPage = () => {
                       <div>
                         <h3 className="text-sm font-semibold text-brand-dark">{order.itemName}</h3>
                         <p className="text-[11px] text-gray-400 mt-0.5">
-                          {isAdmin && <><span className="font-medium text-gray-600">{order.email}</span> &middot; </>}
+                          {isAdmin && <><span className="font-medium text-gray-600">{getCustomer(order)?.email || order.email}</span> &middot; </>}
                           SKU: {order.sku} &middot; #{order.id}
                         </p>
                       </div>

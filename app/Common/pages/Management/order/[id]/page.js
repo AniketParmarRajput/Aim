@@ -28,6 +28,7 @@ export default function OrderDetail() {
   const router = useRouter();
   const { user } = useAuth();
   const [order, setOrder] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -44,6 +45,15 @@ export default function OrderDetail() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (order?.userId) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get/${order.userId}`)
+        .then((r) => r.json())
+        .then((res) => { if (res.success) setCustomer(res.data); })
+        .catch(() => {});
+    }
+  }, [order?.userId]);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -98,14 +108,18 @@ export default function OrderDetail() {
     );
   }
 
-  const totalAmount = Number(order.price) * Number(order.quantity || 1);
+  const totalAmount = Number(order.price);
+
+  const unitPrice = Math.round(Number(order.price) / Math.max(1, Number(order.quantity || 1)));
 
   const handleDownloadBill = async () => {
     try {
       let customerName = "";
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get-by-email/${order.email}`);
-      const result = await res.json();
-      if (result.success && result.data?.name) customerName = result.data.name;
+      if (order.userId) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get/${order.userId}`);
+        const result = await res.json();
+        if (result.success && result.data?.name) customerName = result.data.name;
+      }
       await downloadOrderBill(order, customerName);
     } catch (err) {
       console.error("Error downloading bill:", err);
@@ -157,13 +171,14 @@ export default function OrderDetail() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <InfoItem label="Item Name" value={order.itemName} />
                 <InfoItem label="SKU" value={order.sku} />
-                <InfoItem label="Unit Price" value={`₹${Number(order.price).toLocaleString("en-IN")}`} />
+                <InfoItem label="Unit Price" value={`₹${unitPrice.toLocaleString("en-IN")}`} />
                 <InfoItem label="Quantity" value={order.quantity ?? 1} />
                 <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 sm:col-span-2">
                   <p className="text-[11px] text-orange-500 mb-0.5">Total Amount</p>
                   <p className="text-[18px] font-bold text-brand-orange">₹{totalAmount.toLocaleString("en-IN")}</p>
                 </div>
-                <InfoItem label="Customer Email" value={order.email} />
+                <InfoItem label="Customer" value={customer?.name || "—"} />
+                <InfoItem label="Customer Email" value={customer?.email || order.email} />
                 <InfoItem label="Payment Method" value={order.paymentMethod?.toUpperCase()} />
                 <InfoItem label="Delivery" value={order.deliveryDate} />
                 <InfoItem label="Mobile" value={order.mobile} />

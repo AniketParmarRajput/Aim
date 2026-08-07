@@ -1,13 +1,15 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Bot, Send, X } from "lucide-react";
+import { useAuth } from "../Common/Context/AuthContext";
 
 const SUGGESTIONS = ["Show me best sellers", "Men's products under ₹1500", "Any sale items?", "Do you have shoes?"];
 
 const ChatAssistant = () => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "bot", text: "Hi! I'm the Easy Shop assistant 🛍️ Ask me about products, prices, or deals." },
+    { role: "bot", text: `Hi ${user?.name || "User"}! I'm the Easy Shop assistant 🛍️ Ask me about products, prices, or deals.` },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
