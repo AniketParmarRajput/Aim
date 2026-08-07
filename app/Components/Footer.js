@@ -1,6 +1,11 @@
+"use client";
 import React from "react";
+import { useAuth } from "../Common/Context/AuthContext";
 
 const Footer = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+
   return (
     <footer className="bg-brand-dark text-white/60 px-6 py-8 mt-auto">
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
@@ -15,7 +20,7 @@ const Footer = () => {
           <h4 className="text-white font-medium mb-2">Quick Links</h4>
           <div className="flex flex-col gap-1 text-xs">
             <a href="/Common/pages/Products" className="hover:text-white transition-colors">Products</a>
-            <a href="/Common/pages/Pricing" className="hover:text-white transition-colors">Pricing</a>
+            {isAdmin && <a href="/Common/pages/Pricing" className="hover:text-white transition-colors">Pricing</a>}
             <a href="/Common/pages/About" className="hover:text-white transition-colors">About</a>
             <a href="/Common/pages/Contact" className="hover:text-white transition-colors">Contact</a>
           </div>
