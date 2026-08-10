@@ -29,17 +29,8 @@ const Header = () => {
   // State for cart and wishlist sidebar visibility
   const [cartOpen, setCartOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const update = () => setIsDesktop(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
 
   useEffect(() => {
     if (user?.email) {
@@ -175,24 +166,20 @@ const Header = () => {
       </aside>
 
       {/* Cart Sidebar Component */}
-      <div className="hidden md:block">
-        {isDesktop && (
-          <CartSidebar 
-            isOpen={cartOpen} 
-            onClose={() => setCartOpen(false)} 
-          />
-        )}
-      </div>
+      {mounted && (
+        <CartSidebar 
+          isOpen={cartOpen} 
+          onClose={() => setCartOpen(false)} 
+        />
+      )}
 
       {/* Wishlist Sidebar Component */}
-      <div className="hidden md:block">
-        {isDesktop && (
-          <WishlistSidebar 
-            isOpen={wishlistOpen} 
-            onClose={() => setWishlistOpen(false)} 
-          />
-        )}
-      </div>
+      {mounted && (
+        <WishlistSidebar 
+          isOpen={wishlistOpen} 
+          onClose={() => setWishlistOpen(false)} 
+        />
+      )}
     </>
   );
 };
