@@ -373,15 +373,15 @@ const OrdersPage = () => {
         <div className="relative overflow-hidden rounded-2xl bg-brand-dark text-white p-6 mb-6 shadow-lg">
           <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-brand-orange/20" />
           <div className="absolute right-16 -bottom-10 w-32 h-32 rounded-full bg-brand-tan/20" />
-          <div className="relative flex items-center justify-between gap-4">
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-xl">📦</div>
+              <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-xl shrink-0">📦</div>
               <div>
                 <h1 className="text-lg font-bold">{mounted ? (isAdmin ? "All Orders" : "My Orders") : "Orders"}</h1>
                 <p className="text-xs text-white/60">{orders.length} order{orders.length !== 1 ? "s" : ""} · {isAdmin ? "full order management" : "track & manage your purchases"}</p>
               </div>
             </div>
-            <button onClick={() => router.push("/Common/pages/Products")} className="shrink-0 text-xs font-medium bg-brand-orange hover:bg-brand-orange-hover text-white px-4 py-2.5 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow">
+            <button onClick={() => router.push("/Common/pages/Products")} className="shrink-0 w-full sm:w-auto text-xs font-medium bg-brand-orange hover:bg-brand-orange-hover text-white px-4 py-2.5 rounded-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow">
               🛍️ Continue Shopping
             </button>
           </div>
@@ -456,19 +456,19 @@ const OrdersPage = () => {
                           SKU: {order.sku} &middot; #{order.id}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                        {isAdmin && (
-                          <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1.5 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
-                            Edit
-                          </button>
-                        )}
-                        <button onClick={() => handleDownloadBill(order)} className="text-[11px] text-green-700 border border-green-600 px-2.5 py-1.5 rounded-lg bg-green-50 hover:bg-green-600 hover:text-white transition-all">
-                          🧾 Bill
+                      <span className={`shrink-0 text-[10px] font-semibold px-2.5 py-1.5 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
+                        {STATUS_ICONS[order.status] || ""} {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </div>
+                    <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
+                      {isAdmin && (
+                        <button onClick={() => setEditOrder(order)} className="text-[11px] text-brand-orange border border-brand-orange px-2.5 py-1.5 rounded-lg hover:bg-brand-orange hover:text-white transition-all">
+                          Edit
                         </button>
-                        <span className={`text-[10px] font-semibold px-2.5 py-1.5 rounded-full border ${statusColors[order.status] || "bg-brand-cream text-gray-600 border-gray-200"}`}>
-                          {STATUS_ICONS[order.status] || ""} {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </span>
-                      </div>
+                      )}
+                      <button onClick={() => handleDownloadBill(order)} className="text-[11px] text-green-700 border border-green-600 px-2.5 py-1.5 rounded-lg bg-green-50 hover:bg-green-600 hover:text-white transition-all">
+                        🧾 Bill
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -522,7 +522,6 @@ const OrdersPage = () => {
         )}
       </div>
 
-      {editOrder && <EditModal order={editOrder} isAdmin={isAdmin} onClose={() => setEditOrder(null)} onSave={(updated) => setOrders((prev) => prev.map((o) => o.id === updated.id ? updated : o))} />}
       {editOrder && <EditModal order={editOrder} isAdmin={isAdmin} onClose={() => setEditOrder(null)} onSave={(updated) => setOrders((prev) => prev.map((o) => o.id === updated.id ? updated : o))} />}
       {cancelOrder && <CancelModal order={cancelOrder} onClose={() => setCancelOrder(null)} onSave={(updated) => setOrders((prev) => prev.map((o) => o.id === updated.id ? updated : o))} />}
     </div>

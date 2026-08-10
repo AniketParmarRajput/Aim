@@ -14,6 +14,41 @@ const CATEGORY_ICONS = {
 
 const getImg = (img) => Array.isArray(img) ? img[0] : img;
 
+const HERO_SLIDES = [
+  {
+    badge: "⚡ New Collection 2026",
+    titlePre: "Discover Your",
+    titleAccent: "Perfect Style",
+    desc: "Shop the latest trends with exclusive discounts up to 60% off. Free delivery on your first order!",
+    cta1Label: "Shop Now",
+    route: "/Common/pages/Products",
+  },
+  {
+    badge: "🛍️ Featured Products",
+    titlePre: "Handpicked For",
+    titleAccent: "Every Taste",
+    desc: "Explore our best-selling products curated to match every style and budget this season.",
+    cta1Label: "View Products",
+    route: "/Common/pages/Products",
+  },
+  {
+    badge: "🔥 Mega Sale",
+    titlePre: "Up to 60% Off",
+    titleAccent: "Everything",
+    desc: "Limited-time offers on the hottest items. Grab your favourites before they're gone!",
+    cta1Label: "Shop Sale",
+    route: "/Common/pages/Products",
+  },
+  {
+    badge: "🚚 Free Delivery",
+    titlePre: "On Your",
+    titleAccent: "First Order",
+    desc: "Enjoy free shipping plus easy 30-day returns and secure payment on every purchase.",
+    cta1Label: "Start Shopping",
+    route: "/Common/pages/Products",
+  },
+];
+
 const ProductCard = ({ product, onAdd, onBuy }) => {
   const { isInCart, openCart } = useCart();
   const [added, setAdded] = useState(false);
@@ -115,6 +150,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [visibleCount, setVisibleCount] = useState(8);
+  const [slideIndex, setSlideIndex] = useState(0);
 
   // Refs for scroll containers
   const bigSaleScrollRef = useRef(null);
@@ -144,6 +180,11 @@ const Home = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const t = setInterval(() => setSlideIndex((i) => (i + 1) % HERO_SLIDES.length), 10000);
+    return () => clearInterval(t);
+  }, []);
+
   const categories = useMemo(() => ["All", ...new Set(products.map((p) => p.category).filter(Boolean))], [products]);
 
   const filtered = useMemo(() => {
@@ -167,22 +208,57 @@ const Home = () => {
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <span className="inline-flex items-center gap-1.5 bg-brand-light/10 border border-white/20 text-white/80 text-[11px] font-medium px-3 py-1 rounded-full mb-4 animate-fade-in">
-                ⚡ New Collection 2026
-              </span>
-              <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight mb-3 animate-slide-up">
-                Discover Your <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-yellow-300">Perfect Style</span>
-              </h1>
-              <p className="text-white/50 text-[15px] mb-6 max-w-lg animate-slide-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
-                Shop the latest trends with exclusive discounts up to 60% off. Free delivery on your first order!
-              </p>
-              <div className="flex gap-3 animate-slide-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
-                <button onClick={() => router.push("/Common/pages/Products")} className="bg-brand-dark hover:bg-[#1f0f08] text-white text-[13px] font-semibold px-7 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-black/20">
-                  Shop Now
+              <div className="overflow-hidden">
+                <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${slideIndex * 100}%)` }}>
+                  {HERO_SLIDES.map((s) => (
+                    <div key={s.badge} className="w-full shrink-0 pr-4">
+                      <span className="inline-flex items-center gap-1.5 bg-brand-light/10 border border-white/20 text-white/80 text-[11px] font-medium px-3 py-1 rounded-full mb-4 animate-fade-in">
+                        {s.badge}
+                      </span>
+                      <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight mb-3">
+                        {s.titlePre} <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-tan to-yellow-300">{s.titleAccent}</span>
+                      </h1>
+                      <p className="text-white/50 text-[15px] mb-6 max-w-lg">
+                        {s.desc}
+                      </p>
+                      <div className="flex gap-3">
+                        <button onClick={() => router.push(s.route)} className="bg-brand-dark hover:bg-[#1f0f08] text-white text-[13px] font-semibold px-7 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-black/20">
+                          {s.cta1Label}
+                        </button>
+                        <button onClick={() => { const el = document.getElementById("products"); if (el) el.scrollIntoView({ behavior: "smooth" }); }} className="bg-brand-light/10 hover:bg-brand-light/15 text-white border border-white/20 text-[13px] px-7 py-3 rounded-xl transition-all duration-300">
+                          Explore
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 mt-6">
+                <button
+                  onClick={() => setSlideIndex((slideIndex - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
+                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 flex items-center justify-center transition-all duration-300"
+                  aria-label="Previous slide"
+                >
+                  ‹
                 </button>
-                <button onClick={() => { const el = document.getElementById("products"); if (el) el.scrollIntoView({ behavior: "smooth" }); }} className="bg-brand-light/10 hover:bg-brand-light/15 text-white border border-white/20 text-[13px] px-7 py-3 rounded-xl transition-all duration-300">
-                  Explore
+                <div className="flex items-center gap-2">
+                  {HERO_SLIDES.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSlideIndex(i)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${i === slideIndex ? "w-6 bg-brand-tan" : "w-3 bg-white/25 hover:bg-white/40"}`}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() => setSlideIndex((slideIndex + 1) % HERO_SLIDES.length)}
+                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 flex items-center justify-center transition-all duration-300"
+                  aria-label="Next slide"
+                >
+                  ›
                 </button>
               </div>
             </div>
