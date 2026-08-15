@@ -1,11 +1,19 @@
 "use client";
-import React from "react";
+import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useAuth } from "../Common/Context/AuthContext";
 
+const useMounted = () =>
+  useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
 const Footer = () => {
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const mounted = useMounted();
+  const isAdmin = mounted && user?.role === "admin";
 
   return (
     <footer className="bg-brand-dark text-white/60 px-6 py-8 mt-auto">

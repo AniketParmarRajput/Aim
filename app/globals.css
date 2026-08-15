@@ -11,6 +11,13 @@
   height: 0;
 }
 
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 @layer utilities {
   .animate-slide-in {
     animation: slideIn 0.3s ease-out;
