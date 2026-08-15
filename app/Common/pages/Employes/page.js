@@ -15,6 +15,35 @@ const Page = () => {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([]);
 
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get`, { method: "GET", credentials: "include" });
+      const result = await res.json();
+      if (Array.isArray(result)) setEmployees(result);
+      else if (Array.isArray(result?.data)) setEmployees(result.data);
+      else setEmployees([]);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get`, { method: "GET", credentials: "include" });
+        const result = await res.json();
+        if (cancelled) return;
+        if (Array.isArray(result)) setEmployees(result);
+        else if (Array.isArray(result?.data)) setEmployees(result.data);
+        else setEmployees([]);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   if (user && user.role !== "admin") {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
@@ -29,20 +58,6 @@ const Page = () => {
       </div>
     );
   }
-
-  const fetchEmployees = async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/employees/get`, { method: "GET", credentials: "include" });
-      const result = await res.json();
-      if (Array.isArray(result)) setEmployees(result);
-      else if (Array.isArray(result?.data)) setEmployees(result.data);
-      else setEmployees([]);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
-
-  useEffect(() => { fetchEmployees(); }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

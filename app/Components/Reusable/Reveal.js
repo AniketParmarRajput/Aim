@@ -17,8 +17,8 @@ const Reveal = ({
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
-      setVisible(true);
-      return;
+      const t = setTimeout(() => setVisible(true), 0);
+      return () => clearTimeout(t);
     }
     const observer = new IntersectionObserver(
       (entries) => {

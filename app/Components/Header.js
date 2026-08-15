@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../Common/Context/AuthContext";
 import { useCart } from "../Common/Context/CartContext";
@@ -18,19 +18,17 @@ const NAV_ITEMS = [
 ];
 
 const Header = () => {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const router = useRouter();
   const { user, logout: authLogout } = useAuth();
-  const { cartCount } = useCart();
-  const { wishlistCount } = useWishlist();
+  const { cartCount, cartOpen, setCartOpen } = useCart();
+  const { wishlistCount, wishlistOpen, setWishlistOpen } = useWishlist();
   const { sidebarOpen, setSidebarOpen, closeSidebar } = useSidebar();
   const [userData, setUserData] = useState(null);
-  
-  // State for cart and wishlist sidebar visibility
-  const [cartOpen, setCartOpen] = useState(false);
-  const [wishlistOpen, setWishlistOpen] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (user?.email) {

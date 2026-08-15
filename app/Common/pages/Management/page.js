@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../Context/AuthContext";
@@ -103,7 +103,11 @@ const EditOrderModal = ({ order, onClose, onSave }) => {
 const AdminPage = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const [tab, setTab] = useState("dashboard");
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -151,14 +155,17 @@ const AdminPage = () => {
     } catch (err) { console.error(err); }
   };
 
-  useEffect(() => { setMounted(true); }, []);
-
   useEffect(() => {
     if (!user) return;
     if (!isAdmin) return;
-    setLoading(true);
-    Promise.all([fetchProducts(), fetchOrders(), fetchUsers()]).finally(() => setLoading(false));
-  }, [user]);
+    let cancelled = false;
+    Promise.resolve()
+      .then(() => Promise.all([fetchProducts(), fetchOrders(), fetchUsers()]))
+      .then(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [user, isAdmin]);
 
   if (!mounted) {
     return (

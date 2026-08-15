@@ -37,7 +37,19 @@ export default function Page() {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prizing/getPrizing`);
+        const result = await res.json();
+        if (!cancelled) setProducts(result.data || []);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   if (user && user.role !== "admin") {
     return (
