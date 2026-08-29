@@ -11,6 +11,7 @@ import WishlistSidebar from "./WishlistSidebar";
 const NAV_ITEMS = [
   { label: "Home", route: "/Common/pages/home", icon: "🏠" },
   { label: "Products", route: "/Common/pages/Products", icon: "🛍️" },
+  { label: "Practice", route: "/Common/pages/Practices", icon: "📝" },
   { label: "About", route: "/Common/pages/About", icon: "ℹ️" },
   { label: "Contact", route: "/Common/pages/Contact", icon: "📞" },
   { label: "Orders", route: "/Common/pages/Orders", icon: "📦" },
