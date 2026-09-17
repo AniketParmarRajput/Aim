@@ -23,14 +23,19 @@ const STATUS_OPTIONS = [
   "cancelled",
 ];
 
-const InfoItem = ({ label, value }) => (
-  <div className="bg-brand-cream rounded-xl px-4 py-3">
-    <p className="text-[11px] text-gray-400 mb-0.5">{label}</p>
-    <p className="text-[13.5px] font-semibold text-gray-900 break-words">
-      {value || "—"}
-    </p>
-  </div>
-);
+// Hides itself when there's no real value — no more "—" placeholders
+const InfoItem = ({ label, value }) => {
+  if (value === undefined || value === null || value === "") return null;
+
+  return (
+    <div className="bg-brand-cream rounded-xl px-4 py-3">
+      <p className="text-[11px] text-gray-400 mb-0.5">{label}</p>
+      <p className="text-[13.5px] font-semibold text-gray-900 break-words">
+        {value}
+      </p>
+    </div>
+  );
+};
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -234,7 +239,7 @@ export default function OrderDetail() {
 
           <div>
             <h1 className="text-[19px] font-bold text-gray-900">
-              Order #{order.id}
+              Order {order.id}
             </h1>
 
             <p className="text-[12px] text-gray-400">
@@ -291,6 +296,48 @@ export default function OrderDetail() {
                 Order Details
               </h2>
 
+              {/* Compact summary row: Unit Price / Qty / Total / Payment / Delivery */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+
+                <div className="bg-brand-cream rounded-xl px-4 py-3">
+                  <p className="text-[11px] text-gray-400 mb-0.5">
+                    Unit Price
+                  </p>
+                  <p className="text-[13.5px] font-semibold text-gray-900">
+                    ₹{unitPrice.toLocaleString("en-IN")}
+                  </p>
+                </div>
+
+                <div className="bg-brand-cream rounded-xl px-4 py-3">
+                  <p className="text-[11px] text-gray-400 mb-0.5">Qty</p>
+                  <p className="text-[13.5px] font-semibold text-gray-900">
+                    {order.quantity ?? 1}
+                  </p>
+                </div>
+
+                <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
+                  <p className="text-[11px] text-orange-500 mb-0.5">
+                    Total
+                  </p>
+                  <p className="text-[16px] font-bold text-brand-orange">
+                    ₹{totalAmount.toLocaleString("en-IN")}
+                  </p>
+                </div>
+
+                <div className="bg-brand-cream rounded-xl px-4 py-3">
+                  <p className="text-[11px] text-gray-400 mb-0.5">
+                    Payment
+                  </p>
+                  <p className="text-[13.5px] font-semibold text-gray-900 capitalize">
+                    {order.paymentMethod || "—"}
+                  </p>
+                </div>
+
+                <InfoItem label="Delivery" value={order.deliveryDate} />
+
+              </div>
+
+              {/* Everything else — hidden automatically when empty */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
                 <InfoItem
@@ -304,45 +351,13 @@ export default function OrderDetail() {
                 />
 
                 <InfoItem
-                  label="Unit Price"
-                  value={`₹${unitPrice.toLocaleString("en-IN")}`}
-                />
-
-                <InfoItem
-                  label="Quantity"
-                  value={order.quantity ?? 1}
-                />
-
-                <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 sm:col-span-2">
-
-                  <p className="text-[11px] text-orange-500 mb-0.5">
-                    Total Amount
-                  </p>
-
-                  <p className="text-[18px] font-bold text-brand-orange">
-                    ₹{totalAmount.toLocaleString("en-IN")}
-                  </p>
-
-                </div>
-
-                <InfoItem
                   label="Customer"
-                  value={customer?.name || "—"}
+                  value={customer?.name}
                 />
 
                 <InfoItem
                   label="Customer Email"
                   value={customer?.email || order.email}
-                />
-
-                <InfoItem
-                  label="Payment Method"
-                  value={order.paymentMethod?.toUpperCase()}
-                />
-
-                <InfoItem
-                  label="Delivery"
-                  value={order.deliveryDate}
                 />
 
                 <InfoItem
@@ -355,10 +370,12 @@ export default function OrderDetail() {
                   value={order.status?.toUpperCase()}
                 />
 
-                <InfoItem
-                  label="Cancel Reason"
-                  value={order.cancelReason}
-                />
+                {order.status === "cancelled" && (
+                  <InfoItem
+                    label="Cancel Reason"
+                    value={order.cancelReason}
+                  />
+                )}
 
               </div>
 
@@ -375,33 +392,25 @@ export default function OrderDetail() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                    {order.address && (
-                      <InfoItem
-                        label="Address"
-                        value={order.address}
-                      />
-                    )}
+                    <InfoItem
+                      label="Address"
+                      value={order.address}
+                    />
 
-                    {order.state && (
-                      <InfoItem
-                        label="State"
-                        value={order.state}
-                      />
-                    )}
+                    <InfoItem
+                      label="State"
+                      value={order.state}
+                    />
 
-                    {order.district && (
-                      <InfoItem
-                        label="District"
-                        value={order.district}
-                      />
-                    )}
+                    <InfoItem
+                      label="District"
+                      value={order.district}
+                    />
 
-                    {order.pincode && (
-                      <InfoItem
-                        label="Pincode"
-                        value={order.pincode}
-                      />
-                    )}
+                    <InfoItem
+                      label="Pincode"
+                      value={order.pincode}
+                    />
 
                   </div>
 

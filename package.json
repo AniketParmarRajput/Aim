@@ -28,7 +28,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.2.0",
-    "react-window": "^1.8.9"
+    "react-window": "^1.8.9",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
