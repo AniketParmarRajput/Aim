@@ -5,6 +5,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "../../../Context/AuthContext";
 import PageHero from "@/app/Components/Reusable/PageHero";
 import { LineChart } from "@mui/x-charts/LineChart";
+import PieChart from "@/app/Components/Reusable/CommonPieChart";
 
 const lineColors = { revenue: "#c2703d", orders: "#8b5e3c", pending: "#ca8a04", delivered: "#16a34a" };
 
@@ -21,6 +22,7 @@ const OverviewPage = () => {
     try {
       const oRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/all`);
       const o = await oRes.json();
+     
       if (o.success) setOrders(o.data);
     } catch (err) {
       console.error(err);
@@ -44,6 +46,16 @@ const OverviewPage = () => {
     return { totalRevenue, pending, customers };
   }, [orders]);
 
+  const dataStatus = useMemo(() => {
+    const map = new Map();
+    orders.forEach((o) =>{
+      const status = o.status || "unknown";
+      map.set(status ,(map.get(status) || 0) + 1)
+    })
+
+    return [...map.entries()].map(([status, value]) => ({ name: status, value }));
+  }, [orders]);
+
   const monthlySeries = useMemo(() => {
     const map = new Map();
     orders.forEach((o) => {
@@ -63,6 +75,7 @@ const OverviewPage = () => {
       orders: sorted.map(([, v]) => v.orders),
     };
   }, [orders]);
+
 
   const statusTrend = useMemo(() => {
     const map = new Map();
@@ -182,72 +195,29 @@ const OverviewPage = () => {
                 <div key={s.label} className="bg-brand-light border border-gray-100 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-2xl">{s.icon}</span>
-                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${s.color} flex items-center justify-center opacity-20`} />
+                    <div className={`w-8 h-8 rounded-lg bg-linear-to-br ${s.color} flex items-center justify-center opacity-20`} />
                   </div>
                   <p className="text-2xl font-bold text-gray-900">{s.value}</p>
                   <p className="text-[11px] text-gray-400 mt-0.5">{s.label}</p>
                 </div>
               ))}
             </div>
-
-            {/* Revenue line graph */}
-            <div className="bg-brand-light border border-gray-100 rounded-xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900">Revenue &amp; Orders — Monthly Review</h3>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Month-by-month line graph</p>
-                </div>
+            <div className="bg-brand-light border rounded-xl p-4 w-[30%]">
+              <div>
+                <h2 className="text-gray-900 font-semibold text-sm mb-2">Order Status Distribution</h2>
+                <p className="text-gray-400 text-[11px] mb-4">Visual representation of order statuses in the system.</p>
               </div>
-              {monthlySeries.labels.length === 0 ? (
-                <p className="text-xs text-gray-400 py-16 text-center">No orders yet to chart.</p>
-              ) : (
-                <LineChart
-                  xAxis={[{ scaleType: "point", data: monthlySeries.labels, tickLabelStyle: { fontSize: 10 } }]}
-                  series={[
-                    { id: "revenue", label: "Revenue (₹)", data: monthlySeries.revenue, color: lineColors.revenue, curve: "monotone", area: true, valueFormatter: (v) => (v == null ? "" : `₹${v.toLocaleString("en-IN")}`) },
-                    { id: "orders", label: "Orders", data: monthlySeries.orders, color: lineColors.orders, curve: "monotone", valueFormatter: (v) => (v == null ? "" : `${v}`) },
-                  ]}
-                  height={300}
-                  margin={{ left: 60, right: 20, top: 20, bottom: 30 }}
-                  sx={{ "& .MuiLineElement-root": { strokeWidth: 2 }, "& .MuiAreaElement-root": { opacity: 0.12 } }}
+              <div className="w-full h-64">
+                <PieChart
+                  data={dataStatus}
+                  centerLabel="Order"
                 />
-              )}
+              </div>
             </div>
 
-            {/* Status trend line */}
-            <div className="bg-brand-light border border-gray-100 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-gray-900 mb-4">Order Status Trend</h3>
-              {statusTrend.labels.length === 0 ? (
-                <p className="text-xs text-gray-400 py-16 text-center">No orders yet to chart.</p>
-              ) : (
-                <LineChart
-                  xAxis={[{ scaleType: "point", data: statusTrend.labels, tickLabelStyle: { fontSize: 10 } }]}
-                  series={[
-                    { id: "pending", label: "Pending", data: statusTrend.pending, color: lineColors.pending, curve: "monotone" },
-                    { id: "delivered", label: "Delivered", data: statusTrend.delivered, color: lineColors.delivered, curve: "monotone" },
-                  ]}
-                  height={280}
-                  margin={{ left: 50, right: 20, top: 20, bottom: 30 }}
-                  sx={{ "& .MuiLineElement-root": { strokeWidth: 2 } }}
-                />
-              )}
-            </div>
-
-            {/* Top products line graph */}
-            <div className="bg-brand-light border border-gray-100 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-gray-900 mb-4">Top Products Revenue Trend</h3>
-              {topProductTrend.series.length === 0 ? (
-                <p className="text-xs text-gray-400 py-16 text-center">No orders yet to chart.</p>
-              ) : (
-                <LineChart
-                  xAxis={[{ scaleType: "point", data: topProductTrend.labels, tickLabelStyle: { fontSize: 10 } }]}
-                  series={topProductTrend.series.map((s, i) => ({ ...s, curve: "monotone", color: ["#8b5e3c", "#c2703d", "#d9a066"][i] }))}
-                  height={300}
-                  margin={{ left: 60, right: 20, top: 20, bottom: 30 }}
-                  sx={{ "& .MuiLineElement-root": { strokeWidth: 2 } }}
-                />
-              )}
-            </div>
+           
+        
+      
           </div>
         )}
       </div>
