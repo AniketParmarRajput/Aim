@@ -7,7 +7,12 @@ import PageHero from "@/app/Components/Reusable/PageHero";
 import { LineChart } from "@mui/x-charts/LineChart";
 import PieChart from "@/app/Components/Reusable/CommonPieChart";
 
-const lineColors = { revenue: "#c2703d", orders: "#8b5e3c", pending: "#ca8a04", delivered: "#16a34a" };
+const lineColors = {
+  revenue: "#c2703d",
+  orders: "#8b5e3c",
+  pending: "#ca8a04",
+  delivered: "#16a34a",
+};
 
 const OverviewPage = () => {
   const { user } = useAuth();
@@ -20,9 +25,11 @@ const OverviewPage = () => {
 
   const fetchData = async () => {
     try {
-      const oRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/all`);
+      const oRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/order/all`,
+      );
       const o = await oRes.json();
-     
+
       if (o.success) setOrders(o.data);
     } catch (err) {
       console.error(err);
@@ -31,7 +38,9 @@ const OverviewPage = () => {
     }
   };
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!user || !isAdmin) return;
@@ -42,24 +51,31 @@ const OverviewPage = () => {
   const stats = useMemo(() => {
     const totalRevenue = orders.reduce((s, o) => s + Number(o.price || 0), 0);
     const pending = orders.filter((o) => o.status === "pending").length;
-    const customers = new Set(orders.map((o) => o.userId || o.email).filter(Boolean)).size;
+    const customers = new Set(
+      orders.map((o) => o.userId || o.email).filter(Boolean),
+    ).size;
     return { totalRevenue, pending, customers };
   }, [orders]);
 
   const dataStatus = useMemo(() => {
     const map = new Map();
-    orders.forEach((o) =>{
+    orders.forEach((o) => {
       const status = o.status || "unknown";
-      map.set(status ,(map.get(status) || 0) + 1)
-    })
+      map.set(status, (map.get(status) || 0) + 1);
+    });
 
-    return [...map.entries()].map(([status, value]) => ({ name: status, value }));
+    return [...map.entries()].map(([status, value]) => ({
+      name: status,
+      value,
+    }));
   }, [orders]);
 
   const monthlySeries = useMemo(() => {
     const map = new Map();
     orders.forEach((o) => {
-      const d = o.createdAt ? new Date(o.createdAt).toISOString().slice(0, 7) : "unknown";
+      const d = o.createdAt
+        ? new Date(o.createdAt).toISOString().slice(0, 7)
+        : "unknown";
       if (!map.has(d)) map.set(d, { revenue: 0, orders: 0 });
       const entry = map.get(d);
       entry.revenue += Number(o.price || 0) * Number(o.quantity || 1);
@@ -70,17 +86,23 @@ const OverviewPage = () => {
       .sort((a, b) => (a[0] < b[0] ? -1 : 1))
       .slice(-12);
     return {
-      labels: sorted.map(([d]) => new Date(d).toLocaleDateString("en-IN", { month: "short", year: "numeric" })),
+      labels: sorted.map(([d]) =>
+        new Date(d).toLocaleDateString("en-IN", {
+          month: "short",
+          year: "numeric",
+        }),
+      ),
       revenue: sorted.map(([, v]) => Math.round(v.revenue)),
       orders: sorted.map(([, v]) => v.orders),
     };
   }, [orders]);
 
-
   const statusTrend = useMemo(() => {
     const map = new Map();
     orders.forEach((o) => {
-      const d = o.createdAt ? new Date(o.createdAt).toISOString().slice(0, 10) : "unknown";
+      const d = o.createdAt
+        ? new Date(o.createdAt).toISOString().slice(0, 10)
+        : "unknown";
       if (!map.has(d)) map.set(d, { pending: 0, delivered: 0 });
       const entry = map.get(d);
       if (o.status === "pending") entry.pending += 1;
@@ -91,7 +113,12 @@ const OverviewPage = () => {
       .sort((a, b) => (a[0] < b[0] ? -1 : 1))
       .slice(-12);
     return {
-      labels: sorted.map(([d]) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })),
+      labels: sorted.map(([d]) =>
+        new Date(d).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+        }),
+      ),
       pending: sorted.map(([, v]) => v.pending),
       delivered: sorted.map(([, v]) => v.delivered),
     };
@@ -101,7 +128,9 @@ const OverviewPage = () => {
     const map = new Map();
     orders.forEach((o) => {
       const name = o.itemName || "Unknown";
-      const d = o.createdAt ? new Date(o.createdAt).toISOString().slice(0, 10) : "unknown";
+      const d = o.createdAt
+        ? new Date(o.createdAt).toISOString().slice(0, 10)
+        : "unknown";
       const key = `${name}::${d}`;
       if (!map.has(key)) map.set(key, { name, d, value: 0 });
       map.get(key).value += Number(o.price || 0) * Number(o.quantity || 1);
@@ -110,11 +139,17 @@ const OverviewPage = () => {
     [...map.values()].forEach(({ name, value }) => {
       byName.set(name, (byName.get(name) || 0) + value);
     });
-    const top = [...byName.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name]) => name);
+    const top = [...byName.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name]) => name);
     const daily = new Map();
     [...map.values()].forEach(({ name, d, value }) => {
       if (!top.includes(name)) return;
-      const label = new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+      const label = new Date(d).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+      });
       if (!daily.has(label)) {
         const row = { label };
         top.forEach((t) => (row[t] = 0));
@@ -130,7 +165,9 @@ const OverviewPage = () => {
     const labels = sortedLabels.slice(-10);
     const series = top.slice(0, 3).map((name) => ({
       label: name,
-      data: labels.map((l) => Math.round((daily.get(l) && daily.get(l)[name]) || 0)),
+      data: labels.map((l) =>
+        Math.round((daily.get(l) && daily.get(l)[name]) || 0),
+      ),
     }));
     return { labels, series };
   }, [orders]);
@@ -151,9 +188,16 @@ const OverviewPage = () => {
       <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
         <div className="text-center animate-fade-in max-w-md">
           <span className="text-6xl">🚫</span>
-          <h1 className="text-xl font-bold text-gray-900 mt-4">Access Denied</h1>
-          <p className="text-sm text-gray-400 mt-2">You do not have admin privileges to access this overview.</p>
-          <button onClick={() => router.push("/Common/pages/home")} className="mt-6 bg-brand-orange text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl hover:bg-brand-orange-hover transition-all">
+          <h1 className="text-xl font-bold text-gray-900 mt-4">
+            Access Denied
+          </h1>
+          <p className="text-sm text-gray-400 mt-2">
+            You do not have admin privileges to access this overview.
+          </p>
+          <button
+            onClick={() => router.push("/Common/pages/home")}
+            className="mt-6 bg-brand-orange text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl hover:bg-brand-orange-hover transition-all"
+          >
             Go to Home
           </button>
         </div>
@@ -172,7 +216,10 @@ const OverviewPage = () => {
       />
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => router.push("/Common/pages/Management")} className="flex items-center gap-2 text-[13px] font-medium text-gray-600 bg-brand-light border border-gray-200 px-4 py-2.5 rounded-xl hover:border-brand-orange hover:text-brand-orange transition-all">
+          <button
+            onClick={() => router.push("/Common/pages/Management")}
+            className="flex items-center gap-2 text-[13px] font-medium text-gray-600 bg-brand-light border border-gray-200 px-4 py-2.5 rounded-xl hover:border-brand-orange hover:text-brand-orange transition-all"
+          >
             <ArrowLeftIcon size={14} /> Back to Admin Panel
           </button>
         </div>
@@ -180,22 +227,49 @@ const OverviewPage = () => {
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-20">
             <div className="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-gray-400 font-medium">Loading overview...</p>
+            <p className="text-sm text-gray-400 font-medium">
+              Loading overview...
+            </p>
           </div>
         ) : (
           <div className="space-y-6 animate-fade-in">
             {/* Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Total Revenue", value: `₹${stats.totalRevenue.toLocaleString("en-IN")}`, icon: "💰", color: "from-brand-orange to-orange-500" },
-                { label: "Total Orders", value: orders.length, icon: "📦", color: "from-green-500 to-green-600" },
-                { label: "Pending Orders", value: stats.pending, icon: "⏳", color: "from-yellow-500 to-yellow-600" },
-                { label: "Customers", value: stats.customers, icon: "👤", color: "from-blue-500 to-blue-600" },
+                {
+                  label: "Total Revenue",
+                  value: `₹${stats.totalRevenue.toLocaleString("en-IN")}`,
+                  icon: "💰",
+                  color: "from-brand-orange to-orange-500",
+                },
+                {
+                  label: "Total Orders",
+                  value: orders.length,
+                  icon: "📦",
+                  color: "from-green-500 to-green-600",
+                },
+                {
+                  label: "Pending Orders",
+                  value: stats.pending,
+                  icon: "⏳",
+                  color: "from-yellow-500 to-yellow-600",
+                },
+                {
+                  label: "Customers",
+                  value: stats.customers,
+                  icon: "👤",
+                  color: "from-blue-500 to-blue-600",
+                },
               ].map((s) => (
-                <div key={s.label} className="bg-brand-light border border-gray-100 rounded-xl p-4">
+                <div
+                  key={s.label}
+                  className="bg-brand-light border border-gray-100 rounded-xl p-4"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-2xl">{s.icon}</span>
-                    <div className={`w-8 h-8 rounded-lg bg-linear-to-br ${s.color} flex items-center justify-center opacity-20`} />
+                    <div
+                      className={`w-8 h-8 rounded-lg bg-linear-to-br ${s.color} flex items-center justify-center opacity-20`}
+                    />
                   </div>
                   <p className="text-2xl font-bold text-gray-900">{s.value}</p>
                   <p className="text-[11px] text-gray-400 mt-0.5">{s.label}</p>
@@ -204,20 +278,17 @@ const OverviewPage = () => {
             </div>
             <div className="bg-brand-light border rounded-xl p-4 w-[30%]">
               <div>
-                <h2 className="text-gray-900 font-semibold text-sm mb-2">Order Status Distribution</h2>
-                <p className="text-gray-400 text-[11px] mb-4">Visual representation of order statuses in the system.</p>
+                <h2 className="text-gray-900 font-semibold text-sm mb-2">
+                  Order Status Distribution
+                </h2>
+                <p className="text-gray-400 text-[11px] mb-4">
+                  Visual representation of order statuses in the system.
+                </p>
               </div>
               <div className="w-full h-64">
-                <PieChart
-                  data={dataStatus}
-                  centerLabel="Order"
-                />
+                <PieChart data={dataStatus} centerLabel="Order" />
               </div>
             </div>
-
-           
-        
-      
           </div>
         )}
       </div>
