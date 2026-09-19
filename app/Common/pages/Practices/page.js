@@ -5,7 +5,7 @@ import { useAuth } from "../../Context/AuthContext";
 import PageHero from "@/app/Components/Reusable/PageHero";
 import CommonPieChart from "@/app/Components/Reusable/CommonPieChart";
 
-const PRACTICE_CATEGORIES = ["JavaScript", "React", "Node.js", "DSA", "CSS", "HTML", "Database", "General"];
+const PRACTICE_CATEGORIES = ["JavaScript", "React", "Node.js", "DSA", "CSS", "HTML", "Database", "General", "System Design", "Nginx", "Docker", "Kubernetes", "AI", "Redis"];
 const QUESTION_TYPES = [
   { value: "practical", label: "Practical", icon: "🛠️" },
   { value: "theory", label: "Theory", icon: "📖" },
@@ -468,7 +468,7 @@ export default function PracticesPage() {
 
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
-    if (!form.question.trim() || !form.description.trim()) return;
+    if (!form.question.trim()) return;
     const fd = new FormData();
     fd.append("category", form.category);
     fd.append("question", form.question);
@@ -539,7 +539,7 @@ export default function PracticesPage() {
       fetch(`${API_URL}/api/practices/${p.id}/reset`, { method: "PATCH" }).then(() => { showToast("Reset ✓"); refresh(); }).catch((err) => showToast(`Reset failed: ${err?.message}`));
       return;
     }
-    setForm({ category: p.category, question: p.question, description: p.description, questionType: p.questionType || "practical", solution: p.solution || "", cooldown: p.cooldown || "1day" });
+    setForm({ category: p.category, question: p.question, description: p.description || "", questionType: p.questionType || "practical", solution: p.solution || "", cooldown: p.cooldown || "1day" });
     setQYoutube(isYoutube(p.questionVideo) ? p.questionVideo : "");
     setSYoutube(isYoutube(p.solutionVideo) ? p.solutionVideo : "");
     setQFiles({ questionImage: null, questionPdf: null, questionVideo: null });
@@ -682,7 +682,7 @@ export default function PracticesPage() {
                 </div>
               </div>
               <input placeholder="Question *" value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} required className="w-full px-3.5 py-3 border border-brand-muted bg-white rounded-xl text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/15" />
-              <textarea placeholder="Description *" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required rows={3} className="w-full px-3.5 py-3 border border-brand-muted bg-white rounded-xl text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/15 resize-none" />
+              <textarea placeholder="Description (optional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-3.5 py-3 border border-brand-muted bg-white rounded-xl text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/15 resize-none" />
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="border border-brand-muted/40 rounded-2xl p-4 bg-brand-cream">
