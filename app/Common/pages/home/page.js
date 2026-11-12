@@ -68,6 +68,7 @@ const ProductCard = ({ product, onAdd, onBuy }) => {
   };
 
   const handleGoToCart = (e) => {
+    console.log("helo");
     e.stopPropagation();
     openCart();
   };
