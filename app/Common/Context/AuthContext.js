@@ -1,252 +1,435 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Cookies from "js-cookie";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 
-const AuthContext = createContext();
+import { useRouter, usePathname } from "next/navigation";
+
+const AuthContext = createContext(null);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const LOGIN_PATH = "/Common/pages/login";
 const HOME_PATH = "/Common/pages/home";
-const REFRESH_INTERVAL = 6 * 60 * 60 * 1000; // refresh every 6h (<7h access expiry)
 
-// ============ HELPERS ============
+// ======================================
+// JWT HELPERS
+// ======================================
 
-const readUserCookie = () => {
+const getTokenPayload = (token) => {
   try {
-    const storedUser = Cookies.get("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  } catch (err) {
-    console.error("Failed to parse user from cookies:", err);
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const base64 = parts[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    const padded = base64.padEnd(
+      Math.ceil(base64.length / 4) * 4,
+      "="
+    );
+
+    return JSON.parse(atob(padded));
+  } catch {
     return null;
   }
 };
 
-// Decode JWT payload without verifying signature (client-side expiry check only)
-// Real verification is done on backend via /verify or refresh
 const isTokenValid = (token) => {
   if (!token) return false;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    if (!payload.exp) return true; // no exp => assume valid
-    const nowSec = Math.floor(Date.now() / 1000);
-    // keep 30s buffer before expiry
-    return payload.exp > nowSec + 30;
-  } catch {
-    return false;
-  }
+
+  const payload = getTokenPayload(token);
+
+  if (!payload) return false;
+  if (!payload.exp) return true;
+
+  const now = Math.floor(Date.now() / 1000);
+
+  return payload.exp > now + 10;
 };
 
-const saveTokensToCookies = (data) => {
-  const accessToken = data.accessToken || data.token;
-  if (accessToken) {
-    // js-cookie expires in days: 7h = 7/24
-    Cookies.set("access_token", accessToken, { expires: 7 / 24, sameSite: "lax", path: "/" });
-    Cookies.set("token", accessToken, { expires: 7 / 24, sameSite: "lax", path: "/" }); // alias
-  }
-  if (data.refreshToken) {
-    Cookies.set("refresh_token", data.refreshToken, { expires: 7, sameSite: "lax", path: "/" });
-  }
-};
-
-const clearClientCookies = () => {
-  Cookies.remove("user");
-  Cookies.remove("access_token");
-  Cookies.remove("refresh_token");
-  Cookies.remove("token");
-};
+// ======================================
+// AUTH PROVIDER
+// ======================================
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [user, setUser] = useState(() => readUserCookie());
+  const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [checking, setChecking] = useState(true);
 
-  const getAccessToken = useCallback(() => Cookies.get("access_token") || Cookies.get("token") || null, []);
-  const getRefreshToken = useCallback(() => Cookies.get("refresh_token") || null, []);
+  // Latest access token
+  const accessTokenRef = useRef(null);
 
-  // ------- Step: Is access token valid? (server verify) -------
-  const verifyAccessToken = useCallback(async () => {
-    const token = getAccessToken();
-    // 1) fast client-side check
-    if (token && isTokenValid(token)) {
-      // optionally double-check with backend (uncomment if you want strict server verification)
-      // const res = await fetch(`${API_URL}/api/login/verify`, {
-      //   method: "GET",
-      //   credentials: "include",
-      //   headers: token ? { Authorization: `Bearer ${token}` } : {},
-      // });
-      // return res.ok;
-      return true;
-    }
-    // 2) fallback: try server verify (handles httpOnly cookie even if js cookie missing)
-    try {
-      const res = await fetch(`${API_URL}/api/login/verify`, {
-        method: "GET",
-        credentials: "include",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
-  }, [getAccessToken]);
+  // Prevent duplicate refresh API calls
+  const refreshPromiseRef = useRef(null);
 
-  // ------- Step: Is refresh token available? -> Call refresh API -------
-  const refreshSession = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/login/refresh`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user) {
-          setUser(data.user);
-          Cookies.set("user", JSON.stringify(data.user), { sameSite: "lax", path: "/" });
-          saveTokensToCookies(data);
-          if (pathname === LOGIN_PATH) router.push(HOME_PATH);
-          return true;
-        }
-      }
-      // refresh failed = refresh missing/expired
-      clearClientCookies();
-      setUser(null);
-      return false;
-    } catch (err) {
-      console.error("Session refresh failed:", err);
-      return false;
-    }
-  }, [pathname, router]);
-
-  // ------- Main Flow: Application starts -> Is access valid? -> YES continue | NO -> refresh -------
-  const initializeAuth = useCallback(async () => {
-    // Flow diagram implementation:
-    // Application starts
-    //   ↓
-    // Is access token valid?
-    //   YES → continue
-    //   NO / missing
-    //     ↓
-    //   Is refresh token available?
-    //     YES → Call refresh API → Get new access token → Continue
-    //     NO  → redirect to login
-
-    const hasAccess = await verifyAccessToken();
-
-    if (hasAccess) {
-      // YES → continue, ensure user state is populated from cookie
-      const storedUser = readUserCookie();
-      if (storedUser) {
-        setUser(storedUser);
-        if (pathname === LOGIN_PATH) router.push(HOME_PATH);
-      } else {
-        // edge: token valid but user cookie missing -> try refresh to repopulate user
-        await refreshSession();
-      }
-      return;
-    }
-
-    // NO / missing -> Is refresh token available?
-    // We check both js cookie and httpOnly via attempt
-    const refreshToken = getRefreshToken();
-    const hasRefreshCookie = !!refreshToken;
-
-    // Even if js refresh missing, httpOnly refreshToken might exist, so we still attempt once
-    // If truly no refresh at all and server will 401, we skip call to save request
-    // To strictly follow diagram: only call refresh if refresh is available
-    // Here we try server refresh regardless because httpOnly is invisible to JS
-    // If you want strict: if (!hasRefreshCookie) { clear and return false }
-    if (!hasRefreshCookie) {
-      // Try server refresh anyway - it will 401 if httpOnly also missing, but we can avoid extra call
-      // Check if we should attempt: we attempt because httpOnly may exist
-      const refreshed = await refreshSession();
-      if (!refreshed) {
-        // NO refresh -> will redirect via effect below
-        clearClientCookies();
-        setUser(null);
-      }
-      return;
-    }
-
-    // YES refresh available → Call refresh API
-    const refreshed = await refreshSession();
-    if (refreshed) {
-      // Get new access token → Continue application
-      return;
-    }
-    // refresh failed → must login
-    clearClientCookies();
-    setUser(null);
-  }, [verifyAccessToken, getRefreshToken, refreshSession, pathname, router]);
-
-  // On first load - run flowchart before deciding redirect
-  useEffect(() => {
-    const boot = async () => {
-      await initializeAuth();
-      setChecking(false);
-    };
-    boot();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Update access token
+  const updateAccessToken = useCallback((token) => {
+    accessTokenRef.current = token;
+    setAccessToken(token);
   }, []);
 
-  // Keep token alive (6h < 7h) - silent refresh
-  useEffect(() => {
-    const id = setInterval(() => {
-      // only refresh if user exists, otherwise skip
-      if (Cookies.get("user")) refreshSession();
-    }, REFRESH_INTERVAL);
-    return () => clearInterval(id);
-  }, [refreshSession]);
+  // ======================================
+  // REFRESH SESSION
+  // ======================================
 
-  // Redirect to login only after checking finishes and no user
-  useEffect(() => {
-    if (!checking && !user) {
-      if (pathname !== LOGIN_PATH && pathname !== "/") {
-        router.push(LOGIN_PATH);
-      }
+  const refreshSession = useCallback(async () => {
+
+    // If refresh already running, reuse same request
+    if (refreshPromiseRef.current) {
+      return refreshPromiseRef.current;
     }
-  }, [checking, user, pathname, router]);
 
-  // Login - saves access_token + refresh_token to cookies (JS-accessible)
+    const run = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/api/login/refresh`,
+          {
+            method: "POST",
+
+            // Only refresh API sends cookies
+            credentials: "include",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+
+          if (
+            response.status === 401 ||
+            response.status === 403
+          ) {
+            updateAccessToken(null);
+            setUser(null);
+          }
+
+          return false;
+        }
+
+        const data = await response.json();
+
+        const newToken =
+          data.accessToken || data.token;
+
+        if (!newToken) {
+          console.error(
+            "Refresh API did not return accessToken"
+          );
+
+          return false;
+        }
+
+        // Update token in memory
+        updateAccessToken(newToken);
+
+        // Backend should return user as well
+        if (data.user) {
+          setUser(data.user);
+        }
+
+        console.log("Access token refreshed successfully");
+
+        return true;
+
+      } catch (error) {
+        console.error("Refresh API failed:", error);
+        return false;
+      }
+    };
+
+    refreshPromiseRef.current = run();
+
+    try {
+      return await refreshPromiseRef.current;
+    } finally {
+      refreshPromiseRef.current = null;
+    }
+
+  }, [updateAccessToken]);
+
+  // ======================================
+  // AUTHORIZED API REQUEST
+  // ======================================
+
+  const authFetch = useCallback(
+    async (url, options = {}) => {
+
+      // Refresh token if missing or expired
+      let currentToken = accessTokenRef.current;
+
+      if (!currentToken || !isTokenValid(currentToken)) {
+
+        const refreshed = await refreshSession();
+
+        if (!refreshed) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              message: "Session expired. Please login again.",
+            }),
+            {
+              status: 401,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
+
+        currentToken = accessTokenRef.current;
+      }
+
+      // Build request
+      const buildOptions = () => {
+        const headers = new Headers(options.headers || {});
+
+        headers.set(
+          "Authorization",
+          `Bearer ${accessTokenRef.current}`
+        );
+
+        return {
+          ...options,
+          headers,
+
+          // Never send cookies to normal APIs
+          credentials: "omit",
+        };
+      };
+
+      // Remember token used in this request
+      const tokenUsed = currentToken;
+
+      // First request
+      let response = await fetch(url, buildOptions());
+
+      // Handle unauthorized request
+      if (response.status === 401) {
+
+        // Another request may already have refreshed it
+        if (accessTokenRef.current === tokenUsed) {
+
+          const refreshed = await refreshSession();
+
+          if (!refreshed) {
+            updateAccessToken(null);
+            setUser(null);
+
+            return response;
+          }
+        }
+
+        // Retry only once with latest token
+        response = await fetch(url, buildOptions());
+      }
+
+      return response;
+    },
+    [refreshSession, updateAccessToken]
+  );
+
+  // ======================================
+  // VERIFY ACCESS TOKEN
+  // ======================================
+
+  const verifyAccessToken = useCallback(async () => {
+    const token = accessTokenRef.current;
+
+    if (!token || !isTokenValid(token)) {
+      return false;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/login/verify`,
+        {
+          method: "GET",
+          credentials: "omit",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.ok;
+
+    } catch (error) {
+      console.error("Verify API error:", error);
+      return false;
+    }
+  }, []);
+
+  // ======================================
+  // LOGIN
+  // ======================================
+
   const login = async ({ email, password }) => {
-    const res = await fetch(`${API_URL}/api/login/check`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Login failed");
-    setUser(data.user);
-    Cookies.set("user", JSON.stringify(data.user), { sameSite: "lax", path: "/" });
-    saveTokensToCookies(data);
-    return data.user;
+    try {
+      const response = await fetch(
+        `${API_URL}/api/login/check`,
+        {
+          method: "POST",
+
+          // Allow backend to set HttpOnly refresh cookie
+          credentials: "include",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      const token =
+        data.accessToken || data.token;
+
+      if (!token) {
+        throw new Error("Access token missing");
+      }
+
+      // Store access token only in memory
+      updateAccessToken(token);
+
+      setUser(data.user || null);
+
+      router.push(HOME_PATH);
+
+      return data.user;
+
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
+
+  // ======================================
+  // LOGOUT
+  // ======================================
 
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/api/login/logout`, { method: "POST", credentials: "include" });
-    } catch (err) {
-      console.error("Logout error:", err);
+      await fetch(
+        `${API_URL}/api/login/logout`,
+        {
+          method: "POST",
+
+          // Send refresh cookie for backend logout
+          credentials: "include",
+        }
+      );
+
+    } catch (error) {
+      console.error("Logout error:", error);
     }
+
+    updateAccessToken(null);
     setUser(null);
-    clearClientCookies();
+
     router.push(LOGIN_PATH);
   };
+
+  // ======================================
+  // INITIAL AUTH CHECK
+  // ======================================
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        // On page reload, access token is lost.
+        // Use refresh cookie to obtain a new access token.
+        const refreshed = await refreshSession();
+
+        if (!mounted) return;
+
+        if (!refreshed) {
+          updateAccessToken(null);
+          setUser(null);
+        }
+
+      } catch (error) {
+        console.error("Initial auth error:", error);
+
+        if (mounted) {
+          updateAccessToken(null);
+          setUser(null);
+        }
+
+      } finally {
+        if (mounted) {
+          setChecking(false);
+        }
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+
+  }, [refreshSession, updateAccessToken]);
+
+  // ======================================
+  // ROUTE REDIRECT
+  // ======================================
+
+  useEffect(() => {
+    if (checking) return;
+
+    if (
+      !user &&
+      pathname !== LOGIN_PATH &&
+      pathname !== "/"
+    ) {
+      router.replace(LOGIN_PATH);
+    }
+
+    if (user && pathname === LOGIN_PATH) {
+      router.replace(HOME_PATH);
+    }
+
+  }, [checking, user, pathname, router]);
+
+  // ======================================
+  // AUTH CONTEXT
+  // ======================================
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        accessToken,
         checking,
+
         login,
         logout,
-        getAccessToken,
-        getRefreshToken,
+
+        authFetch,
         refreshSession,
         verifyAccessToken,
         isTokenValid,
@@ -257,4 +440,18 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// ======================================
+// CUSTOM HOOK
+// ======================================
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
+      "useAuth must be used inside AuthProvider"
+    );
+  }
+
+  return context;
+};

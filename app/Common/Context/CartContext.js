@@ -7,13 +7,13 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, authFetch } = useAuth();
   const [items, setItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
 
   const loadCart = async (userId) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/user/${userId}`);
+      const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/user/${userId}`);
       const result = await res.json();
       if (result.success) setItems(result.data);
     } catch (err) {
@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
     const load = async () => {
       if (user?.id) {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/user/${user.id}`);
+          const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/user/${user.id}`);
           const result = await res.json();
           if (active && result.success) setItems(result.data);
         } catch (err) {
@@ -40,12 +40,12 @@ export const CartProvider = ({ children }) => {
     return () => {
       active = false;
     };
-  }, [user?.id]);
+  }, [user?.id, authFetch]);
 
   const addToCart = (product) => {
     const qty = Number(product.quantity) || 1;
     if (user?.id) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/add`, {
+      authFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.id, productId: product.id, quantity: qty }),
@@ -71,7 +71,9 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = (id) => {
     const item = items.find((i) => i.id === id);
     if (item?.cartId && user?.id) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/remove/${item.cartId}`, { method: "DELETE" })
+      authFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/remove/${item.cartId}`, {
+        method: "DELETE",
+      })
         .then(() => loadCart(user.id))
         .catch((err) => console.error("Failed to remove item:", err));
     } else {
@@ -84,7 +86,7 @@ export const CartProvider = ({ children }) => {
     if (!item) return;
     const newQty = Math.max(1, item.quantity + delta);
     if (item.cartId && user?.id) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/update/${item.cartId}`, {
+      authFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/update/${item.cartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quantity: newQty }),
@@ -98,7 +100,9 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     if (user?.id) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/clear/${user.id}`, { method: "DELETE" })
+      authFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/clear/${user.id}`, {
+        method: "DELETE",
+      })
         .catch((err) => console.error("Failed to clear cart:", err));
     }
     setItems([]);
